@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { formatCLP, getProduct, installment, store, discountPct } from "./catalog";
 import { useCart } from "./cart";
+import { useSelectedColor } from "./selection";
 
 // Selector de color (muestras) + talla + cantidad + agregar. Forma y color salen de los tokens.
 export function BuyBox({ slug, direction, cartHref, label = "Agregar al carrito", round = false }: {
@@ -15,7 +16,7 @@ export function BuyBox({ slug, direction, cartHref, label = "Agregar al carrito"
 }) {
   const p = getProduct(slug)!;
   const cart = useCart(direction);
-  const [color, setColor] = useState(p.colors[0].name);
+  const [color, setColor] = useSelectedColor(slug);
   const [size, setSize] = useState<string | null>(p.sizes.length === 1 ? p.sizes[0] : null);
   const [added, setAdded] = useState(false);
   const [warn, setWarn] = useState(false);

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { categoryName, getProduct, products } from "@/designs/catalog";
-import { Photo } from "@/designs/Photo";
+import { Gallery } from "@/designs/Gallery";
 import { BuyBox } from "@/designs/BuyBox";
 import { Card } from "../../Card";
 
@@ -18,11 +18,7 @@ export default async function MercadoProduct({ params }: PageProps<"/disenos/mer
   return (
     <div className="mx-auto max-w-[1440px] px-4 sm:px-6">
       <div className="grid gap-4 lg:grid-cols-2">
-        <div className="grid grid-cols-2 gap-4">
-          {p.gallery.map((g, i) => (
-            <Photo key={g} name={g} alt={`${p.name}, foto ${i + 1}`} priority={i === 0} sizes={i === 0 ? "50vw" : "25vw"} className={`${i === 0 ? "col-span-2 aspect-[4/5]" : "aspect-[4/5]"} rounded-brand`} />
-          ))}
-        </div>
+        <div className="lg:sticky lg:top-28 lg:h-fit"><Gallery slug={p.slug} round /></div>
         <div className="flex flex-col gap-8 rounded-brand bg-surface p-6 md:p-10 lg:sticky lg:top-24 lg:h-fit">
           <Link href={`${B}/catalogo?c=${p.category}`} className="w-fit rounded-full bg-field px-4 py-2 text-base font-semibold text-field-ink">
             {categoryName(p.category)}

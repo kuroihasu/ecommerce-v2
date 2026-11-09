@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { badgeLabel, formatCLP, type DemoProduct } from "@/designs/catalog";
-import { Photo } from "@/designs/Photo";
+import { CardPhotos } from "@/designs/CardPhotos";
 import { QuickAdd } from "@/designs/BuyBox";
 
 export function Card({ p, sizes = "(max-width: 768px) 50vw, 25vw" }: { p: DemoProduct; sizes?: string }) {
@@ -8,8 +8,8 @@ export function Card({ p, sizes = "(max-width: 768px) 50vw, 25vw" }: { p: DemoPr
   return (
     <Link href={`/disenos/atelier/producto/${p.slug}`} className="group flex flex-col gap-3">
       <div className="relative overflow-hidden">
-        <Photo name={p.image} hover={p.hover} alt={p.name} sizes={sizes} className="aspect-[3/4] [&_img]:transition-transform [&_img]:duration-700 group-hover:[&_img]:scale-[1.03]" />
-        {badge && <span className="absolute top-3 left-3 bg-bg px-3 py-1 text-sm">{badge}</span>}
+        <CardPhotos p={p} sizes={sizes} />
+        {badge && <span className="absolute top-6 left-3 bg-bg px-3 py-1 text-sm">{badge}</span>}
         <QuickAdd slug={p.slug} direction="atelier" className="quick-add absolute inset-x-0 bottom-0 bg-ink/90 py-3 text-base text-bg">
           Agregar rápido
         </QuickAdd>

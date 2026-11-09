@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { badgeLabel, formatCLP, type DemoProduct } from "@/designs/catalog";
-import { Photo } from "@/designs/Photo";
+import { CardPhotos } from "@/designs/CardPhotos";
 import { QuickAdd } from "@/designs/BuyBox";
 
 export function Card({ p }: { p: DemoProduct }) {
@@ -8,9 +8,9 @@ export function Card({ p }: { p: DemoProduct }) {
   return (
     <Link href={`/disenos/mercado/producto/${p.slug}`} className="group flex flex-col gap-3">
       <div className="relative overflow-hidden rounded-brand">
-        <Photo name={p.image} hover={p.hover} alt={p.name} sizes="(max-width: 768px) 50vw, 25vw" className="aspect-[4/5] rounded-brand [&_img]:transition-transform [&_img]:duration-500 group-hover:[&_img]:scale-105" />
+        <CardPhotos p={p} sizes="(max-width: 768px) 50vw, 25vw" aspect="aspect-[4/5]" className="rounded-brand" />
         {badge && (
-          <span className={`absolute top-3 left-3 rounded-full px-3 py-1 text-sm font-semibold ${p.compareAtPrice ? "bg-[var(--field-2)]" : "bg-field text-field-ink"}`}>
+          <span className={`absolute top-6 left-3 rounded-full px-3 py-1 text-sm font-semibold ${p.compareAtPrice ? "bg-[var(--field-2)]" : "bg-field text-field-ink"}`}>
             {badge === "Nuevo" ? "¡Nuevo!" : badge}
           </span>
         )}

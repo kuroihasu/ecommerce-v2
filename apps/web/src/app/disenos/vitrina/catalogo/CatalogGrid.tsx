@@ -12,7 +12,7 @@ export function CatalogGrid() {
   return (
     <>
       <h1 className="rise pt-4 pb-6 text-[clamp(3.6rem,12vw,12rem)] font-black uppercase leading-[0.82] tracking-[-0.025em] [font-stretch:62%] [word-spacing:0.08em]">{title}</h1>
-      <div className="sticky top-[76px] z-20 -mx-4 mb-3 flex flex-col gap-2 bg-bg px-4 py-3 sm:-mx-6 sm:px-6">
+      <div className="z-20 md:sticky md:top-[76px] -mx-4 mb-3 flex flex-col gap-2 bg-bg px-4 py-3 sm:-mx-6 sm:px-6">
         <div className="flex flex-wrap items-center gap-2">
           <button className={chip(!c)} onClick={() => set("c", null)}>Todo</button>
           {categories.map((x) => <button key={x.slug} className={chip(c === x.slug)} onClick={() => set("c", x.slug)}>{x.name}</button>)}

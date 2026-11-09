@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { categoryName, getProduct, products } from "@/designs/catalog";
-import { Photo } from "@/designs/Photo";
+import { Gallery } from "@/designs/Gallery";
 import { BuyBox } from "@/designs/BuyBox";
 import { Reveal } from "@/designs/Reveal";
 import { Card } from "../../Card";
@@ -22,11 +22,7 @@ export default async function AtelierProduct({ params }: PageProps<"/disenos/ate
         <Link href={`${B}/catalogo`} className="hover:text-ink">Colección</Link> / <Link href={`${B}/catalogo?c=${p.category}`} className="hover:text-ink">{categoryName(p.category)}</Link>
       </p>
       <div className="grid gap-12 lg:grid-cols-[7fr_5fr]">
-        <div className="-mx-5 flex snap-x gap-3 overflow-x-auto px-5 sm:-mx-8 sm:px-8 lg:mx-0 lg:grid lg:grid-cols-2 lg:overflow-visible lg:px-0">
-          {p.gallery.map((g, i) => (
-            <Photo key={g} name={g} alt={`${p.name}, foto ${i + 1}`} priority={i === 0} sizes="(max-width: 1024px) 85vw, 30vw" className={`aspect-[3/4] w-[85vw] shrink-0 snap-start lg:w-auto ${i === 0 && p.gallery.length % 2 === 1 ? "lg:col-span-2 lg:aspect-[4/3]" : ""}`} />
-          ))}
-        </div>
+        <div className="lg:sticky lg:top-28 lg:h-fit"><Gallery slug={p.slug} /></div>
         <div className="flex flex-col gap-7 lg:sticky lg:top-28 lg:h-fit">
           <div className="flex flex-col gap-3">
             <span className="text-lg">{p.short}</span>

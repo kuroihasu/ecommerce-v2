@@ -22,6 +22,21 @@ export const photos: Record<string, string> = {
   editorial: "photo-1529139574466-a303027c1d8b",
   editorial2: "photo-1469334031218-e382a71b716b",
   street2: "photo-1516826957135-700dedea698c",
+  teeModel: "photo-1503342217505-b0a15ec3261c",
+  pants: "photo-1594633312681-425c7b97ccd1",
+  leather: "photo-1551028719-00167b16eac5",
+  dress3: "photo-1515372039744-b8f02a3ae446",
+  shopping: "photo-1483985988355-763728e1935b",
+  portrait: "photo-1517841905240-472988babdf9",
+  man2: "photo-1617137968427-85924c800a22",
+  woman2: "photo-1485968579580-b6d095142e6e",
+  woman3: "photo-1539109136881-3be0616acf4b",
+  clothes: "photo-1558769132-cb1aea458c5e",
+  handbag: "photo-1584917865442-de89df76afd3",
+  knit: "photo-1434389677669-e08b4cac3105",
+  shirt: "photo-1596755094514-f87e34085b2c",
+  tee4: "photo-1618354691373-d851c5c3a990",
+  sneakers: "photo-1549298916-b41d501d3772",
 };
 
 export const photoUrl = (key: string) =>

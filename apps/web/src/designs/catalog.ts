@@ -25,6 +25,8 @@ export type DemoProduct = {
   image: string;
   hover: string;
   gallery: string[];
+  // Fotos propias de cada color (si no hay, se usa `gallery`).
+  colorPhotos?: Record<string, string[]>;
   badge?: Badge;
   featured?: boolean;
   variants: DemoVariant[];
@@ -107,7 +109,8 @@ const base: Base[] = [
     compareAtPrice: 54990,
     image: "hoodie",
     hover: "hoodie2",
-    gallery: ["hoodie", "hoodie2", "streetwear"],
+    gallery: ["hoodie", "hoodie2", "streetwear", "man", "clothes"],
+    colorPhotos: { Negro: ["hoodie2", "hoodie", "man", "streetwear"], "Gris melange": ["hoodie", "streetwear", "man2", "clothes"], Burdeo: ["knit", "hoodie", "street2", "clothes"] },
     featured: true,
   },
   {
@@ -123,7 +126,7 @@ const base: Base[] = [
     price: 49990,
     image: "hoodie2",
     hover: "hoodie",
-    gallery: ["hoodie2", "hoodie", "man"],
+    gallery: ["hoodie2", "hoodie", "man", "street2"],
     badge: "preventa",
     featured: true,
   },
@@ -140,7 +143,8 @@ const base: Base[] = [
     price: 19990,
     image: "tee",
     hover: "tee2",
-    gallery: ["tee", "tee2", "streetwear"],
+    gallery: ["tee", "teeModel", "tee2", "tee4", "streetwear"],
+    colorPhotos: { Blanco: ["tee", "teeModel", "tee4", "streetwear"], Negro: ["tee2", "tee3", "man2", "streetwear"], Beige: ["tee4", "tee", "clothes"] },
     featured: true,
   },
   {
@@ -157,7 +161,7 @@ const base: Base[] = [
     compareAtPrice: 24990,
     image: "tee2",
     hover: "woman",
-    gallery: ["tee2", "woman"],
+    gallery: ["tee2", "woman", "woman2", "portrait"],
   },
   {
     slug: "polera-estampada-norte",
@@ -172,7 +176,7 @@ const base: Base[] = [
     price: 17990,
     image: "tee3",
     hover: "tee",
-    gallery: ["tee3", "tee"],
+    gallery: ["tee3", "tee", "teeModel", "street2"],
     badge: "nuevo",
   },
   {
@@ -190,7 +194,7 @@ const base: Base[] = [
     compareAtPrice: 44990,
     image: "cargo",
     hover: "streetwear",
-    gallery: ["cargo", "streetwear"],
+    gallery: ["cargo", "pants", "streetwear", "man2"],
     featured: true,
   },
   {
@@ -206,7 +210,7 @@ const base: Base[] = [
     price: 32990,
     image: "jeans",
     hover: "woman",
-    gallery: ["jeans", "woman"],
+    gallery: ["jeans", "woman", "woman3", "shopping"],
   },
   {
     slug: "cortavientos-track",
@@ -221,7 +225,7 @@ const base: Base[] = [
     price: 54990,
     image: "jacket",
     hover: "jacket2",
-    gallery: ["jacket", "jacket2"],
+    gallery: ["jacket", "jacket2", "leather", "street2", "man"],
     badge: "nuevo",
     featured: true,
   },
@@ -239,7 +243,7 @@ const base: Base[] = [
     compareAtPrice: 52990,
     image: "jacket2",
     hover: "jacket",
-    gallery: ["jacket2", "jacket"],
+    gallery: ["jacket2", "jacket", "woman2", "street2"],
   },
   {
     slug: "vestido-midi-satinado",
@@ -254,7 +258,8 @@ const base: Base[] = [
     price: 29990,
     image: "dress",
     hover: "dress2",
-    gallery: ["dress", "dress2", "woman"],
+    gallery: ["dress", "dress3", "woman3", "portrait", "woman"],
+    colorPhotos: { Negro: ["dress3", "dress", "portrait", "woman"], Champagne: ["dress", "woman3", "dress2", "woman2"] },
     featured: true,
   },
   {
@@ -272,7 +277,7 @@ const base: Base[] = [
     compareAtPrice: 29990,
     image: "dress2",
     hover: "dress",
-    gallery: ["dress2", "dress"],
+    gallery: ["dress2", "dress", "woman2", "shopping"],
     badge: "ultimas",
   },
   {
@@ -288,7 +293,7 @@ const base: Base[] = [
     price: 14990,
     image: "cap",
     hover: "streetwear",
-    gallery: ["cap"],
+    gallery: ["cap", "streetwear", "man", "sneakers"],
   },
   {
     slug: "bolso-tote",
@@ -303,12 +308,15 @@ const base: Base[] = [
     price: 12990,
     image: "bag",
     hover: "bag",
-    gallery: ["bag"],
+    gallery: ["bag", "handbag", "shopping", "woman"],
     badge: "nuevo",
   },
 ];
 
 export const products: DemoProduct[] = base.map(make);
+
+export const photosFor = (p: DemoProduct, color?: string) =>
+  (color && p.colorPhotos?.[color]) || p.gallery;
 
 export const getProduct = (slug: string) => products.find((p) => p.slug === slug);
 export const categoryName = (slug: CategorySlug) => categories.find((c) => c.slug === slug)?.name ?? slug;
