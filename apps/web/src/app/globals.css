@@ -3,7 +3,7 @@
 /*
  * Tokens de marca. Todo el front usa estos roles (bg, ink, surface, accent, field…),
  * nunca colores sueltos. Cambiar de cliente = cambiar un bloque de variables
- * (más adelante se llenan desde Store.theme en la base de datos).
+ * (los valores reales los pone src/themes según Store.theme).
  */
 :root {
   --bg: #ffffff;
@@ -13,6 +13,7 @@
   --accent-ink: #ffffff;
   --field: #f2f2f2;
   --field-ink: #171717;
+  --field-2: #f2f2f2;
   --radius: 0px;
   --font-display: var(--font-geist-sans);
   --font-body: var(--font-geist-sans);
@@ -30,49 +31,6 @@
   --font-display: var(--font-display);
   --font-body: var(--font-body);
   --font-sans: var(--font-body);
-}
-
-/* Dirección A · Atelier: boutique editorial, serif grande, verde bosque. */
-.theme-atelier {
-  --bg: #f3f2ee;
-  --ink: #1b2420;
-  --surface: #e6e4dd;
-  --accent: #2c4a3b;
-  --accent-ink: #f3f2ee;
-  --field: #2c4a3b;
-  --field-ink: #f3f2ee;
-  --radius: 0px;
-  --font-display: var(--font-atelier-display);
-  --font-body: var(--font-atelier-body);
-}
-
-/* Dirección B · Vitrina: alto contraste, tipografía enorme, rojo señal. */
-.theme-vitrina {
-  --bg: #ffffff;
-  --ink: #0b0b0b;
-  --surface: #eeeeec;
-  --accent: #e8361f;
-  --accent-ink: #ffffff;
-  --field: #0b0b0b;
-  --field-ink: #ffffff;
-  --radius: 0px;
-  --font-display: var(--font-vitrina);
-  --font-body: var(--font-vitrina);
-}
-
-/* Dirección C · Mercado: campos de color, formas redondas, cercano. */
-.theme-mercado {
-  --bg: #ffffff;
-  --ink: #12302b;
-  --surface: #f1efe9;
-  --accent: #0f4c45;
-  --accent-ink: #ffffff;
-  --field: #f2b705;
-  --field-ink: #12302b;
-  --field-2: #f6c9c1;
-  --radius: 28px;
-  --font-display: var(--font-mercado);
-  --font-body: var(--font-mercado);
 }
 
 body {
