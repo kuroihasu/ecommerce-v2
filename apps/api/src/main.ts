@@ -10,4 +10,5 @@ async function bootstrap() {
   // En Vercel el puerto llega en PORT; en local usamos API_PORT.
   await app.listen(process.env.PORT ?? process.env.API_PORT ?? 4000);
 }
-await bootstrap();
+// Sin top-level await: en Vercel el módulo debe terminar de cargar para recibir tráfico.
+void bootstrap();
