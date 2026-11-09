@@ -1,9 +1,9 @@
 import { Body, Controller, Get, HttpCode, Post, ServiceUnavailableException, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { CurrentUser, PasswordHasher, Public, TokenService } from '@nestjs/authentication';
-import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { z } from 'zod';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { authEnabled } from './auth.config.js';
+import { LoginRateLimitGuard } from './login-rate-limit.guard.js';
 import type { AuthUser } from './auth.types.js';
 
 const LoginBody = z.object({
@@ -21,8 +21,7 @@ export class AuthController {
 
   // Máximo 5 intentos por minuto por IP, para frenar a quien prueba contraseñas.
   @Public()
-  @UseGuards(ThrottlerGuard)
-  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  @UseGuards(LoginRateLimitGuard)
   @Post('login')
   @HttpCode(200)
   async login(@Body({ schema: LoginBody }) body: z.infer<typeof LoginBody>) {
