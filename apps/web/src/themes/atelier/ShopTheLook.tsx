@@ -2,13 +2,15 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { formatCLP, getProduct } from "@/designs/catalog";
+import { findProduct, formatCLP } from "@/designs/catalog";
+import { useCatalogData } from "@/designs/CatalogProvider";
 import { useCart } from "@/designs/cart";
 import { Photo } from "@/designs/Photo";
 
 // Lista de prendas del look con casillas: suma el total y agrega todo en la talla elegida.
 export function ShopTheLook({ slugs }: { slugs: string[] }) {
-  const items = slugs.map((s) => getProduct(s)!);
+  const catalog = useCatalogData();
+  const items = slugs.flatMap((s) => findProduct(catalog, s) ?? []);
   const cart = useCart("tienda");
   const [picked, setPicked] = useState<string[]>(slugs);
   const [size, setSize] = useState("M");

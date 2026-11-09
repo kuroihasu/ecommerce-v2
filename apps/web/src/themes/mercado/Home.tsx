@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { categories, products } from "@/designs/catalog";
+import { getCatalog } from "@/lib/catalog";
 import { Photo } from "@/designs/Photo";
 import { Carousel } from "@/designs/Carousel";
 import { Reveal } from "@/designs/Reveal";
@@ -13,7 +13,8 @@ const slides = [
   { image: "hoodie", bg: "bg-accent text-accent-ink", title: "Polerones para el frío", text: "Oversize, perchados y en tres colores. Desde $44.990.", cta: "Ver polerones", href: `/catalogo?c=polerones` },
 ];
 
-export function Home() {
+export async function Home() {
+  const { categories, products } = await getCatalog();
   const fresh = products.filter((p) => p.badge === "nuevo" || p.featured).slice(0, 8);
   const sale = products.filter((p) => p.compareAtPrice);
 

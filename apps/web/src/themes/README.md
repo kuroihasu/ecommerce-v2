@@ -26,7 +26,7 @@ Colores disponibles: `bg` (fondo), `ink` (texto), `surface` (tarjetas y filtros)
 El botón **Personalizar** de la tienda hace lo mismo como vista previa (en una
 cookie) y su botón "Copiar configuración" entrega el JSON de arriba. En el panel
 de administración, al guardar, se escribe en `Store.theme` y se llama a
-`revalidateTag("store-theme")`. Para ocultar el botón en una tienda en producción:
+`revalidateTag("store")`. Para ocultar el botón en una tienda en producción:
 `NEXT_PUBLIC_HIDE_CUSTOMIZER=1`.
 
 ## Agregar un diseño nuevo
@@ -36,7 +36,9 @@ de administración, al guardar, se escribe en `Store.theme` y se llama a
    `Layout` (menú y pie), `Home`, `Catalog`, `Product({ slug })` y `Cart`.
    Usa solo las clases de tokens (`bg-bg`, `text-ink`, `bg-accent`,
    `bg-field`, `rounded-brand`, `font-display`…), nunca colores fijos, para que
-   el cliente pueda cambiar los colores.
+   el cliente pueda cambiar los colores. Los datos se leen con
+   `await getCatalog()` (`@/lib/catalog`) en componentes de servidor y con
+   `useCatalogData()` (`@/designs/CatalogProvider`) en componentes de cliente.
 3. En `nuevo/index.ts` ponle `id`, `name`, `description` y sus `defaults`.
 4. Súmalo a la lista `themes` de `registry.ts`.
 

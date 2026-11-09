@@ -40,6 +40,29 @@ export class CatalogService {
     });
   }
 
+  // Todo lo que necesita la vitrina en una sola llamada: tienda, categorías con
+  // productos activos y productos (con fotos y variantes).
+  async getCatalog(storeSlug: string) {
+    const store = await this.getStore(storeSlug);
+    const [categories, products] = await Promise.all([
+      this.prisma.client.category.findMany({
+        where: { storeId: store.id, products: { some: { status: 'ACTIVE' } } },
+        orderBy: { position: 'asc' },
+        select: { id: true, slug: true, name: true, description: true, imageUrl: true },
+      }),
+      this.prisma.client.product.findMany({
+        where: { storeId: store.id, status: 'ACTIVE' },
+        include: {
+          category: { select: { slug: true } },
+          images: { orderBy: { position: 'asc' } },
+          variants: { orderBy: { position: 'asc' } },
+        },
+        orderBy: { createdAt: 'desc' },
+      }),
+    ]);
+    return { store, categories, products };
+  }
+
   async getProduct(storeSlug: string, productSlug: string) {
     const store = await this.getStore(storeSlug);
     const product = await this.prisma.client.product.findFirst({

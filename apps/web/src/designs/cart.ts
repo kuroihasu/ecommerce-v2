@@ -1,7 +1,8 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { getProduct } from "./catalog";
+import { findProduct } from "./catalog";
+import { useCatalogData } from "./CatalogProvider";
 
 // Carrito de las previews: vive en localStorage, separado por dirección de diseño.
 // En la versión real se sincroniza con el carrito de la API.
@@ -45,10 +46,11 @@ function subscribe(cb: () => void) {
 
 export function useCart(direction: string) {
   const key = `cart2:${direction}`;
+  const catalog = useCatalogData();
   const lines = useSyncExternalStore(subscribe, () => read(key), () => EMPTY);
 
   const detailed = lines.flatMap((l) => {
-    const product = getProduct(l.slug);
+    const product = findProduct(catalog, l.slug);
     const variant = product?.variants.find((x) => x.id === l.variantId);
     return product && variant ? [{ ...l, product, variant, total: variant.price * l.qty }] : [];
   });

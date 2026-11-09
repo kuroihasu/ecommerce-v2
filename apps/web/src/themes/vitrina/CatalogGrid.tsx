@@ -1,12 +1,15 @@
 "use client";
 
-import { categories, categoryName } from "@/designs/catalog";
+import { categoryName } from "@/designs/catalog";
+import { useCatalogData } from "@/designs/CatalogProvider";
 import { allSizes, sortLabels, useCatalog, type Sort } from "@/designs/useCatalog";
 import { ProductTile } from "./ProductTile";
 
 export function CatalogGrid() {
+  const catalog = useCatalogData();
+  const { categories } = catalog;
   const { list, c, l, t, o, set } = useCatalog();
-  const title = c ? categoryName(c) : l === "mujer" ? "Girls" : l === "hombre" ? "Men" : o === "ofertas" ? "Sale" : o === "nuevos" ? "New in" : "Tienda";
+  const title = c ? categoryName(catalog, c) : l === "mujer" ? "Girls" : l === "hombre" ? "Men" : o === "ofertas" ? "Sale" : o === "nuevos" ? "New in" : "Tienda";
   const chip = (on: boolean) => `h-11 px-4 text-base font-semibold uppercase transition-colors ${on ? "bg-ink text-bg" : "bg-surface hover:bg-accent hover:text-accent-ink"}`;
 
   return (

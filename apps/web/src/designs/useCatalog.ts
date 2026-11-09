@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { products, type CategorySlug, type Line } from "./catalog";
+import { type CategorySlug, type Line } from "./catalog";
+import { useCatalogData } from "./CatalogProvider";
 
 export type Sort = "destacados" | "nuevos" | "menor" | "mayor" | "ofertas";
 export const sortLabels: Record<Sort, string> = {
@@ -18,6 +19,7 @@ export const allSizes = ["XS", "S", "M", "L", "XL", "36", "38", "40", "42", "44"
 export function useCatalog() {
   const params = useSearchParams();
   const router = useRouter();
+  const { products } = useCatalogData();
   const c = params.get("c") as CategorySlug | null;
   const l = params.get("l") as Line | null;
   const t = params.get("t");

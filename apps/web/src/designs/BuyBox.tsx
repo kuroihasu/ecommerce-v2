@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { formatCLP, getProduct, installment, store, discountPct } from "./catalog";
+import { formatCLP, findProduct, installment, discountPct } from "./catalog";
+import { useCatalogData } from "./CatalogProvider";
 import { useCart } from "./cart";
 import { useSelectedColor } from "./selection";
 
@@ -14,7 +15,9 @@ export function BuyBox({ slug, direction, cartHref, label = "Agregar al carrito"
   label?: string;
   round?: boolean;
 }) {
-  const p = getProduct(slug)!;
+  const cat = useCatalogData();
+  const { store } = cat;
+  const p = findProduct(cat, slug)!;
   const cart = useCart(direction);
   const [color, setColor] = useSelectedColor(slug);
   const [size, setSize] = useState<string | null>(p.sizes.length === 1 ? p.sizes[0] : null);
@@ -44,7 +47,7 @@ export function BuyBox({ slug, direction, cartHref, label = "Agregar al carrito"
           )}
         </p>
         <p className="text-base text-ink/75">
-          {store.installments} cuotas sin interés de {installment(p.price)} con Mercado Pago
+          {store.installments} cuotas sin interés de {installment(p.price, store.installments)} con Mercado Pago
         </p>
       </div>
 
@@ -155,7 +158,7 @@ export function QuickAdd({ slug, direction, className = "", children }: {
   className?: string;
   children: React.ReactNode;
 }) {
-  const p = getProduct(slug)!;
+  const p = findProduct(useCatalogData(), slug)!;
   const cart = useCart(direction);
   const [done, setDone] = useState(false);
   const v = p.variants.find((x) => x.stock > 0)!;

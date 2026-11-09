@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { CartCount } from "@/designs/BuyBox";
 import { AnnouncementRotator, Newsletter } from "@/designs/extras";
-import { formatCLP, store } from "@/designs/catalog";
+import { formatCLP } from "@/designs/catalog";
+import { getCatalog } from "@/lib/catalog";
 
 
 
-export function Layout({ children }: { children: React.ReactNode }) {
+export async function Layout({ children }: { children: React.ReactNode }) {
+  const { store } = await getCatalog();
   return (
     <div className="flex min-h-screen flex-col bg-bg font-body text-ink">
       <AnnouncementRotator

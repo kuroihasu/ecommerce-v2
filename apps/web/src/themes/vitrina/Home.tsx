@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { categories, lines, products, store } from "@/designs/catalog";
+import { getCatalog } from "@/lib/catalog";
 import { Photo } from "@/designs/Photo";
 import { Carousel } from "@/designs/Carousel";
 import { Reveal } from "@/designs/Reveal";
@@ -9,13 +9,18 @@ import { Rail } from "./Rail";
 
 const H = "text-6xl font-black uppercase leading-[0.85] tracking-[-0.025em] [font-stretch:62%] [word-spacing:0.08em] md:text-8xl";
 
+const dropDate = (iso: string) =>
+  new Intl.DateTimeFormat("es-CL", { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", timeZone: "America/Santiago" }).format(new Date(iso));
+
 const slides = [
   { image: "streetwear", title: "Drop 026 ya disponible", cta: "Comprar el drop", href: `/catalogo?o=nuevos`, tag: "Edición limitada" },
   { image: "hoodie2", title: "Preventa Zip Logo 3D", cta: "Reservar el mío", href: `/producto/poleron-zip-logo`, tag: "Despacho 25/11" },
   { image: "street2", title: "Sale hasta 33% off", cta: "Ver el sale", href: `/catalogo?o=ofertas`, tag: "Hasta agotar stock" },
 ];
 
-export function Home() {
+export async function Home() {
+  const { categories, lines, products, store } = await getCatalog();
+  const drop = store.nextDrop;
   const best = products.filter((p) => p.featured);
   const fresh = products.filter((p) => p.badge || p.compareAtPrice);
 
@@ -41,17 +46,19 @@ export function Home() {
       />
 
       {/* Próximo drop: cuenta regresiva */}
+      {drop && (
       <section className="grid gap-3 bg-accent p-4 text-accent-ink sm:p-6 md:grid-cols-[1fr_auto] md:items-center">
         <div className="flex flex-col gap-2">
           <p className="text-lg font-semibold uppercase">Próximo lanzamiento</p>
-          <h2 className="text-5xl font-black uppercase leading-[0.85] tracking-[-0.02em] [font-stretch:62%] [word-spacing:0.15em] md:text-7xl">{store.nextDrop.name}</h2>
-          <p className="text-lg">Viernes 21 de noviembre, 19:00. Te avisamos 10 minutos antes.</p>
+          <h2 className="text-5xl font-black uppercase leading-[0.85] tracking-[-0.02em] [font-stretch:62%] [word-spacing:0.15em] md:text-7xl">{drop.name}</h2>
+          <p className="text-lg first-letter:uppercase">{dropDate(drop.date)}. Te avisamos 10 minutos antes.</p>
         </div>
         <div className="flex flex-col gap-3">
-          <Countdown date={store.nextDrop.date} className="text-5xl font-black [font-stretch:62%] md:min-w-[460px] md:text-6xl" cellClass="bg-ink text-bg" />
+          <Countdown date={drop.date} className="text-5xl font-black [font-stretch:62%] md:min-w-[460px] md:text-6xl" cellClass="bg-ink text-bg" />
           <Newsletter inputClass="bg-bg text-ink" buttonClass="bg-ink text-bg font-semibold uppercase" label="Avísame" />
         </div>
       </section>
+      )}
 
       {/* Girls / Men */}
       <section className="mt-3 grid grid-cols-2 gap-3 px-4 sm:px-6">

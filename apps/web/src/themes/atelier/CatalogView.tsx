@@ -1,12 +1,15 @@
 "use client";
 
-import { categories, categoryName } from "@/designs/catalog";
+import { categoryName } from "@/designs/catalog";
+import { useCatalogData } from "@/designs/CatalogProvider";
 import { allSizes, sortLabels, useCatalog, type Sort } from "@/designs/useCatalog";
 import { Card } from "./Card";
 
 export function CatalogView() {
+  const catalog = useCatalogData();
+  const { categories } = catalog;
   const { list, c, l, t, o, set } = useCatalog();
-  const title = c ? categoryName(c) : l === "mujer" ? "Mujer" : l === "hombre" ? "Hombre" : o === "ofertas" ? "Ofertas" : o === "nuevos" ? "Lo nuevo" : "Toda la colección";
+  const title = c ? categoryName(catalog, c) : l === "mujer" ? "Mujer" : l === "hombre" ? "Hombre" : o === "ofertas" ? "Ofertas" : o === "nuevos" ? "Lo nuevo" : "Toda la colección";
   const chip = (on: boolean) => `h-11 px-4 text-base transition-colors ${on ? "bg-ink text-bg" : "bg-surface hover:bg-ink/10"}`;
 
   return (

@@ -39,5 +39,8 @@ export const photos: Record<string, string> = {
   sneakers: "photo-1549298916-b41d501d3772",
 };
 
+// Acepta una clave de la muestra ("hoodie") o una URL completa (fotos de la API).
 export const photoUrl = (key: string) =>
-  `https://images.unsplash.com/${photos[key] ?? photos.rack}?auto=format&fit=crop&q=80`;
+  /^(https?:)?\/\//.test(key) || key.startsWith("/")
+    ? key
+    : `https://images.unsplash.com/${photos[key] ?? photos.rack}?auto=format&fit=crop&q=80`;

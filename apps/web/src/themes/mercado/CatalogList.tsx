@@ -1,13 +1,16 @@
 "use client";
 
-import { categories, categoryName } from "@/designs/catalog";
+import { categoryName } from "@/designs/catalog";
+import { useCatalogData } from "@/designs/CatalogProvider";
 import { allSizes, sortLabels, useCatalog, type Sort } from "@/designs/useCatalog";
 import { Card } from "./Card";
 
 export function CatalogList() {
+  const catalog = useCatalogData();
+  const { categories } = catalog;
   const { list, c, l, t, o, set } = useCatalog();
   const cat = categories.find((x) => x.slug === c);
-  const title = c ? categoryName(c) : l === "mujer" ? "Mujer" : l === "hombre" ? "Hombre" : o === "ofertas" ? "Ofertas" : o === "nuevos" ? "Lo nuevo" : "Todos los productos";
+  const title = c ? categoryName(catalog, c) : l === "mujer" ? "Mujer" : l === "hombre" ? "Hombre" : o === "ofertas" ? "Ofertas" : o === "nuevos" ? "Lo nuevo" : "Todos los productos";
   const pill = (on: boolean) => `h-12 rounded-full px-5 text-base font-semibold transition-all active:scale-95 ${on ? "bg-ink text-bg" : "bg-bg hover:-translate-y-0.5"}`;
 
   return (

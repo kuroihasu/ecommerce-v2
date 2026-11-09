@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { CartCount } from "@/designs/BuyBox";
 import { Newsletter } from "@/designs/extras";
-import { store } from "@/designs/catalog";
+import { getCatalog } from "@/lib/catalog";
 
 
 
-export function Layout({ children }: { children: React.ReactNode }) {
+export async function Layout({ children }: { children: React.ReactNode }) {
+  const { store } = await getCatalog();
   return (
     <div className="flex min-h-screen flex-col bg-bg font-body text-ink">
       <div className="overflow-hidden bg-accent py-2 text-base font-semibold text-accent-ink">

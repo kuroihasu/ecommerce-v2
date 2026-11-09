@@ -1,21 +1,24 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { categoryName, getProduct, products } from "@/designs/catalog";
+import { categoryName, findProduct } from "@/designs/catalog";
+import { getCatalog } from "@/lib/catalog";
 import { Gallery } from "@/designs/Gallery";
 import { BuyBox } from "@/designs/BuyBox";
 import { Reveal } from "@/designs/Reveal";
 import { Card } from "./Card";
 
 
-export function Product({ slug }: { slug: string }) {
-  const p = getProduct(slug);
+export async function Product({ slug }: { slug: string }) {
+  const catalog = await getCatalog();
+  const { products } = catalog;
+  const p = findProduct(catalog, slug);
   if (!p) notFound();
   const related = products.filter((x) => x.slug !== p.slug && x.category === p.category).concat(products.filter((x) => x.featured && x.slug !== p.slug && x.category !== p.category)).slice(0, 4);
 
   return (
     <div className="mx-auto max-w-[1440px] px-5 sm:px-8">
       <p className="py-6 text-base text-ink/70">
-        <Link href={`/catalogo`} className="hover:text-ink">Colección</Link> / <Link href={`/catalogo?c=${p.category}`} className="hover:text-ink">{categoryName(p.category)}</Link>
+        <Link href={`/catalogo`} className="hover:text-ink">Colección</Link> / <Link href={`/catalogo?c=${p.category}`} className="hover:text-ink">{categoryName(catalog, p.category)}</Link>
       </p>
       <div className="grid gap-12 lg:grid-cols-[7fr_5fr]">
         <div className="lg:sticky lg:top-28 lg:h-fit"><Gallery slug={p.slug} /></div>

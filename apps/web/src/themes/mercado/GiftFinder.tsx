@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { formatCLP, products } from "@/designs/catalog";
+import { formatCLP } from "@/designs/catalog";
+import { useCatalogData } from "@/designs/CatalogProvider";
 import { Card } from "./Card";
 
 const budgets = [15000, 25000, 35000, 50000];
 
 // Buscador por precio: lo "vivo" de la portada.
 export function GiftFinder() {
+  const { products } = useCatalogData();
   const [max, setMax] = useState(25000);
   const list = products.filter((p) => p.price <= max).sort((a, b) => b.price - a.price);
 

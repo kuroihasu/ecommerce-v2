@@ -1,11 +1,11 @@
-// Catálogo de muestra para las previews de diseño: una marca de ropa chilena
-// (streetwear + moda mujer), con tallas, colores, ofertas y preventas, para ver
-// cada dirección con la densidad de una tienda real. Cuando se elija una
-// dirección, estas páginas pasan a leer la API (lib/api.ts).
+// Modelo de catálogo que usan los diseños, más un catálogo de muestra: una marca
+// de ropa chilena (streetwear + moda mujer) con tallas, colores, ofertas y preventas.
+// Los datos reales salen de la API (lib/catalog.ts); esta muestra es el respaldo
+// cuando la API no responde, por ejemplo en desarrollo sin base de datos.
 
 export type Badge = "nuevo" | "preventa" | "ultimas";
 export type Line = "mujer" | "hombre" | "unisex";
-export type CategorySlug = "poleras" | "polerones" | "pantalones" | "chaquetas" | "vestidos" | "accesorios";
+export type CategorySlug = string;
 export type Color = { name: string; hex: string };
 export type DemoVariant = { id: string; name: string; color: string; size: string; price: number; compareAtPrice?: number; stock: number };
 
@@ -32,7 +32,7 @@ export type DemoProduct = {
   variants: DemoVariant[];
 };
 
-export const store = {
+const store = {
   name: "NORTE",
   tagline: "Ropa urbana hecha en Santiago",
   email: "hola@norte.cl",
@@ -45,10 +45,15 @@ export const store = {
   freeShippingFrom: 60000,
   installments: 6,
   // Próximo lanzamiento (para la cuenta regresiva de la dirección Vitrina).
-  nextDrop: { name: "Drop 027 · Invierno", date: "2026-11-21T19:00:00-03:00" },
+  nextDrop: { name: "Drop 027 · Invierno", date: "2026-11-21T19:00:00-03:00" } as { name: string; date: string } | null,
 };
 
-export const categories: { slug: CategorySlug; name: string; blurb: string; image: string }[] = [
+export type StoreInfo = typeof store;
+export type CategoryInfo = { slug: CategorySlug; name: string; blurb: string; image: string };
+export type LineInfo = { slug: Line; name: string; image: string };
+export type Catalog = { store: StoreInfo; categories: CategoryInfo[]; lines: LineInfo[]; products: DemoProduct[] };
+
+const categories: CategoryInfo[] = [
   { slug: "polerones", name: "Polerones", blurb: "Algodón perchado de 380 g, corte oversize.", image: "hoodie" },
   { slug: "poleras", name: "Poleras", blurb: "Boxy, manga larga y estampadas.", image: "tee" },
   { slug: "pantalones", name: "Pantalones", blurb: "Baggy, cargo y wide leg.", image: "cargo" },
@@ -57,7 +62,7 @@ export const categories: { slug: CategorySlug; name: string; blurb: string; imag
   { slug: "accesorios", name: "Accesorios", blurb: "Jockeys, bolsos y lo que completa el look.", image: "cap" },
 ];
 
-export const lines: { slug: Line; name: string; image: string }[] = [
+const lines: LineInfo[] = [
   { slug: "mujer", name: "Mujer", image: "woman" },
   { slug: "hombre", name: "Hombre", image: "man" },
 ];
@@ -313,13 +318,13 @@ const base: Base[] = [
   },
 ];
 
-export const products: DemoProduct[] = base.map(make);
+export const demoCatalog: Catalog = { store, categories, lines, products: base.map(make) };
 
 export const photosFor = (p: DemoProduct, color?: string) =>
   (color && p.colorPhotos?.[color]) || p.gallery;
 
-export const getProduct = (slug: string) => products.find((p) => p.slug === slug);
-export const categoryName = (slug: CategorySlug) => categories.find((c) => c.slug === slug)?.name ?? slug;
+export const findProduct = (cat: Catalog, slug: string) => cat.products.find((p) => p.slug === slug);
+export const categoryName = (cat: Catalog, slug: CategorySlug) => cat.categories.find((c) => c.slug === slug)?.name ?? slug;
 export const fromPrice = (p: DemoProduct) => p.price;
 export const discountPct = (p: DemoProduct) => (p.compareAtPrice ? Math.round((1 - p.price / p.compareAtPrice) * 100) : 0);
 
@@ -334,4 +339,4 @@ export const badgeLabel = (p: DemoProduct): string | null => {
 export const formatCLP = (n: number) =>
   new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP", maximumFractionDigits: 0 }).format(n);
 
-export const installment = (n: number) => formatCLP(Math.round(n / store.installments));
+export const installment = (n: number, count: number) => formatCLP(Math.round(n / Math.max(1, count)));

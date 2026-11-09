@@ -10,6 +10,11 @@ export class CatalogController {
     return this.catalog.getStore(store);
   }
 
+  @Get('catalog')
+  getCatalog(@Param('store') store: string) {
+    return this.catalog.getCatalog(store);
+  }
+
   @Get('categories')
   listCategories(@Param('store') store: string) {
     return this.catalog.listCategories(store);

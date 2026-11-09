@@ -1,14 +1,17 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { categoryName, getProduct, products } from "@/designs/catalog";
+import { categoryName, findProduct } from "@/designs/catalog";
+import { getCatalog } from "@/lib/catalog";
 import { Gallery } from "@/designs/Gallery";
 import { BuyBox } from "@/designs/BuyBox";
 import { ProductTile } from "./ProductTile";
 import { Reveal } from "@/designs/Reveal";
 
 
-export function Product({ slug }: { slug: string }) {
-  const p = getProduct(slug);
+export async function Product({ slug }: { slug: string }) {
+  const catalog = await getCatalog();
+  const { products } = catalog;
+  const p = findProduct(catalog, slug);
   if (!p) notFound();
   const related = products.filter((x) => x.slug !== p.slug && x.category === p.category).concat(products.filter((x) => x.featured && x.slug !== p.slug)).slice(0, 4);
 
@@ -18,7 +21,7 @@ export function Product({ slug }: { slug: string }) {
         <div className="lg:sticky lg:top-28 lg:h-fit"><Gallery slug={p.slug} /></div>
         <div className="flex flex-col gap-8 bg-surface p-6 md:p-10 lg:sticky lg:top-[76px] lg:h-fit">
           <p className="text-base font-semibold">
-            <Link href={`/catalogo?c=${p.category}`} className="underline underline-offset-4 hover:text-accent">{categoryName(p.category)}</Link> · {p.short}
+            <Link href={`/catalogo?c=${p.category}`} className="underline underline-offset-4 hover:text-accent">{categoryName(catalog, p.category)}</Link> · {p.short}
           </p>
           <h1 className="rise text-6xl font-black uppercase leading-[0.85] tracking-[-0.03em] [font-stretch:62%] md:text-8xl">{p.name}</h1>
           <BuyBox slug={p.slug} direction="tienda" cartHref={`/carrito`} label="Añadir al carrito" />

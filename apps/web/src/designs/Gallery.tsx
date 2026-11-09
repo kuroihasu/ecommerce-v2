@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { getProduct, photosFor } from "./catalog";
+import { findProduct, photosFor } from "./catalog";
+import { useCatalogData } from "./CatalogProvider";
 import { photoUrl } from "./images";
 import { Photo } from "./Photo";
 import { useSelectedColor } from "./selection";
@@ -10,7 +11,7 @@ import { useSelectedColor } from "./selection";
 // Galería de la ficha: miniaturas, flechas, deslizar con el dedo y zoom a pantalla
 // completa. Las fotos cambian según el color elegido.
 export function Gallery({ slug, round = false }: { slug: string; round?: boolean }) {
-  const p = getProduct(slug)!;
+  const p = findProduct(useCatalogData(), slug)!;
   const [color] = useSelectedColor(slug);
   const photos = photosFor(p, color);
   return <GalleryInner key={color} photos={photos} name={`${p.name}, ${color}`} round={round} />;

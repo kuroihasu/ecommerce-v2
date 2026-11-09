@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { categories, getProduct, lines, products } from "@/designs/catalog";
+import { findProduct } from "@/designs/catalog";
+import { getCatalog } from "@/lib/catalog";
 import { Photo } from "@/designs/Photo";
 import { Carousel } from "@/designs/Carousel";
 import { Reveal } from "@/designs/Reveal";
@@ -13,9 +14,11 @@ const slides = [
   { image: "rack", title: "Hasta 30% en básicos", text: "Poleras y polerones con precio de temporada.", cta: "Ver ofertas", href: `/catalogo?o=ofertas` },
 ];
 
-export function Home() {
+export async function Home() {
+  const catalog = await getCatalog();
+  const { categories, lines, products } = catalog;
   const fresh = products.filter((p) => p.featured).slice(0, 4);
-  const look = ["chaqueta-mezclilla-oversize", "polera-boxy-heavy", "jeans-wide-leg", "bolso-tote"].map((s) => getProduct(s)!);
+  const look = ["chaqueta-mezclilla-oversize", "polera-boxy-heavy", "jeans-wide-leg", "bolso-tote"].flatMap((s) => findProduct(catalog, s) ?? []);
 
   return (
     <>
@@ -62,6 +65,7 @@ export function Home() {
       </section>
 
       {/* Compra el look: lo único "vivo" de la portada */}
+      {look.length > 0 && (
       <section className="mt-36 bg-surface py-24">
         <div className="mx-auto grid max-w-[1440px] gap-12 px-5 sm:px-8 lg:grid-cols-[7fr_5fr]">
           <Reveal>
@@ -74,6 +78,7 @@ export function Home() {
           </Reveal>
         </div>
       </section>
+      )}
 
       {/* Categorías: franja horizontal */}
       <section className="mt-36">

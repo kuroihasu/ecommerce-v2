@@ -1,7 +1,8 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { getProduct } from "./catalog";
+import { findProduct } from "./catalog";
+import { useCatalogData } from "./CatalogProvider";
 
 // Color elegido en la ficha, compartido entre la galería y el selector de compra.
 const chosen = new Map<string, string>();
@@ -12,7 +13,7 @@ const subscribe = (cb: () => void) => {
 };
 
 export function useSelectedColor(slug: string): [string, (c: string) => void] {
-  const fallback = getProduct(slug)?.colors[0].name ?? "";
+  const fallback = findProduct(useCatalogData(), slug)?.colors[0]?.name ?? "";
   const color = useSyncExternalStore(subscribe, () => chosen.get(slug) ?? fallback, () => fallback);
   return [
     color,

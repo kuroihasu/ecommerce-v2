@@ -1,0 +1,1746 @@
+{
+  "store": {
+    "name": "NORTE",
+    "settings": {
+      "name": "NORTE",
+      "tagline": "Ropa urbana hecha en Santiago",
+      "email": "hola@norte.cl",
+      "instagram": "@norte.cl",
+      "tiktok": "@norte.cl",
+      "whatsapp": "+56 9 1234 5678",
+      "discountCode": "NORTECLUB",
+      "shippingRM": 3500,
+      "shippingRegions": 5990,
+      "freeShippingFrom": 60000,
+      "installments": 6,
+      "nextDrop": {
+        "name": "Drop 027 · Invierno",
+        "date": "2026-11-21T19:00:00-03:00"
+      },
+      "lines": [
+        {
+          "slug": "mujer",
+          "name": "Mujer",
+          "image": "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "slug": "hombre",
+          "name": "Hombre",
+          "image": "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=1600&q=80"
+        }
+      ]
+    }
+  },
+  "categories": [
+    {
+      "slug": "polerones",
+      "name": "Polerones",
+      "description": "Algodón perchado de 380 g, corte oversize.",
+      "imageUrl": "https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=1600&q=80"
+    },
+    {
+      "slug": "poleras",
+      "name": "Poleras",
+      "description": "Boxy, manga larga y estampadas.",
+      "imageUrl": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1600&q=80"
+    },
+    {
+      "slug": "pantalones",
+      "name": "Pantalones",
+      "description": "Baggy, cargo y wide leg.",
+      "imageUrl": "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1600&q=80"
+    },
+    {
+      "slug": "chaquetas",
+      "name": "Chaquetas",
+      "description": "Cortavientos y mezclilla para el día a día.",
+      "imageUrl": "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&w=1600&q=80"
+    },
+    {
+      "slug": "vestidos",
+      "name": "Vestidos",
+      "description": "Satinados, florales y para salir.",
+      "imageUrl": "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=1600&q=80"
+    },
+    {
+      "slug": "accesorios",
+      "name": "Accesorios",
+      "description": "Jockeys, bolsos y lo que completa el look.",
+      "imageUrl": "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&w=1600&q=80"
+    }
+  ],
+  "products": [
+    {
+      "slug": "poleron-oversize-club",
+      "name": "Polerón Oversize Club",
+      "category": "polerones",
+      "description": "Nuestro polerón más vendido. Corte oversize, capucha doble y bordado frontal en hilo grueso. Lavado previo, así que no encoge.",
+      "featured": true,
+      "tags": [
+        "unisex"
+      ],
+      "attributes": {
+        "short": "Algodón perchado 380 g",
+        "details": [
+          "80% algodón, 20% poliéster",
+          "380 g/m²",
+          "Bordado frontal",
+          "Hecho en Santiago"
+        ],
+        "colors": [
+          {
+            "name": "Negro",
+            "hex": "#111111"
+          },
+          {
+            "name": "Gris melange",
+            "hex": "#9a9a96"
+          },
+          {
+            "name": "Burdeo",
+            "hex": "#6b1f2a"
+          }
+        ]
+      },
+      "images": [
+        {
+          "url": "https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1523398002811-999ca8dec234?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&w=1600&q=80",
+          "color": "Negro"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=1600&q=80",
+          "color": "Negro"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=1600&q=80",
+          "color": "Negro"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1523398002811-999ca8dec234?auto=format&fit=crop&w=1600&q=80",
+          "color": "Negro"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=1600&q=80",
+          "color": "Gris melange"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1523398002811-999ca8dec234?auto=format&fit=crop&w=1600&q=80",
+          "color": "Gris melange"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1617137968427-85924c800a22?auto=format&fit=crop&w=1600&q=80",
+          "color": "Gris melange"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?auto=format&fit=crop&w=1600&q=80",
+          "color": "Gris melange"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?auto=format&fit=crop&w=1600&q=80",
+          "color": "Burdeo"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=1600&q=80",
+          "color": "Burdeo"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1516826957135-700dedea698c?auto=format&fit=crop&w=1600&q=80",
+          "color": "Burdeo"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?auto=format&fit=crop&w=1600&q=80",
+          "color": "Burdeo"
+        }
+      ],
+      "variants": [
+        {
+          "name": "Negro / S",
+          "options": {
+            "Color": "Negro",
+            "Talla": "S"
+          },
+          "price": 44990,
+          "compareAtPrice": 54990,
+          "stock": 0,
+          "sku": "POLERON-OVERSIZE-CLUB-NEGRO-S"
+        },
+        {
+          "name": "Negro / M",
+          "options": {
+            "Color": "Negro",
+            "Talla": "M"
+          },
+          "price": 44990,
+          "compareAtPrice": 54990,
+          "stock": 12,
+          "sku": "POLERON-OVERSIZE-CLUB-NEGRO-M"
+        },
+        {
+          "name": "Negro / L",
+          "options": {
+            "Color": "Negro",
+            "Talla": "L"
+          },
+          "price": 44990,
+          "compareAtPrice": 54990,
+          "stock": 12,
+          "sku": "POLERON-OVERSIZE-CLUB-NEGRO-L"
+        },
+        {
+          "name": "Negro / XL",
+          "options": {
+            "Color": "Negro",
+            "Talla": "XL"
+          },
+          "price": 44990,
+          "compareAtPrice": 54990,
+          "stock": 12,
+          "sku": "POLERON-OVERSIZE-CLUB-NEGRO-XL"
+        },
+        {
+          "name": "Gris melange / S",
+          "options": {
+            "Color": "Gris melange",
+            "Talla": "S"
+          },
+          "price": 44990,
+          "compareAtPrice": 54990,
+          "stock": 0,
+          "sku": "POLERON-OVERSIZE-CLUB-GRIS-MELANGE-S"
+        },
+        {
+          "name": "Gris melange / M",
+          "options": {
+            "Color": "Gris melange",
+            "Talla": "M"
+          },
+          "price": 44990,
+          "compareAtPrice": 54990,
+          "stock": 12,
+          "sku": "POLERON-OVERSIZE-CLUB-GRIS-MELANGE-M"
+        },
+        {
+          "name": "Gris melange / L",
+          "options": {
+            "Color": "Gris melange",
+            "Talla": "L"
+          },
+          "price": 44990,
+          "compareAtPrice": 54990,
+          "stock": 12,
+          "sku": "POLERON-OVERSIZE-CLUB-GRIS-MELANGE-L"
+        },
+        {
+          "name": "Gris melange / XL",
+          "options": {
+            "Color": "Gris melange",
+            "Talla": "XL"
+          },
+          "price": 44990,
+          "compareAtPrice": 54990,
+          "stock": 12,
+          "sku": "POLERON-OVERSIZE-CLUB-GRIS-MELANGE-XL"
+        },
+        {
+          "name": "Burdeo / S",
+          "options": {
+            "Color": "Burdeo",
+            "Talla": "S"
+          },
+          "price": 44990,
+          "compareAtPrice": 54990,
+          "stock": 0,
+          "sku": "POLERON-OVERSIZE-CLUB-BURDEO-S"
+        },
+        {
+          "name": "Burdeo / M",
+          "options": {
+            "Color": "Burdeo",
+            "Talla": "M"
+          },
+          "price": 44990,
+          "compareAtPrice": 54990,
+          "stock": 12,
+          "sku": "POLERON-OVERSIZE-CLUB-BURDEO-M"
+        },
+        {
+          "name": "Burdeo / L",
+          "options": {
+            "Color": "Burdeo",
+            "Talla": "L"
+          },
+          "price": 44990,
+          "compareAtPrice": 54990,
+          "stock": 12,
+          "sku": "POLERON-OVERSIZE-CLUB-BURDEO-L"
+        },
+        {
+          "name": "Burdeo / XL",
+          "options": {
+            "Color": "Burdeo",
+            "Talla": "XL"
+          },
+          "price": 44990,
+          "compareAtPrice": 54990,
+          "stock": 12,
+          "sku": "POLERON-OVERSIZE-CLUB-BURDEO-XL"
+        }
+      ]
+    },
+    {
+      "slug": "poleron-zip-logo",
+      "name": "Polerón Zip Logo 3D",
+      "category": "polerones",
+      "description": "Polerón con cierre doble y logo 3D en el pecho. Sale en el Drop 027; lo reservas hoy y lo despachamos el 25 de noviembre.",
+      "featured": true,
+      "tags": [
+        "unisex",
+        "preventa"
+      ],
+      "attributes": {
+        "short": "Doble cierre, logo en relieve",
+        "details": [
+          "100% algodón",
+          "420 g/m²",
+          "Cierre doble YKK",
+          "Despacho desde el 25/11"
+        ],
+        "colors": [
+          {
+            "name": "Negro",
+            "hex": "#111111"
+          },
+          {
+            "name": "Verde oliva",
+            "hex": "#55593c"
+          }
+        ]
+      },
+      "images": [
+        {
+          "url": "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1516826957135-700dedea698c?auto=format&fit=crop&w=1600&q=80"
+        }
+      ],
+      "variants": [
+        {
+          "name": "Negro / S",
+          "options": {
+            "Color": "Negro",
+            "Talla": "S"
+          },
+          "price": 49990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "POLERON-ZIP-LOGO-NEGRO-S"
+        },
+        {
+          "name": "Negro / M",
+          "options": {
+            "Color": "Negro",
+            "Talla": "M"
+          },
+          "price": 49990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "POLERON-ZIP-LOGO-NEGRO-M"
+        },
+        {
+          "name": "Negro / L",
+          "options": {
+            "Color": "Negro",
+            "Talla": "L"
+          },
+          "price": 49990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "POLERON-ZIP-LOGO-NEGRO-L"
+        },
+        {
+          "name": "Negro / XL",
+          "options": {
+            "Color": "Negro",
+            "Talla": "XL"
+          },
+          "price": 49990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "POLERON-ZIP-LOGO-NEGRO-XL"
+        },
+        {
+          "name": "Verde oliva / S",
+          "options": {
+            "Color": "Verde oliva",
+            "Talla": "S"
+          },
+          "price": 49990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "POLERON-ZIP-LOGO-VERDE-OLIVA-S"
+        },
+        {
+          "name": "Verde oliva / M",
+          "options": {
+            "Color": "Verde oliva",
+            "Talla": "M"
+          },
+          "price": 49990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "POLERON-ZIP-LOGO-VERDE-OLIVA-M"
+        },
+        {
+          "name": "Verde oliva / L",
+          "options": {
+            "Color": "Verde oliva",
+            "Talla": "L"
+          },
+          "price": 49990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "POLERON-ZIP-LOGO-VERDE-OLIVA-L"
+        },
+        {
+          "name": "Verde oliva / XL",
+          "options": {
+            "Color": "Verde oliva",
+            "Talla": "XL"
+          },
+          "price": 49990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "POLERON-ZIP-LOGO-VERDE-OLIVA-XL"
+        }
+      ]
+    },
+    {
+      "slug": "polera-boxy-heavy",
+      "name": "Polera Boxy Heavy",
+      "category": "poleras",
+      "description": "Polera de algodón pesado, cuello grueso y corte boxy que cae recto. La básica que se ve cara.",
+      "featured": true,
+      "tags": [
+        "unisex"
+      ],
+      "attributes": {
+        "short": "Corte cuadrado, 260 g",
+        "details": [
+          "100% algodón peinado",
+          "260 g/m²",
+          "Corte boxy",
+          "Cuello reforzado"
+        ],
+        "colors": [
+          {
+            "name": "Blanco",
+            "hex": "#f4f4f1"
+          },
+          {
+            "name": "Negro",
+            "hex": "#111111"
+          },
+          {
+            "name": "Beige",
+            "hex": "#d9c8ad"
+          }
+        ]
+      },
+      "images": [
+        {
+          "url": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1523398002811-999ca8dec234?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1600&q=80",
+          "color": "Blanco"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1600&q=80",
+          "color": "Blanco"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=1600&q=80",
+          "color": "Blanco"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1523398002811-999ca8dec234?auto=format&fit=crop&w=1600&q=80",
+          "color": "Blanco"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1600&q=80",
+          "color": "Negro"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=1600&q=80",
+          "color": "Negro"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1617137968427-85924c800a22?auto=format&fit=crop&w=1600&q=80",
+          "color": "Negro"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1523398002811-999ca8dec234?auto=format&fit=crop&w=1600&q=80",
+          "color": "Negro"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=1600&q=80",
+          "color": "Beige"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1600&q=80",
+          "color": "Beige"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?auto=format&fit=crop&w=1600&q=80",
+          "color": "Beige"
+        }
+      ],
+      "variants": [
+        {
+          "name": "Blanco / S",
+          "options": {
+            "Color": "Blanco",
+            "Talla": "S"
+          },
+          "price": 19990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "POLERA-BOXY-HEAVY-BLANCO-S"
+        },
+        {
+          "name": "Blanco / M",
+          "options": {
+            "Color": "Blanco",
+            "Talla": "M"
+          },
+          "price": 19990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "POLERA-BOXY-HEAVY-BLANCO-M"
+        },
+        {
+          "name": "Blanco / L",
+          "options": {
+            "Color": "Blanco",
+            "Talla": "L"
+          },
+          "price": 19990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "POLERA-BOXY-HEAVY-BLANCO-L"
+        },
+        {
+          "name": "Blanco / XL",
+          "options": {
+            "Color": "Blanco",
+            "Talla": "XL"
+          },
+          "price": 19990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "POLERA-BOXY-HEAVY-BLANCO-XL"
+        },
+        {
+          "name": "Negro / S",
+          "options": {
+            "Color": "Negro",
+            "Talla": "S"
+          },
+          "price": 19990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "POLERA-BOXY-HEAVY-NEGRO-S"
+        },
+        {
+          "name": "Negro / M",
+          "options": {
+            "Color": "Negro",
+            "Talla": "M"
+          },
+          "price": 19990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "POLERA-BOXY-HEAVY-NEGRO-M"
+        },
+        {
+          "name": "Negro / L",
+          "options": {
+            "Color": "Negro",
+            "Talla": "L"
+          },
+          "price": 19990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "POLERA-BOXY-HEAVY-NEGRO-L"
+        },
+        {
+          "name": "Negro / XL",
+          "options": {
+            "Color": "Negro",
+            "Talla": "XL"
+          },
+          "price": 19990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "POLERA-BOXY-HEAVY-NEGRO-XL"
+        },
+        {
+          "name": "Beige / S",
+          "options": {
+            "Color": "Beige",
+            "Talla": "S"
+          },
+          "price": 19990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "POLERA-BOXY-HEAVY-BEIGE-S"
+        },
+        {
+          "name": "Beige / M",
+          "options": {
+            "Color": "Beige",
+            "Talla": "M"
+          },
+          "price": 19990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "POLERA-BOXY-HEAVY-BEIGE-M"
+        },
+        {
+          "name": "Beige / L",
+          "options": {
+            "Color": "Beige",
+            "Talla": "L"
+          },
+          "price": 19990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "POLERA-BOXY-HEAVY-BEIGE-L"
+        },
+        {
+          "name": "Beige / XL",
+          "options": {
+            "Color": "Beige",
+            "Talla": "XL"
+          },
+          "price": 19990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "POLERA-BOXY-HEAVY-BEIGE-XL"
+        }
+      ]
+    },
+    {
+      "slug": "polera-manga-larga-special",
+      "name": "Polera Manga Larga Special",
+      "category": "poleras",
+      "description": "Manga larga de algodón con elasticidad, estampado serigrafiado en la espalda y puños largos.",
+      "featured": false,
+      "tags": [
+        "mujer"
+      ],
+      "attributes": {
+        "short": "Ajustada, con estampado en la espalda",
+        "details": [
+          "95% algodón, 5% elastano",
+          "Estampado serigrafía",
+          "Calce ajustado"
+        ],
+        "colors": [
+          {
+            "name": "Negro",
+            "hex": "#111111"
+          },
+          {
+            "name": "Blanco",
+            "hex": "#f4f4f1"
+          }
+        ]
+      },
+      "images": [
+        {
+          "url": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1485968579580-b6d095142e6e?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1600&q=80"
+        }
+      ],
+      "variants": [
+        {
+          "name": "Negro / XS",
+          "options": {
+            "Color": "Negro",
+            "Talla": "XS"
+          },
+          "price": 22990,
+          "compareAtPrice": 24990,
+          "stock": 12,
+          "sku": "POLERA-MANGA-LARGA-SPECIAL-NEGRO-XS"
+        },
+        {
+          "name": "Negro / S",
+          "options": {
+            "Color": "Negro",
+            "Talla": "S"
+          },
+          "price": 22990,
+          "compareAtPrice": 24990,
+          "stock": 12,
+          "sku": "POLERA-MANGA-LARGA-SPECIAL-NEGRO-S"
+        },
+        {
+          "name": "Negro / M",
+          "options": {
+            "Color": "Negro",
+            "Talla": "M"
+          },
+          "price": 22990,
+          "compareAtPrice": 24990,
+          "stock": 12,
+          "sku": "POLERA-MANGA-LARGA-SPECIAL-NEGRO-M"
+        },
+        {
+          "name": "Negro / L",
+          "options": {
+            "Color": "Negro",
+            "Talla": "L"
+          },
+          "price": 22990,
+          "compareAtPrice": 24990,
+          "stock": 12,
+          "sku": "POLERA-MANGA-LARGA-SPECIAL-NEGRO-L"
+        },
+        {
+          "name": "Blanco / XS",
+          "options": {
+            "Color": "Blanco",
+            "Talla": "XS"
+          },
+          "price": 22990,
+          "compareAtPrice": 24990,
+          "stock": 12,
+          "sku": "POLERA-MANGA-LARGA-SPECIAL-BLANCO-XS"
+        },
+        {
+          "name": "Blanco / S",
+          "options": {
+            "Color": "Blanco",
+            "Talla": "S"
+          },
+          "price": 22990,
+          "compareAtPrice": 24990,
+          "stock": 12,
+          "sku": "POLERA-MANGA-LARGA-SPECIAL-BLANCO-S"
+        },
+        {
+          "name": "Blanco / M",
+          "options": {
+            "Color": "Blanco",
+            "Talla": "M"
+          },
+          "price": 22990,
+          "compareAtPrice": 24990,
+          "stock": 12,
+          "sku": "POLERA-MANGA-LARGA-SPECIAL-BLANCO-M"
+        },
+        {
+          "name": "Blanco / L",
+          "options": {
+            "Color": "Blanco",
+            "Talla": "L"
+          },
+          "price": 22990,
+          "compareAtPrice": 24990,
+          "stock": 12,
+          "sku": "POLERA-MANGA-LARGA-SPECIAL-BLANCO-L"
+        }
+      ]
+    },
+    {
+      "slug": "polera-estampada-norte",
+      "name": "Polera Estampada Norte",
+      "category": "poleras",
+      "description": "Estampado del Drop 026 en tinta al agua. Solo 150 unidades numeradas en la etiqueta.",
+      "featured": false,
+      "tags": [
+        "unisex",
+        "nuevo"
+      ],
+      "attributes": {
+        "short": "Edición limitada, 150 unidades",
+        "details": [
+          "100% algodón",
+          "Tinta al agua",
+          "150 unidades numeradas"
+        ],
+        "colors": [
+          {
+            "name": "Blanco",
+            "hex": "#f4f4f1"
+          }
+        ]
+      },
+      "images": [
+        {
+          "url": "https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1516826957135-700dedea698c?auto=format&fit=crop&w=1600&q=80"
+        }
+      ],
+      "variants": [
+        {
+          "name": "Blanco / S",
+          "options": {
+            "Color": "Blanco",
+            "Talla": "S"
+          },
+          "price": 17990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "POLERA-ESTAMPADA-NORTE-BLANCO-S"
+        },
+        {
+          "name": "Blanco / M",
+          "options": {
+            "Color": "Blanco",
+            "Talla": "M"
+          },
+          "price": 17990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "POLERA-ESTAMPADA-NORTE-BLANCO-M"
+        },
+        {
+          "name": "Blanco / L",
+          "options": {
+            "Color": "Blanco",
+            "Talla": "L"
+          },
+          "price": 17990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "POLERA-ESTAMPADA-NORTE-BLANCO-L"
+        },
+        {
+          "name": "Blanco / XL",
+          "options": {
+            "Color": "Blanco",
+            "Talla": "XL"
+          },
+          "price": 17990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "POLERA-ESTAMPADA-NORTE-BLANCO-XL"
+        }
+      ]
+    },
+    {
+      "slug": "pantalon-baggy-cargo",
+      "name": "Pantalón Baggy Cargo",
+      "category": "pantalones",
+      "description": "Cargo de gabardina con seis bolsillos, pierna ancha y cordón en la basta para ajustarlo sobre la zapatilla.",
+      "featured": true,
+      "tags": [
+        "unisex"
+      ],
+      "attributes": {
+        "short": "Bolsillos laterales, pretina ajustable",
+        "details": [
+          "100% algodón gabardina",
+          "6 bolsillos",
+          "Basta con cordón"
+        ],
+        "colors": [
+          {
+            "name": "Gris melange",
+            "hex": "#9a9a96"
+          },
+          {
+            "name": "Negro",
+            "hex": "#111111"
+          }
+        ]
+      },
+      "images": [
+        {
+          "url": "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1523398002811-999ca8dec234?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1617137968427-85924c800a22?auto=format&fit=crop&w=1600&q=80"
+        }
+      ],
+      "variants": [
+        {
+          "name": "Gris melange / 38",
+          "options": {
+            "Color": "Gris melange",
+            "Talla": "38"
+          },
+          "price": 34990,
+          "compareAtPrice": 44990,
+          "stock": 12,
+          "sku": "PANTALON-BAGGY-CARGO-GRIS-MELANGE-38"
+        },
+        {
+          "name": "Gris melange / 40",
+          "options": {
+            "Color": "Gris melange",
+            "Talla": "40"
+          },
+          "price": 34990,
+          "compareAtPrice": 44990,
+          "stock": 12,
+          "sku": "PANTALON-BAGGY-CARGO-GRIS-MELANGE-40"
+        },
+        {
+          "name": "Gris melange / 42",
+          "options": {
+            "Color": "Gris melange",
+            "Talla": "42"
+          },
+          "price": 34990,
+          "compareAtPrice": 44990,
+          "stock": 12,
+          "sku": "PANTALON-BAGGY-CARGO-GRIS-MELANGE-42"
+        },
+        {
+          "name": "Gris melange / 44",
+          "options": {
+            "Color": "Gris melange",
+            "Talla": "44"
+          },
+          "price": 34990,
+          "compareAtPrice": 44990,
+          "stock": 0,
+          "sku": "PANTALON-BAGGY-CARGO-GRIS-MELANGE-44"
+        },
+        {
+          "name": "Negro / 38",
+          "options": {
+            "Color": "Negro",
+            "Talla": "38"
+          },
+          "price": 34990,
+          "compareAtPrice": 44990,
+          "stock": 12,
+          "sku": "PANTALON-BAGGY-CARGO-NEGRO-38"
+        },
+        {
+          "name": "Negro / 40",
+          "options": {
+            "Color": "Negro",
+            "Talla": "40"
+          },
+          "price": 34990,
+          "compareAtPrice": 44990,
+          "stock": 12,
+          "sku": "PANTALON-BAGGY-CARGO-NEGRO-40"
+        },
+        {
+          "name": "Negro / 42",
+          "options": {
+            "Color": "Negro",
+            "Talla": "42"
+          },
+          "price": 34990,
+          "compareAtPrice": 44990,
+          "stock": 12,
+          "sku": "PANTALON-BAGGY-CARGO-NEGRO-42"
+        },
+        {
+          "name": "Negro / 44",
+          "options": {
+            "Color": "Negro",
+            "Talla": "44"
+          },
+          "price": 34990,
+          "compareAtPrice": 44990,
+          "stock": 0,
+          "sku": "PANTALON-BAGGY-CARGO-NEGRO-44"
+        }
+      ]
+    },
+    {
+      "slug": "jeans-wide-leg",
+      "name": "Jeans Wide Leg",
+      "category": "pantalones",
+      "description": "Jeans de tiro alto y pierna ancha en mezclilla rígida de 13 oz, que se amolda con el uso.",
+      "featured": false,
+      "tags": [
+        "mujer"
+      ],
+      "attributes": {
+        "short": "Tiro alto, pierna ancha",
+        "details": [
+          "100% algodón",
+          "Mezclilla 13 oz",
+          "Tiro alto"
+        ],
+        "colors": [
+          {
+            "name": "Azul claro",
+            "hex": "#8fa9c4"
+          },
+          {
+            "name": "Azul oscuro",
+            "hex": "#2b3a52"
+          }
+        ]
+      },
+      "images": [
+        {
+          "url": "https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1600&q=80"
+        }
+      ],
+      "variants": [
+        {
+          "name": "Azul claro / 36",
+          "options": {
+            "Color": "Azul claro",
+            "Talla": "36"
+          },
+          "price": 32990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "JEANS-WIDE-LEG-AZUL-CLARO-36"
+        },
+        {
+          "name": "Azul claro / 38",
+          "options": {
+            "Color": "Azul claro",
+            "Talla": "38"
+          },
+          "price": 32990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "JEANS-WIDE-LEG-AZUL-CLARO-38"
+        },
+        {
+          "name": "Azul claro / 40",
+          "options": {
+            "Color": "Azul claro",
+            "Talla": "40"
+          },
+          "price": 32990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "JEANS-WIDE-LEG-AZUL-CLARO-40"
+        },
+        {
+          "name": "Azul claro / 42",
+          "options": {
+            "Color": "Azul claro",
+            "Talla": "42"
+          },
+          "price": 32990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "JEANS-WIDE-LEG-AZUL-CLARO-42"
+        },
+        {
+          "name": "Azul oscuro / 36",
+          "options": {
+            "Color": "Azul oscuro",
+            "Talla": "36"
+          },
+          "price": 32990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "JEANS-WIDE-LEG-AZUL-OSCURO-36"
+        },
+        {
+          "name": "Azul oscuro / 38",
+          "options": {
+            "Color": "Azul oscuro",
+            "Talla": "38"
+          },
+          "price": 32990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "JEANS-WIDE-LEG-AZUL-OSCURO-38"
+        },
+        {
+          "name": "Azul oscuro / 40",
+          "options": {
+            "Color": "Azul oscuro",
+            "Talla": "40"
+          },
+          "price": 32990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "JEANS-WIDE-LEG-AZUL-OSCURO-40"
+        },
+        {
+          "name": "Azul oscuro / 42",
+          "options": {
+            "Color": "Azul oscuro",
+            "Talla": "42"
+          },
+          "price": 32990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "JEANS-WIDE-LEG-AZUL-OSCURO-42"
+        }
+      ]
+    },
+    {
+      "slug": "cortavientos-track",
+      "name": "Cortavientos Track",
+      "category": "chaquetas",
+      "description": "Cortavientos liviano con forro de malla, capucha que se guarda en el cuello y reflectante en la espalda.",
+      "featured": true,
+      "tags": [
+        "unisex",
+        "nuevo"
+      ],
+      "attributes": {
+        "short": "Impermeable, con capucha guardable",
+        "details": [
+          "100% poliéster",
+          "Repele el agua",
+          "Reflectante trasero"
+        ],
+        "colors": [
+          {
+            "name": "Negro",
+            "hex": "#111111"
+          },
+          {
+            "name": "Rojo",
+            "hex": "#c22a22"
+          }
+        ]
+      },
+      "images": [
+        {
+          "url": "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1516826957135-700dedea698c?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=1600&q=80"
+        }
+      ],
+      "variants": [
+        {
+          "name": "Negro / S",
+          "options": {
+            "Color": "Negro",
+            "Talla": "S"
+          },
+          "price": 54990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "CORTAVIENTOS-TRACK-NEGRO-S"
+        },
+        {
+          "name": "Negro / M",
+          "options": {
+            "Color": "Negro",
+            "Talla": "M"
+          },
+          "price": 54990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "CORTAVIENTOS-TRACK-NEGRO-M"
+        },
+        {
+          "name": "Negro / L",
+          "options": {
+            "Color": "Negro",
+            "Talla": "L"
+          },
+          "price": 54990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "CORTAVIENTOS-TRACK-NEGRO-L"
+        },
+        {
+          "name": "Negro / XL",
+          "options": {
+            "Color": "Negro",
+            "Talla": "XL"
+          },
+          "price": 54990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "CORTAVIENTOS-TRACK-NEGRO-XL"
+        },
+        {
+          "name": "Rojo / S",
+          "options": {
+            "Color": "Rojo",
+            "Talla": "S"
+          },
+          "price": 54990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "CORTAVIENTOS-TRACK-ROJO-S"
+        },
+        {
+          "name": "Rojo / M",
+          "options": {
+            "Color": "Rojo",
+            "Talla": "M"
+          },
+          "price": 54990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "CORTAVIENTOS-TRACK-ROJO-M"
+        },
+        {
+          "name": "Rojo / L",
+          "options": {
+            "Color": "Rojo",
+            "Talla": "L"
+          },
+          "price": 54990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "CORTAVIENTOS-TRACK-ROJO-L"
+        },
+        {
+          "name": "Rojo / XL",
+          "options": {
+            "Color": "Rojo",
+            "Talla": "XL"
+          },
+          "price": 54990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "CORTAVIENTOS-TRACK-ROJO-XL"
+        }
+      ]
+    },
+    {
+      "slug": "chaqueta-mezclilla-oversize",
+      "name": "Chaqueta de Mezclilla Oversize",
+      "category": "chaquetas",
+      "description": "Chaqueta de mezclilla con lavado vintage, hombros caídos y botones metálicos grabados.",
+      "featured": false,
+      "tags": [
+        "unisex"
+      ],
+      "attributes": {
+        "short": "Lavado vintage",
+        "details": [
+          "100% algodón",
+          "Lavado vintage",
+          "Botones grabados"
+        ],
+        "colors": [
+          {
+            "name": "Azul claro",
+            "hex": "#8fa9c4"
+          }
+        ]
+      },
+      "images": [
+        {
+          "url": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1485968579580-b6d095142e6e?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1516826957135-700dedea698c?auto=format&fit=crop&w=1600&q=80"
+        }
+      ],
+      "variants": [
+        {
+          "name": "Azul claro / S",
+          "options": {
+            "Color": "Azul claro",
+            "Talla": "S"
+          },
+          "price": 46990,
+          "compareAtPrice": 52990,
+          "stock": 12,
+          "sku": "CHAQUETA-MEZCLILLA-OVERSIZE-AZUL-CLARO-S"
+        },
+        {
+          "name": "Azul claro / M",
+          "options": {
+            "Color": "Azul claro",
+            "Talla": "M"
+          },
+          "price": 46990,
+          "compareAtPrice": 52990,
+          "stock": 12,
+          "sku": "CHAQUETA-MEZCLILLA-OVERSIZE-AZUL-CLARO-M"
+        },
+        {
+          "name": "Azul claro / L",
+          "options": {
+            "Color": "Azul claro",
+            "Talla": "L"
+          },
+          "price": 46990,
+          "compareAtPrice": 52990,
+          "stock": 12,
+          "sku": "CHAQUETA-MEZCLILLA-OVERSIZE-AZUL-CLARO-L"
+        },
+        {
+          "name": "Azul claro / XL",
+          "options": {
+            "Color": "Azul claro",
+            "Talla": "XL"
+          },
+          "price": 46990,
+          "compareAtPrice": 52990,
+          "stock": 12,
+          "sku": "CHAQUETA-MEZCLILLA-OVERSIZE-AZUL-CLARO-XL"
+        }
+      ]
+    },
+    {
+      "slug": "vestido-midi-satinado",
+      "name": "Vestido Midi Satinado",
+      "category": "vestidos",
+      "description": "Vestido midi de satín cortado al bies, con tiritas regulables y espalda descubierta.",
+      "featured": true,
+      "tags": [
+        "mujer"
+      ],
+      "attributes": {
+        "short": "Tiritas regulables, caída al bies",
+        "details": [
+          "100% poliéster satinado",
+          "Largo midi",
+          "Tiritas regulables"
+        ],
+        "colors": [
+          {
+            "name": "Negro",
+            "hex": "#111111"
+          },
+          {
+            "name": "Champagne",
+            "hex": "#e3cfae"
+          }
+        ]
+      },
+      "images": [
+        {
+          "url": "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=1600&q=80",
+          "color": "Negro"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=1600&q=80",
+          "color": "Negro"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1600&q=80",
+          "color": "Negro"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1600&q=80",
+          "color": "Negro"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=1600&q=80",
+          "color": "Champagne"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=1600&q=80",
+          "color": "Champagne"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=1600&q=80",
+          "color": "Champagne"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1485968579580-b6d095142e6e?auto=format&fit=crop&w=1600&q=80",
+          "color": "Champagne"
+        }
+      ],
+      "variants": [
+        {
+          "name": "Negro / XS",
+          "options": {
+            "Color": "Negro",
+            "Talla": "XS"
+          },
+          "price": 29990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "VESTIDO-MIDI-SATINADO-NEGRO-XS"
+        },
+        {
+          "name": "Negro / S",
+          "options": {
+            "Color": "Negro",
+            "Talla": "S"
+          },
+          "price": 29990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "VESTIDO-MIDI-SATINADO-NEGRO-S"
+        },
+        {
+          "name": "Negro / M",
+          "options": {
+            "Color": "Negro",
+            "Talla": "M"
+          },
+          "price": 29990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "VESTIDO-MIDI-SATINADO-NEGRO-M"
+        },
+        {
+          "name": "Negro / L",
+          "options": {
+            "Color": "Negro",
+            "Talla": "L"
+          },
+          "price": 29990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "VESTIDO-MIDI-SATINADO-NEGRO-L"
+        },
+        {
+          "name": "Champagne / XS",
+          "options": {
+            "Color": "Champagne",
+            "Talla": "XS"
+          },
+          "price": 29990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "VESTIDO-MIDI-SATINADO-CHAMPAGNE-XS"
+        },
+        {
+          "name": "Champagne / S",
+          "options": {
+            "Color": "Champagne",
+            "Talla": "S"
+          },
+          "price": 29990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "VESTIDO-MIDI-SATINADO-CHAMPAGNE-S"
+        },
+        {
+          "name": "Champagne / M",
+          "options": {
+            "Color": "Champagne",
+            "Talla": "M"
+          },
+          "price": 29990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "VESTIDO-MIDI-SATINADO-CHAMPAGNE-M"
+        },
+        {
+          "name": "Champagne / L",
+          "options": {
+            "Color": "Champagne",
+            "Talla": "L"
+          },
+          "price": 29990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "VESTIDO-MIDI-SATINADO-CHAMPAGNE-L"
+        }
+      ]
+    },
+    {
+      "slug": "vestido-corto-floral",
+      "name": "Vestido Corto Floral",
+      "category": "vestidos",
+      "description": "Vestido corto forrado con estampado floral, manga globo y elástico en la espalda.",
+      "featured": false,
+      "tags": [
+        "mujer",
+        "ultimas"
+      ],
+      "attributes": {
+        "short": "Manga globo, forrado",
+        "details": [
+          "Viscosa",
+          "Forrado",
+          "Manga globo"
+        ],
+        "colors": [
+          {
+            "name": "Floral",
+            "hex": "#d98f9a"
+          }
+        ]
+      },
+      "images": [
+        {
+          "url": "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1485968579580-b6d095142e6e?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1600&q=80"
+        }
+      ],
+      "variants": [
+        {
+          "name": "Floral / S",
+          "options": {
+            "Color": "Floral",
+            "Talla": "S"
+          },
+          "price": 24990,
+          "compareAtPrice": 29990,
+          "stock": 0,
+          "sku": "VESTIDO-CORTO-FLORAL-FLORAL-S"
+        },
+        {
+          "name": "Floral / M",
+          "options": {
+            "Color": "Floral",
+            "Talla": "M"
+          },
+          "price": 24990,
+          "compareAtPrice": 29990,
+          "stock": 2,
+          "sku": "VESTIDO-CORTO-FLORAL-FLORAL-M"
+        },
+        {
+          "name": "Floral / L",
+          "options": {
+            "Color": "Floral",
+            "Talla": "L"
+          },
+          "price": 24990,
+          "compareAtPrice": 29990,
+          "stock": 2,
+          "sku": "VESTIDO-CORTO-FLORAL-FLORAL-L"
+        }
+      ]
+    },
+    {
+      "slug": "jockey-bordado",
+      "name": "Jockey Bordado",
+      "category": "accesorios",
+      "description": "Jockey de gabardina con logo bordado y hebilla metálica para ajustar atrás.",
+      "featured": false,
+      "tags": [
+        "unisex"
+      ],
+      "attributes": {
+        "short": "Visera curva, ajuste trasero",
+        "details": [
+          "100% algodón",
+          "Talla única",
+          "Hebilla metálica"
+        ],
+        "colors": [
+          {
+            "name": "Negro",
+            "hex": "#111111"
+          },
+          {
+            "name": "Beige",
+            "hex": "#d9c8ad"
+          }
+        ]
+      },
+      "images": [
+        {
+          "url": "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1523398002811-999ca8dec234?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=1600&q=80"
+        }
+      ],
+      "variants": [
+        {
+          "name": "Negro",
+          "options": {
+            "Color": "Negro",
+            "Talla": "Única"
+          },
+          "price": 14990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "JOCKEY-BORDADO-NEGRO-U-NICA"
+        },
+        {
+          "name": "Beige",
+          "options": {
+            "Color": "Beige",
+            "Talla": "Única"
+          },
+          "price": 14990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "JOCKEY-BORDADO-BEIGE-U-NICA"
+        }
+      ]
+    },
+    {
+      "slug": "bolso-tote",
+      "name": "Bolso Tote Canvas",
+      "category": "accesorios",
+      "description": "Tote de lona gruesa con bolsillo interior con cierre. Cabe un notebook de 15 pulgadas.",
+      "featured": false,
+      "tags": [
+        "unisex",
+        "nuevo"
+      ],
+      "attributes": {
+        "short": "Lona gruesa, bolsillo interior",
+        "details": [
+          "Lona 12 oz",
+          "40 × 38 cm",
+          "Bolsillo con cierre"
+        ],
+        "colors": [
+          {
+            "name": "Beige",
+            "hex": "#d9c8ad"
+          },
+          {
+            "name": "Negro",
+            "hex": "#111111"
+          }
+        ]
+      },
+      "images": [
+        {
+          "url": "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1600&q=80"
+        }
+      ],
+      "variants": [
+        {
+          "name": "Beige",
+          "options": {
+            "Color": "Beige",
+            "Talla": "Única"
+          },
+          "price": 12990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "BOLSO-TOTE-BEIGE-U-NICA"
+        },
+        {
+          "name": "Negro",
+          "options": {
+            "Color": "Negro",
+            "Talla": "Única"
+          },
+          "price": 12990,
+          "compareAtPrice": null,
+          "stock": 12,
+          "sku": "BOLSO-TOTE-NEGRO-U-NICA"
+        }
+      ]
+    }
+  ]
+}

@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { formatCLP, installment, store } from "./catalog";
+import { formatCLP, installment } from "./catalog";
+import { useCatalogData } from "./CatalogProvider";
 import { useCart } from "./cart";
 import { Photo } from "./Photo";
 
@@ -14,6 +15,7 @@ export function CartView({ direction, base, checkoutLabel = "Ir a pagar", round 
   round?: boolean;
 }) {
   const cart = useCart(direction);
+  const { store } = useCatalogData();
   const [region, setRegion] = useState<"rm" | "regiones">("rm");
   const [code, setCode] = useState("");
   const [applied, setApplied] = useState(false);
@@ -113,7 +115,7 @@ export function CartView({ direction, base, checkoutLabel = "Ir a pagar", round 
           <div className="flex justify-between"><dt>Envío</dt><dd className="tabular-nums">{shipping === 0 ? "Gratis" : formatCLP(shipping)}</dd></div>
           <div className="mt-3 flex justify-between text-2xl"><dt>Total</dt><dd className="tabular-nums">{formatCLP(total)}</dd></div>
         </dl>
-        <p className="-mt-2 text-base">o {store.installments} cuotas sin interés de {installment(total)}</p>
+        <p className="-mt-2 text-base">o {store.installments} cuotas sin interés de {installment(total, store.installments)}</p>
         <a href="#checkout" className={`bg-bg px-6 py-4 text-center text-lg text-ink transition-transform active:scale-[0.98] ${r}`}>
           {checkoutLabel}
         </a>

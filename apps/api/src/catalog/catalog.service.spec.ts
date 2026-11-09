@@ -27,4 +27,23 @@ describe('CatalogService', () => {
       featured: true,
     });
   });
+
+  it('el catálogo trae solo productos activos y categorías con productos', async () => {
+    const products = vi.fn().mockResolvedValue([]);
+    const categories = vi.fn().mockResolvedValue([]);
+    const prisma = {
+      client: {
+        store: { findUnique: vi.fn().mockResolvedValue({ id: 's1', slug: 'demo' }) },
+        product: { findMany: products },
+        category: { findMany: categories },
+      },
+    } as unknown as PrismaService;
+    const res = await new CatalogService(prisma).getCatalog('demo');
+    expect(res.store).toMatchObject({ slug: 'demo' });
+    expect(products.mock.calls[0][0].where).toEqual({ storeId: 's1', status: 'ACTIVE' });
+    expect(categories.mock.calls[0][0].where).toMatchObject({
+      storeId: 's1',
+      products: { some: { status: 'ACTIVE' } },
+    });
+  });
 });
