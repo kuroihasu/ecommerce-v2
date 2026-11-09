@@ -20,18 +20,18 @@ export default async function MercadoProduct({ params }: PageProps<"/disenos/mer
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="grid grid-cols-2 gap-4">
           {p.gallery.map((g, i) => (
-            <Photo key={g} name={g} alt={`${p.name}, foto ${i + 1}`} priority={i === 0} sizes={i === 0 ? "50vw" : "25vw"} className={`${i === 0 ? "col-span-2 aspect-square" : "aspect-square"} rounded-brand`} />
+            <Photo key={g} name={g} alt={`${p.name}, foto ${i + 1}`} priority={i === 0} sizes={i === 0 ? "50vw" : "25vw"} className={`${i === 0 ? "col-span-2 aspect-[4/5]" : "aspect-[4/5]"} rounded-brand`} />
           ))}
         </div>
         <div className="flex flex-col gap-8 rounded-brand bg-surface p-6 md:p-10 lg:sticky lg:top-24 lg:h-fit">
           <Link href={`${B}/catalogo?c=${p.category}`} className="w-fit rounded-full bg-field px-4 py-2 text-base font-semibold text-field-ink">
             {categoryName(p.category)}
           </Link>
-          <h1 className="text-5xl font-extrabold leading-[0.95] tracking-[-0.04em] md:text-6xl">{p.name}</h1>
+          <h1 className="rise text-5xl font-extrabold leading-[0.95] tracking-[-0.04em] md:text-6xl">{p.name}</h1>
           <p className="text-xl leading-relaxed">{p.description}</p>
-          <BuyBox slug={p.slug} direction="mercado" cartHref={`${B}/carrito`} />
+          <BuyBox slug={p.slug} direction="mercado" cartHref={`${B}/carrito`} round />
           <div className="flex flex-col gap-3 rounded-[calc(var(--radius)-8px)] bg-bg p-6 text-base">
-            <p className="font-semibold">Hecho en {p.origin}</p>
+            <p className="font-semibold">{p.short}</p>
             <ul className="flex flex-wrap gap-2">
               {p.details.map((d) => <li key={d} className="rounded-full bg-surface px-4 py-2">{d}</li>)}
             </ul>

@@ -36,16 +36,15 @@ function write(key: string, lines: CartLine[]) {
 
 function subscribe(cb: () => void) {
   listeners.add(cb);
-  const onStorage = () => cb();
-  window.addEventListener("storage", onStorage);
+  window.addEventListener("storage", cb);
   return () => {
     listeners.delete(cb);
-    window.removeEventListener("storage", onStorage);
+    window.removeEventListener("storage", cb);
   };
 }
 
 export function useCart(direction: string) {
-  const key = `cart:${direction}`;
+  const key = `cart2:${direction}`;
   const lines = useSyncExternalStore(subscribe, () => read(key), () => EMPTY);
 
   const detailed = lines.flatMap((l) => {
@@ -76,5 +75,3 @@ export function useCart(direction: string) {
     },
   };
 }
-
-export const shippingFor = (subtotal: number, freeFrom: number) => (subtotal === 0 || subtotal >= freeFrom ? 0 : 3990);

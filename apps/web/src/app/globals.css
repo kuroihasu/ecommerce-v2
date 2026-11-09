@@ -32,8 +32,8 @@
   --font-sans: var(--font-body);
 }
 
-/* Dirección A · Taller: editorial y sereno, serif grande, verde bosque. */
-.theme-taller {
+/* Dirección A · Atelier: boutique editorial, serif grande, verde bosque. */
+.theme-atelier {
   --bg: #f3f2ee;
   --ink: #1b2420;
   --surface: #e6e4dd;
@@ -42,8 +42,8 @@
   --field: #2c4a3b;
   --field-ink: #f3f2ee;
   --radius: 0px;
-  --font-display: var(--font-taller-display);
-  --font-body: var(--font-taller-body);
+  --font-display: var(--font-atelier-display);
+  --font-body: var(--font-atelier-body);
 }
 
 /* Dirección B · Vitrina: alto contraste, tipografía enorme, rojo señal. */
@@ -129,4 +129,52 @@ body {
   .rise, .marquee, .drift img {
     animation: none;
   }
+}
+
+/* Entradas al hacer scroll (Reveal.tsx) */
+.reveal-pending {
+  opacity: 0;
+  transform: translateY(28px);
+}
+.reveal-pending.reveal-in {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.8s cubic-bezier(0.2, 0.7, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* Carrusel de banners (Carousel.tsx) */
+@keyframes progress {
+  from { width: 0; }
+  to { width: 100%; }
+}
+.carousel-progress {
+  animation: progress linear forwards;
+}
+@keyframes kenburns {
+  from { transform: scale(1); }
+  to { transform: scale(1.08); }
+}
+.slide-active .slide-media img {
+  animation: kenburns 7s ease-out forwards;
+}
+.slide-active .slide-text > * {
+  animation: rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.slide-active .slide-text > *:nth-child(2) { animation-delay: 120ms; }
+.slide-active .slide-text > *:nth-child(3) { animation-delay: 240ms; }
+
+/* Botón "agregar" que aparece sobre la ficha al pasar el mouse */
+.quick-add {
+  transform: translateY(110%);
+  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.group:hover .quick-add,
+.group:focus-within .quick-add {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-pending { opacity: 1; transform: none; }
+  .carousel-progress, .slide-active .slide-media img, .slide-active .slide-text > * { animation: none; }
+  .carousel-progress { width: 100%; }
 }

@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 const directions = [
-  { href: "/disenos/taller", label: "A · Taller" },
+  { href: "/disenos/atelier", label: "A · Atelier" },
   { href: "/disenos/vitrina", label: "B · Vitrina" },
   { href: "/disenos/mercado", label: "C · Mercado" },
 ];

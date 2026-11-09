@@ -1,22 +1,34 @@
 import Link from "next/link";
-import { formatCLP, fromPrice, type DemoProduct } from "@/designs/catalog";
+import { badgeLabel, formatCLP, type DemoProduct } from "@/designs/catalog";
 import { Photo } from "@/designs/Photo";
+import { QuickAdd } from "@/designs/BuyBox";
 
 export function Card({ p }: { p: DemoProduct }) {
+  const badge = badgeLabel(p);
   return (
     <Link href={`/disenos/mercado/producto/${p.slug}`} className="group flex flex-col gap-3">
-      <div className="relative">
-        <Photo name={p.image} alt={p.name} sizes="(max-width: 768px) 50vw, 25vw" className="aspect-square rounded-brand [&_img]:transition-transform [&_img]:duration-500 group-hover:[&_img]:scale-105" />
-        {(p.isNew || p.variants[0].compareAtPrice) && (
-          <span className="absolute top-3 left-3 rounded-full bg-field px-3 py-1 text-sm font-semibold text-field-ink">
-            {p.isNew ? "Nuevo" : "Oferta"}
+      <div className="relative overflow-hidden rounded-brand">
+        <Photo name={p.image} hover={p.hover} alt={p.name} sizes="(max-width: 768px) 50vw, 25vw" className="aspect-[4/5] rounded-brand [&_img]:transition-transform [&_img]:duration-500 group-hover:[&_img]:scale-105" />
+        {badge && (
+          <span className={`absolute top-3 left-3 rounded-full px-3 py-1 text-sm font-semibold ${p.compareAtPrice ? "bg-[var(--field-2)]" : "bg-field text-field-ink"}`}>
+            {badge === "Nuevo" ? "¡Nuevo!" : badge}
           </span>
         )}
+        <QuickAdd
+          slug={p.slug}
+          direction="mercado"
+          className="absolute right-3 bottom-3 flex h-12 min-w-12 items-center justify-center rounded-full bg-bg px-4 text-base font-semibold shadow-none transition-all hover:bg-accent hover:text-accent-ink active:scale-90"
+        >
+          <span aria-label="Agregar al carrito">+ Agregar</span>
+        </QuickAdd>
       </div>
       <div className="flex flex-col px-1">
         <span className="text-lg font-semibold leading-snug">{p.name}</span>
-        <span className="text-base text-ink/70">{p.short}</span>
-        <span className="mt-1 text-lg font-semibold tabular-nums">{formatCLP(fromPrice(p))}</span>
+        <span className="flex items-baseline gap-2">
+          <span className={`text-lg font-semibold tabular-nums ${p.compareAtPrice ? "text-[#b3261e]" : ""}`}>{formatCLP(p.price)}</span>
+          {p.compareAtPrice && <s className="text-base text-ink/55">{formatCLP(p.compareAtPrice)}</s>}
+        </span>
+        {p.colors.length > 1 && <span className="text-base text-ink/70">{p.colors.length} colores</span>}
       </div>
     </Link>
   );

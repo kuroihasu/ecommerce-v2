@@ -2,24 +2,24 @@ import Link from "next/link";
 
 const options = [
   {
-    href: "/disenos/taller",
-    name: "A · Taller",
-    mood: "Editorial y sereno",
-    text: "Serif grande, mucho aire, verde bosque. Se siente como una revista de diseño o una tienda de autor. Ideal para marcas que venden calidad y origen.",
+    href: "/disenos/atelier",
+    name: "A · Atelier",
+    mood: "Boutique editorial",
+    text: "Serif grande, carrusel a pantalla completa, fotos que cambian al pasar el mouse y un \"compra el look\" que agrega varias prendas de una vez. Para marcas de moda que quieren verse premium.",
     swatch: ["#f3f2ee", "#1b2420", "#2c4a3b"],
   },
   {
     href: "/disenos/vitrina",
     name: "B · Vitrina",
-    mood: "Audaz y de alto contraste",
-    text: "Tipografía condensada enorme, blanco y negro con rojo señal, fotos a sangre. Se siente como una marca de moda o un concept store.",
+    mood: "Streetwear de drops",
+    text: "Tipografía condensada enorme, negro con rojo, cuenta regresiva al próximo drop, preventas y sale. Al estilo de las marcas urbanas que lanzan ediciones limitadas.",
     swatch: ["#ffffff", "#0b0b0b", "#e8361f"],
   },
   {
     href: "/disenos/mercado",
     name: "C · Mercado",
-    mood: "Cercano y colorido",
-    text: "Campos de color, formas redondas y un buscador de regalos por presupuesto. Se siente amable y fácil, bueno para regalos y público amplio.",
+    mood: "Moda de temporada",
+    text: "Campos de color, todo redondeado, categorías en burbujas, banner de ofertas y un buscador por precio. Cercana y fácil, para tiendas de tendencia con público amplio.",
     swatch: ["#f2b705", "#f6c9c1", "#0f4c45"],
   },
 ];
@@ -29,7 +29,7 @@ export default function Disenos() {
     <main className="mx-auto max-w-[1200px] px-5 py-16 sm:px-8">
       <h1 className="text-5xl font-semibold tracking-[-0.03em] md:text-7xl">Tres direcciones de diseño</h1>
       <p className="mt-6 max-w-2xl text-xl leading-relaxed">
-        La misma tienda de muestra (Lana &amp; Greda) en tres estilos. Cada una tiene inicio, catálogo, ficha de
+        La misma tienda de ropa de muestra (NORTE) en tres estilos. Cada una tiene inicio, catálogo, ficha de
         producto y carrito funcionando. Los colores y tipografías son tokens: cambiarlos por la marca de cada cliente
         es editar un bloque de variables.
       </p>

@@ -1,29 +1,28 @@
 // Fotos de muestra (Unsplash, licencia libre para uso comercial). Son de referencia:
-// cada pyme reemplaza estas imágenes por las suyas desde el panel.
+// cada tienda reemplaza estas imágenes por las suyas desde el panel.
 export const photos: Record<string, string> = {
-  mug: "photo-1514228742587-6b1558fcca3d",
-  mug2: "photo-1572119865084-43c285814d63",
-  bowls: "photo-1610701596007-11502861dcfa",
-  plates: "photo-1603199506016-b9a594b593c0",
-  vase: "photo-1612196808214-b8e1d6145a8c",
-  pottery: "photo-1565193566173-7a0ee3dbe261",
-  blanket: "photo-1580301762395-21ce84d00bc6",
-  blanket2: "photo-1600369671236-e74521d4b6ad",
-  wool: "photo-1584992236310-6edddc08acff",
-  cushion: "photo-1584100936595-c0654b55a2e2",
-  candle: "photo-1602874801007-bd458bb1b8b6",
-  candle2: "photo-1603006905003-be475563bc59",
-  diffuser: "photo-1608571423902-eed4a5ad8108",
-  basket: "photo-1595515106969-1ce29566ff1c",
-  board: "photo-1594385208974-2e75f8d7bb48",
-  linen: "photo-1583847268964-b28dc8f51f92",
-  room: "photo-1493663284031-b7e3aefcae8e",
-  room2: "photo-1586023492125-27b2c045efd7",
-  room3: "photo-1616486338812-3dadae4b4ace",
-  table: "photo-1519710164239-da123dc03ef4",
-  hands: "photo-1452860606245-08befc0ff44b",
-  landscape: "photo-1478827387698-1527781a4887",
+  hoodie: "photo-1556821840-3a63f95609a7",
+  hoodie2: "photo-1620799140408-edc6dcb6d633",
+  tee: "photo-1521572163474-6864f9cf17ab",
+  tee2: "photo-1583743814966-8936f5b7be1a",
+  tee3: "photo-1576566588028-4147f3842f27",
+  cargo: "photo-1624378439575-d8705ad7ae80",
+  jeans: "photo-1542272604-787c3835535d",
+  jacket: "photo-1591047139829-d91aecb6caea",
+  jacket2: "photo-1544022613-e87ca75a784a",
+  dress: "photo-1595777457583-95e059d581b8",
+  dress2: "photo-1572804013309-59a88b7e92f1",
+  cap: "photo-1588850561407-ed78c282e89b",
+  bag: "photo-1590874103328-eac38a683ce7",
+  streetwear: "photo-1523398002811-999ca8dec234",
+  man: "photo-1552374196-1ab2a1c593e8",
+  woman: "photo-1509631179647-0177331693ae",
+  rack: "photo-1490481651871-ab68de25d43d",
+  shop: "photo-1441984904996-e0b6ba687e04",
+  editorial: "photo-1529139574466-a303027c1d8b",
+  editorial2: "photo-1469334031218-e382a71b716b",
+  street2: "photo-1516826957135-700dedea698c",
 };
 
 export const photoUrl = (key: string) =>
-  `https://images.unsplash.com/${photos[key] ?? photos.room}?auto=format&fit=crop&q=80`;
+  `https://images.unsplash.com/${photos[key] ?? photos.rack}?auto=format&fit=crop&q=80`;

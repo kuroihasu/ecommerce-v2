@@ -1,91 +1,126 @@
 import Link from "next/link";
-import { categories, products } from "@/designs/catalog";
+import { categories, lines, products, store } from "@/designs/catalog";
 import { Photo } from "@/designs/Photo";
+import { Carousel } from "@/designs/Carousel";
+import { Reveal } from "@/designs/Reveal";
+import { Countdown, Newsletter } from "@/designs/extras";
 import { ProductTile } from "./ProductTile";
+import { Rail } from "./Rail";
 
 const B = "/disenos/vitrina";
+const H = "text-6xl font-black uppercase leading-[0.85] tracking-[-0.025em] [font-stretch:62%] [word-spacing:0.08em] md:text-8xl";
+
+const slides = [
+  { image: "streetwear", title: "Drop 026 ya disponible", cta: "Comprar el drop", href: `${B}/catalogo?o=nuevos`, tag: "Edición limitada" },
+  { image: "hoodie2", title: "Preventa Zip Logo 3D", cta: "Reservar el mío", href: `${B}/producto/poleron-zip-logo`, tag: "Despacho 25/11" },
+  { image: "street2", title: "Sale hasta 33% off", cta: "Ver el sale", href: `${B}/catalogo?o=ofertas`, tag: "Hasta agotar stock" },
+];
 
 export default function VitrinaHome() {
-  const featured = products.filter((p) => p.featured);
-  const fresh = products.filter((p) => p.isNew || p.variants[0].compareAtPrice);
+  const best = products.filter((p) => p.featured);
+  const fresh = products.filter((p) => p.badge || p.compareAtPrice);
 
   return (
     <>
-      {/* Portada: titular gigante condensado sobre una foto a sangre completa */}
-      <section className="px-4 sm:px-6">
-        <h1 className="rise pt-4 pb-6 text-[clamp(3.6rem,13.5vw,15rem)] font-black uppercase leading-[0.82] tracking-[-0.025em] [font-stretch:62%] [word-spacing:0.08em]">
-          Hecho a mano en Chile
-        </h1>
-        <div className="grid gap-3 md:grid-cols-[2fr_1fr]">
-          <Photo name="room2" alt="Living con mantas de lana y cerámica" priority sizes="(max-width: 768px) 100vw, 66vw" className="drift rise rise-1 aspect-[4/3] md:aspect-[16/10]" />
-          <div className="rise rise-2 flex flex-col justify-between gap-8 bg-accent p-6 text-accent-ink md:p-8">
-            <p className="text-3xl font-semibold leading-tight [font-stretch:87%]">
-              12 piezas de 10 talleres, del altiplano a Chiloé. Despacho gratis sobre $40.000.
-            </p>
-            <Link href={`${B}/catalogo`} className="flex h-16 items-center justify-between bg-ink px-6 text-xl font-semibold text-bg transition-transform active:scale-[0.98]">
-              Comprar ahora <span aria-hidden>→</span>
-            </Link>
+      {/* Portada: carrusel a sangre con titulares gigantes */}
+      <Carousel
+        label="Lanzamientos"
+        className="h-[82vh] min-h-[540px] bg-ink"
+        slides={slides.map((s, k) => (
+          <div key={s.title} className="relative h-full">
+            <Photo name={s.image} alt={s.title} priority={k === 0} sizes="100vw" className="slide-media absolute inset-0" />
+            <div className="absolute inset-0 bg-black/35" />
+            <div className="slide-text absolute inset-x-0 bottom-0 flex flex-col items-start gap-5 p-4 pb-20 text-white sm:p-6 sm:pb-24">
+              <span className="bg-accent px-3 py-1 text-base font-semibold uppercase text-accent-ink">{s.tag}</span>
+              <h2 className="max-w-[14ch] text-[clamp(3.6rem,11vw,12rem)] font-black uppercase leading-[0.82] tracking-[-0.025em] [font-stretch:62%] [word-spacing:0.08em]">{s.title}</h2>
+              <Link href={s.href} className="flex h-14 items-center gap-6 bg-white px-6 text-lg font-semibold uppercase text-black transition-colors hover:bg-accent hover:text-white">
+                {s.cta} <span aria-hidden>→</span>
+              </Link>
+            </div>
           </div>
+        ))}
+      />
+
+      {/* Próximo drop: cuenta regresiva */}
+      <section className="grid gap-3 bg-accent p-4 text-accent-ink sm:p-6 md:grid-cols-[1fr_auto] md:items-center">
+        <div className="flex flex-col gap-2">
+          <p className="text-lg font-semibold uppercase">Próximo lanzamiento</p>
+          <h2 className="text-5xl font-black uppercase leading-[0.85] tracking-[-0.02em] [font-stretch:62%] [word-spacing:0.15em] md:text-7xl">{store.nextDrop.name}</h2>
+          <p className="text-lg">Viernes 21 de noviembre, 19:00. Te avisamos 10 minutos antes.</p>
+        </div>
+        <div className="flex flex-col gap-3">
+          <Countdown date={store.nextDrop.date} className="text-5xl font-black [font-stretch:62%] md:min-w-[460px] md:text-6xl" cellClass="bg-ink text-bg" />
+          <Newsletter inputClass="bg-bg text-ink" buttonClass="bg-ink text-bg font-semibold uppercase" label="Avísame" />
         </div>
       </section>
 
-      {/* Destacados: rejilla sin aire, una ficha doble */}
+      {/* Girls / Men */}
+      <section className="mt-3 grid grid-cols-2 gap-3 px-4 sm:px-6">
+        {lines.map((l, k) => (
+          <Reveal key={l.slug} delay={k * 90}>
+            <Link href={`${B}/catalogo?l=${l.slug}`} className="group relative block overflow-hidden">
+              <Photo name={l.image} alt={l.name} sizes="50vw" className="aspect-[3/4] md:aspect-[4/3] [&_img]:transition-transform [&_img]:duration-700 group-hover:[&_img]:scale-105" />
+              <span className="absolute bottom-3 left-3 text-[clamp(3rem,9vw,9rem)] font-black uppercase leading-[0.8] text-white [font-stretch:62%] transition-transform duration-300 group-hover:-translate-y-2">
+                {l.slug === "mujer" ? "Girls" : "Men"}
+              </span>
+            </Link>
+          </Reveal>
+        ))}
+      </section>
+
+      {/* Más vendidos */}
       <section className="mt-32 px-4 sm:px-6">
-        <div className="mb-6 flex items-end justify-between gap-4">
-          <h2 className="text-6xl font-black uppercase leading-[0.85] tracking-[-0.03em] [font-stretch:62%] md:text-8xl">Los más vendidos</h2>
-          <Link href={`${B}/catalogo`} className="text-lg font-semibold underline underline-offset-4 hover:text-accent">Ver todo</Link>
-        </div>
+        <Reveal className="mb-6 flex items-end justify-between gap-4">
+          <h2 className={H}>Más vendidos</h2>
+          <Link href={`${B}/catalogo`} className="text-lg font-semibold uppercase underline underline-offset-4 hover:text-accent">Ver todo</Link>
+        </Reveal>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          <div className="col-span-2 row-span-2 min-h-[480px]"><ProductTile p={featured[0]} big /></div>
-          {featured.slice(1, 5).map((p) => <ProductTile key={p.slug} p={p} />)}
+          <Reveal className="col-span-2 row-span-2 min-h-[480px]"><ProductTile p={best[0]} big /></Reveal>
+          {best.slice(1, 5).map((p, k) => <Reveal key={p.slug} delay={k * 70}><ProductTile p={p} /></Reveal>)}
         </div>
       </section>
 
       {/* Categorías: lista tipográfica gigante sobre negro */}
       <section className="mt-32 bg-field py-16 text-field-ink">
         <ul className="flex flex-col px-4 sm:px-6">
-          {categories.map((c) => (
-            <li key={c.slug}>
-              <Link href={`${B}/catalogo?c=${c.slug}`} className="group grid items-center gap-6 py-3 md:grid-cols-[1fr_280px]">
-                <span className="text-[clamp(3rem,11vw,11rem)] font-black uppercase leading-[0.85] tracking-[-0.04em] transition-colors [font-stretch:62%] group-hover:text-accent">
+          {categories.map((c, k) => (
+            <Reveal as="li" key={c.slug} delay={k * 60}>
+              <Link href={`${B}/catalogo?c=${c.slug}`} className="group grid items-center gap-6 py-2 md:grid-cols-[1fr_120px_280px]">
+                <span className="text-[clamp(3rem,10vw,10rem)] font-black uppercase leading-[0.85] tracking-[-0.025em] transition-all duration-300 [font-stretch:62%] group-hover:translate-x-4 group-hover:text-accent">
                   {c.name}
                 </span>
+                <Photo name={c.image} alt="" sizes="120px" className="hidden aspect-square scale-75 opacity-0 transition-all duration-300 group-hover:scale-100 group-hover:opacity-100 md:block" />
                 <span className="hidden text-lg md:block">{c.blurb}</span>
               </Link>
-            </li>
+            </Reveal>
           ))}
         </ul>
       </section>
 
-      {/* Novedades y ofertas: carrusel horizontal */}
+      {/* Novedades: carril horizontal con flechas */}
       <section className="mt-32">
-        <h2 className="mb-6 px-4 text-6xl font-black uppercase leading-[0.85] tracking-[-0.03em] [font-stretch:62%] sm:px-6 md:text-8xl">Recién llegados</h2>
-        <div className="flex snap-x gap-3 overflow-x-auto px-4 pb-4 sm:px-6">
-          {fresh.concat(products.slice(6, 9)).map((p) => (
+        <Reveal className="mb-6 px-4 sm:px-6"><h2 className={H}>New in</h2></Reveal>
+        <Rail>
+          {fresh.map((p) => (
             <div key={p.slug} className="w-[72vw] shrink-0 snap-start sm:w-[36vw] lg:w-[24vw]">
               <ProductTile p={p} />
             </div>
           ))}
-        </div>
+        </Rail>
       </section>
 
-      {/* Taller: foto grande + texto grande */}
-      <section className="mt-32 grid gap-3 px-4 sm:px-6 md:grid-cols-2">
-        <Photo name="hands" alt="Manos torneando greda" sizes="50vw" className="aspect-square" />
-        <div className="flex flex-col justify-between gap-10 bg-surface p-6 md:p-10">
-          <h2 className="text-6xl font-black uppercase leading-[0.85] tracking-[-0.03em] [font-stretch:62%] md:text-8xl">Sin fábrica</h2>
-          <div className="flex flex-col gap-6 text-xl leading-relaxed">
-            <p>Compramos directo a ceramistas, tejedoras y veleros. Cada ficha dice el pueblo donde se hizo la pieza.</p>
-            <dl className="grid grid-cols-3 gap-4">
-              {[["10", "talleres"], ["48 h", "despacho"], ["30", "días para cambios"]].map(([n, l]) => (
-                <div key={l} className="flex flex-col">
-                  <dt className="text-5xl font-black [font-stretch:62%]">{n}</dt>
-                  <dd className="text-base">{l}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        </div>
+      {/* Pagos y envíos */}
+      <section className="mt-32 grid gap-3 px-4 sm:px-6 md:grid-cols-3">
+        {[
+          ["6 cuotas", "sin interés con Mercado Pago"],
+          ["3 cuotas", "sin interés con Venti"],
+          ["$3.500", "envío a la RM, gratis sobre $60.000"],
+        ].map(([n, l], k) => (
+          <Reveal key={n} delay={k * 80} className="flex flex-col gap-2 bg-surface p-6 md:p-8">
+            <span className="text-7xl font-black uppercase leading-none [font-stretch:62%]">{n}</span>
+            <span className="text-lg">{l}</span>
+          </Reveal>
+        ))}
       </section>
     </>
   );

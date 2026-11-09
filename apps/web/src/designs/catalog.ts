@@ -1,204 +1,329 @@
-// Catálogo de muestra para las previews de diseño. Es más amplio que el seed de la
-// API (3 productos) para ver cada dirección con densidad real. Cuando se elija una
+// Catálogo de muestra para las previews de diseño: una marca de ropa chilena
+// (streetwear + moda mujer), con tallas, colores, ofertas y preventas, para ver
+// cada dirección con la densidad de una tienda real. Cuando se elija una
 // dirección, estas páginas pasan a leer la API (lib/api.ts).
 
-export type DemoVariant = { id: string; name: string; price: number; compareAtPrice?: number; stock: number };
+export type Badge = "nuevo" | "preventa" | "ultimas";
+export type Line = "mujer" | "hombre" | "unisex";
+export type CategorySlug = "poleras" | "polerones" | "pantalones" | "chaquetas" | "vestidos" | "accesorios";
+export type Color = { name: string; hex: string };
+export type DemoVariant = { id: string; name: string; color: string; size: string; price: number; compareAtPrice?: number; stock: number };
+
 export type DemoProduct = {
   slug: string;
   name: string;
   category: CategorySlug;
+  line: Line;
   short: string;
   description: string;
   details: string[];
-  origin: string;
+  colors: Color[];
+  sizes: string[];
+  soldOut?: string[];
+  price: number;
+  compareAtPrice?: number;
   image: string;
+  hover: string;
   gallery: string[];
-  variants: DemoVariant[];
+  badge?: Badge;
   featured?: boolean;
-  isNew?: boolean;
+  variants: DemoVariant[];
 };
 
-export type CategorySlug = "ceramica" | "textil" | "velas" | "cocina";
-
 export const store = {
-  name: "Lana & Greda",
-  tagline: "Objetos de hogar hechos a mano en Chile",
-  email: "hola@lanaygreda.cl",
-  instagram: "@lanaygreda",
+  name: "NORTE",
+  tagline: "Ropa urbana hecha en Santiago",
+  email: "hola@norte.cl",
+  instagram: "@norte.cl",
+  tiktok: "@norte.cl",
   whatsapp: "+56 9 1234 5678",
-  freeShippingFrom: 40000,
+  discountCode: "NORTECLUB",
+  shippingRM: 3500,
+  shippingRegions: 5990,
+  freeShippingFrom: 60000,
+  installments: 6,
+  // Próximo lanzamiento (para la cuenta regresiva de la dirección Vitrina).
+  nextDrop: { name: "Drop 027 · Invierno", date: "2026-11-21T19:00:00-03:00" },
 };
 
 export const categories: { slug: CategorySlug; name: string; blurb: string; image: string }[] = [
-  { slug: "ceramica", name: "Cerámica", blurb: "Gres y greda torneados a mano en Pomaire y Santiago.", image: "pottery" },
-  { slug: "textil", name: "Textil", blurb: "Lana merino y alpaca hilada y tejida a telar en el sur.", image: "blanket" },
-  { slug: "velas", name: "Velas y aromas", blurb: "Cera de soya y esencias de bosque nativo.", image: "candle" },
-  { slug: "cocina", name: "Cocina", blurb: "Maderas nativas, lino y mimbre de Chimbarongo.", image: "board" },
+  { slug: "polerones", name: "Polerones", blurb: "Algodón perchado de 380 g, corte oversize.", image: "hoodie" },
+  { slug: "poleras", name: "Poleras", blurb: "Boxy, manga larga y estampadas.", image: "tee" },
+  { slug: "pantalones", name: "Pantalones", blurb: "Baggy, cargo y wide leg.", image: "cargo" },
+  { slug: "chaquetas", name: "Chaquetas", blurb: "Cortavientos y mezclilla para el día a día.", image: "jacket" },
+  { slug: "vestidos", name: "Vestidos", blurb: "Satinados, florales y para salir.", image: "dress" },
+  { slug: "accesorios", name: "Accesorios", blurb: "Jockeys, bolsos y lo que completa el look.", image: "cap" },
 ];
 
-const v = (slug: string, price: number, stock: number, names: string[] = ["Único"], compareAtPrice?: number) =>
-  names.map((name, i) => ({ id: `${slug}-${i}`, name, price, stock, compareAtPrice }));
+export const lines: { slug: Line; name: string; image: string }[] = [
+  { slug: "mujer", name: "Mujer", image: "woman" },
+  { slug: "hombre", name: "Hombre", image: "man" },
+];
 
-export const products: DemoProduct[] = [
+const SIZES = ["S", "M", "L", "XL"];
+const C = {
+  negro: { name: "Negro", hex: "#111111" },
+  gris: { name: "Gris melange", hex: "#9a9a96" },
+  burdeo: { name: "Burdeo", hex: "#6b1f2a" },
+  blanco: { name: "Blanco", hex: "#f4f4f1" },
+  beige: { name: "Beige", hex: "#d9c8ad" },
+  verde: { name: "Verde oliva", hex: "#55593c" },
+  azulClaro: { name: "Azul claro", hex: "#8fa9c4" },
+  azul: { name: "Azul oscuro", hex: "#2b3a52" },
+  rojo: { name: "Rojo", hex: "#c22a22" },
+  champagne: { name: "Champagne", hex: "#e3cfae" },
+  floral: { name: "Floral", hex: "#d98f9a" },
+};
+
+type Base = Omit<DemoProduct, "variants">;
+const make = (p: Base): DemoProduct => ({
+  ...p,
+  variants: p.colors.flatMap((c, ci) =>
+    p.sizes.map((s, si) => ({
+      id: `${p.slug}-${ci}-${si}`,
+      name: p.sizes.length > 1 ? `${c.name} / ${s}` : c.name,
+      color: c.name,
+      size: s,
+      price: p.price,
+      compareAtPrice: p.compareAtPrice,
+      stock: p.soldOut?.includes(s) ? 0 : p.badge === "ultimas" ? 2 : 12,
+    })),
+  ),
+});
+
+const base: Base[] = [
   {
-    slug: "taza-greda-negra",
-    name: "Taza de greda negra",
-    category: "ceramica",
-    short: "Pulida a piedra, 300 ml",
-    description:
-      "Torneada y pulida a piedra, sin esmalte por fuera, con un interior vitrificado que aguanta el lavavajillas. Cada taza sale distinta del horno.",
-    details: ["300 ml", "Apta para lavavajillas", "Interior esmaltado sin plomo", "Hecha en Quinchamalí"],
-    origin: "Quinchamalí, Ñuble",
-    image: "mug",
-    gallery: ["mug", "mug2", "pottery"],
-    variants: v("taza-greda-negra", 12990, 25, ["Negra", "Natural"]),
+    slug: "poleron-oversize-club",
+    name: "Polerón Oversize Club",
+    category: "polerones",
+    line: "unisex",
+    short: "Algodón perchado 380 g",
+    description: "Nuestro polerón más vendido. Corte oversize, capucha doble y bordado frontal en hilo grueso. Lavado previo, así que no encoge.",
+    details: ["80% algodón, 20% poliéster", "380 g/m²", "Bordado frontal", "Hecho en Santiago"],
+    colors: [C.negro, C.gris, C.burdeo],
+    sizes: SIZES,
+    soldOut: ["S"],
+    price: 44990,
+    compareAtPrice: 54990,
+    image: "hoodie",
+    hover: "hoodie2",
+    gallery: ["hoodie", "hoodie2", "streetwear"],
     featured: true,
   },
   {
-    slug: "set-platos-hondos",
-    name: "Set de 2 platos hondos",
-    category: "ceramica",
-    short: "Gres esmaltado, 20 cm",
-    description:
-      "Platos hondos de gres con esmalte mate en dos tonos. Pensados para la sopa de todos los días y para que no se vean de serie.",
-    details: ["20 cm de diámetro", "Set de 2", "Apto para microondas", "Esmalte mate"],
-    origin: "Pomaire, Región Metropolitana",
-    image: "bowls",
-    gallery: ["bowls", "plates", "pottery"],
-    variants: v("set-platos-hondos", 24990, 14, ["Arena", "Musgo", "Carbón"]),
+    slug: "poleron-zip-logo",
+    name: "Polerón Zip Logo 3D",
+    category: "polerones",
+    line: "unisex",
+    short: "Doble cierre, logo en relieve",
+    description: "Polerón con cierre doble y logo 3D en el pecho. Sale en el Drop 027; lo reservas hoy y lo despachamos el 25 de noviembre.",
+    details: ["100% algodón", "420 g/m²", "Cierre doble YKK", "Despacho desde el 25/11"],
+    colors: [C.negro, C.verde],
+    sizes: SIZES,
+    price: 49990,
+    image: "hoodie2",
+    hover: "hoodie",
+    gallery: ["hoodie2", "hoodie", "man"],
+    badge: "preventa",
     featured: true,
   },
   {
-    slug: "jarro-ceramica-blanca",
-    name: "Jarro de cerámica blanca",
-    category: "ceramica",
-    short: "1 litro, para agua o flores",
-    description: "Un jarro de un litro con asa ancha y pico que no gotea. Sirve en la mesa y como florero.",
-    details: ["1 litro", "28 cm de alto", "Esmalte brillante"],
-    origin: "Santiago",
-    image: "vase",
-    gallery: ["vase", "pottery"],
-    variants: v("jarro-ceramica-blanca", 18990, 9),
-    isNew: true,
-  },
-  {
-    slug: "manta-lana-merino",
-    name: "Manta de lana merino",
-    category: "textil",
-    short: "Tejida a telar, 130 × 180 cm",
-    description:
-      "Lana merino de Magallanes, hilada y tejida a telar en Chiloé. Abriga sin pesar y se lava a mano con agua fría.",
-    details: ["130 × 180 cm", "100% lana merino", "Lavar a mano", "Tejida en Chiloé"],
-    origin: "Chiloé, Los Lagos",
-    image: "blanket",
-    gallery: ["blanket", "blanket2", "wool"],
-    variants: v("manta-lana-merino", 49990, 8, ["Natural", "Gris piedra", "Musgo"]),
+    slug: "polera-boxy-heavy",
+    name: "Polera Boxy Heavy",
+    category: "poleras",
+    line: "unisex",
+    short: "Corte cuadrado, 260 g",
+    description: "Polera de algodón pesado, cuello grueso y corte boxy que cae recto. La básica que se ve cara.",
+    details: ["100% algodón peinado", "260 g/m²", "Corte boxy", "Cuello reforzado"],
+    colors: [C.blanco, C.negro, C.beige],
+    sizes: SIZES,
+    price: 19990,
+    image: "tee",
+    hover: "tee2",
+    gallery: ["tee", "tee2", "streetwear"],
     featured: true,
   },
   {
-    slug: "pie-de-cama-alpaca",
-    name: "Pie de cama de alpaca",
-    category: "textil",
-    short: "Alpaca y lana, 70 × 220 cm",
-    description: "Un pie de cama tupido de alpaca con lana de oveja, con flecos anudados a mano.",
-    details: ["70 × 220 cm", "60% alpaca, 40% lana", "Flecos anudados a mano"],
-    origin: "Putre, Arica y Parinacota",
-    image: "blanket2",
-    gallery: ["blanket2", "wool"],
-    variants: v("pie-de-cama-alpaca", 64990, 4, ["Crudo", "Café"], 74990),
+    slug: "polera-manga-larga-special",
+    name: "Polera Manga Larga Special",
+    category: "poleras",
+    line: "mujer",
+    short: "Ajustada, con estampado en la espalda",
+    description: "Manga larga de algodón con elasticidad, estampado serigrafiado en la espalda y puños largos.",
+    details: ["95% algodón, 5% elastano", "Estampado serigrafía", "Calce ajustado"],
+    colors: [C.negro, C.blanco],
+    sizes: ["XS", "S", "M", "L"],
+    price: 22990,
+    compareAtPrice: 24990,
+    image: "tee2",
+    hover: "woman",
+    gallery: ["tee2", "woman"],
   },
   {
-    slug: "cojin-telar",
-    name: "Cojín tejido a telar",
-    category: "textil",
-    short: "45 × 45 cm, con relleno",
-    description: "Funda de lana tejida a telar con relleno de pluma sintética. La funda se retira con un cierre oculto.",
-    details: ["45 × 45 cm", "Funda de lana", "Relleno incluido"],
-    origin: "Temuco, La Araucanía",
-    image: "cushion",
-    gallery: ["cushion", "wool"],
-    variants: v("cojin-telar", 22990, 18, ["Crudo", "Terracota", "Gris"]),
-    isNew: true,
+    slug: "polera-estampada-norte",
+    name: "Polera Estampada Norte",
+    category: "poleras",
+    line: "unisex",
+    short: "Edición limitada, 150 unidades",
+    description: "Estampado del Drop 026 en tinta al agua. Solo 150 unidades numeradas en la etiqueta.",
+    details: ["100% algodón", "Tinta al agua", "150 unidades numeradas"],
+    colors: [C.blanco],
+    sizes: SIZES,
+    price: 17990,
+    image: "tee3",
+    hover: "tee",
+    gallery: ["tee3", "tee"],
+    badge: "nuevo",
   },
   {
-    slug: "vela-soya-cedro",
-    name: "Vela de soya aroma cedro",
-    category: "velas",
-    short: "Mecha de algodón, 45 horas",
-    description: "Cera de soya vertida a mano en vaso de vidrio reciclado, con aroma a cedro y vetiver. Dura unas 45 horas.",
-    details: ["220 g", "45 horas de duración", "Mecha de algodón", "Vaso reutilizable"],
-    origin: "Valparaíso",
-    image: "candle",
-    gallery: ["candle", "candle2"],
-    variants: v("vela-soya-cedro", 9990, 40),
+    slug: "pantalon-baggy-cargo",
+    name: "Pantalón Baggy Cargo",
+    category: "pantalones",
+    line: "unisex",
+    short: "Bolsillos laterales, pretina ajustable",
+    description: "Cargo de gabardina con seis bolsillos, pierna ancha y cordón en la basta para ajustarlo sobre la zapatilla.",
+    details: ["100% algodón gabardina", "6 bolsillos", "Basta con cordón"],
+    colors: [C.gris, C.negro],
+    sizes: ["38", "40", "42", "44"],
+    soldOut: ["44"],
+    price: 34990,
+    compareAtPrice: 44990,
+    image: "cargo",
+    hover: "streetwear",
+    gallery: ["cargo", "streetwear"],
     featured: true,
   },
   {
-    slug: "vela-bosque-valdiviano",
-    name: "Vela Bosque Valdiviano",
-    category: "velas",
-    short: "Ulmo, musgo y lluvia",
-    description: "Notas de miel de ulmo, musgo húmedo y tierra mojada. Hecha en pequeños lotes de 60 velas.",
-    details: ["220 g", "45 horas", "Lotes de 60 unidades"],
-    origin: "Valdivia, Los Ríos",
-    image: "candle2",
-    gallery: ["candle2", "candle"],
-    variants: v("vela-bosque-valdiviano", 11990, 22),
+    slug: "jeans-wide-leg",
+    name: "Jeans Wide Leg",
+    category: "pantalones",
+    line: "mujer",
+    short: "Tiro alto, pierna ancha",
+    description: "Jeans de tiro alto y pierna ancha en mezclilla rígida de 13 oz, que se amolda con el uso.",
+    details: ["100% algodón", "Mezclilla 13 oz", "Tiro alto"],
+    colors: [C.azulClaro, C.azul],
+    sizes: ["36", "38", "40", "42"],
+    price: 32990,
+    image: "jeans",
+    hover: "woman",
+    gallery: ["jeans", "woman"],
   },
   {
-    slug: "difusor-palo-santo",
-    name: "Difusor de palo santo",
-    category: "velas",
-    short: "Varillas de ratán, 100 ml",
-    description: "Difusor de ambiente con base de aceites vegetales y aroma a palo santo. Perfuma un cuarto por dos meses.",
-    details: ["100 ml", "8 varillas de ratán", "Dura unos 2 meses"],
-    origin: "Santiago",
-    image: "diffuser",
-    gallery: ["diffuser", "candle"],
-    variants: v("difusor-palo-santo", 14990, 16),
-  },
-  {
-    slug: "canasto-mimbre",
-    name: "Canasto de mimbre",
-    category: "cocina",
-    short: "Tejido en Chimbarongo",
-    description: "Canasto de mimbre tejido a mano en Chimbarongo, para el pan, la fruta o la leña chica.",
-    details: ["35 cm de diámetro", "Mimbre natural", "Tejido a mano"],
-    origin: "Chimbarongo, O'Higgins",
-    image: "basket",
-    gallery: ["basket"],
-    variants: v("canasto-mimbre", 27990, 11, ["Mediano", "Grande"]),
+    slug: "cortavientos-track",
+    name: "Cortavientos Track",
+    category: "chaquetas",
+    line: "unisex",
+    short: "Impermeable, con capucha guardable",
+    description: "Cortavientos liviano con forro de malla, capucha que se guarda en el cuello y reflectante en la espalda.",
+    details: ["100% poliéster", "Repele el agua", "Reflectante trasero"],
+    colors: [C.negro, C.rojo],
+    sizes: SIZES,
+    price: 54990,
+    image: "jacket",
+    hover: "jacket2",
+    gallery: ["jacket", "jacket2"],
+    badge: "nuevo",
     featured: true,
   },
   {
-    slug: "tabla-rauli",
-    name: "Tabla de raulí",
-    category: "cocina",
-    short: "Madera nativa certificada",
-    description: "Tabla para picar y servir de raulí de manejo certificado, terminada con aceite de linaza.",
-    details: ["40 × 22 cm", "Raulí certificado", "Aceite de linaza"],
-    origin: "Panguipulli, Los Ríos",
-    image: "board",
-    gallery: ["board"],
-    variants: v("tabla-rauli", 19990, 13),
+    slug: "chaqueta-mezclilla-oversize",
+    name: "Chaqueta de Mezclilla Oversize",
+    category: "chaquetas",
+    line: "unisex",
+    short: "Lavado vintage",
+    description: "Chaqueta de mezclilla con lavado vintage, hombros caídos y botones metálicos grabados.",
+    details: ["100% algodón", "Lavado vintage", "Botones grabados"],
+    colors: [C.azulClaro],
+    sizes: SIZES,
+    price: 46990,
+    compareAtPrice: 52990,
+    image: "jacket2",
+    hover: "jacket",
+    gallery: ["jacket2", "jacket"],
   },
   {
-    slug: "pano-lino",
-    name: "Paño de cocina de lino",
-    category: "cocina",
-    short: "Set de 2, 50 × 70 cm",
-    description: "Paños de lino lavado que secan rápido y se ponen más suaves con cada lavado.",
-    details: ["Set de 2", "50 × 70 cm", "100% lino lavado"],
-    origin: "Santiago",
-    image: "linen",
-    gallery: ["linen"],
-    variants: v("pano-lino", 8990, 30, ["Natural", "Rayado"]),
+    slug: "vestido-midi-satinado",
+    name: "Vestido Midi Satinado",
+    category: "vestidos",
+    line: "mujer",
+    short: "Tiritas regulables, caída al bies",
+    description: "Vestido midi de satín cortado al bies, con tiritas regulables y espalda descubierta.",
+    details: ["100% poliéster satinado", "Largo midi", "Tiritas regulables"],
+    colors: [C.negro, C.champagne],
+    sizes: ["XS", "S", "M", "L"],
+    price: 29990,
+    image: "dress",
+    hover: "dress2",
+    gallery: ["dress", "dress2", "woman"],
+    featured: true,
+  },
+  {
+    slug: "vestido-corto-floral",
+    name: "Vestido Corto Floral",
+    category: "vestidos",
+    line: "mujer",
+    short: "Manga globo, forrado",
+    description: "Vestido corto forrado con estampado floral, manga globo y elástico en la espalda.",
+    details: ["Viscosa", "Forrado", "Manga globo"],
+    colors: [C.floral],
+    sizes: ["S", "M", "L"],
+    soldOut: ["S"],
+    price: 24990,
+    compareAtPrice: 29990,
+    image: "dress2",
+    hover: "dress",
+    gallery: ["dress2", "dress"],
+    badge: "ultimas",
+  },
+  {
+    slug: "jockey-bordado",
+    name: "Jockey Bordado",
+    category: "accesorios",
+    line: "unisex",
+    short: "Visera curva, ajuste trasero",
+    description: "Jockey de gabardina con logo bordado y hebilla metálica para ajustar atrás.",
+    details: ["100% algodón", "Talla única", "Hebilla metálica"],
+    colors: [C.negro, C.beige],
+    sizes: ["Única"],
+    price: 14990,
+    image: "cap",
+    hover: "streetwear",
+    gallery: ["cap"],
+  },
+  {
+    slug: "bolso-tote",
+    name: "Bolso Tote Canvas",
+    category: "accesorios",
+    line: "unisex",
+    short: "Lona gruesa, bolsillo interior",
+    description: "Tote de lona gruesa con bolsillo interior con cierre. Cabe un notebook de 15 pulgadas.",
+    details: ["Lona 12 oz", "40 × 38 cm", "Bolsillo con cierre"],
+    colors: [C.beige, C.negro],
+    sizes: ["Única"],
+    price: 12990,
+    image: "bag",
+    hover: "bag",
+    gallery: ["bag"],
+    badge: "nuevo",
   },
 ];
+
+export const products: DemoProduct[] = base.map(make);
 
 export const getProduct = (slug: string) => products.find((p) => p.slug === slug);
 export const categoryName = (slug: CategorySlug) => categories.find((c) => c.slug === slug)?.name ?? slug;
-export const fromPrice = (p: DemoProduct) => Math.min(...p.variants.map((x) => x.price));
+export const fromPrice = (p: DemoProduct) => p.price;
+export const discountPct = (p: DemoProduct) => (p.compareAtPrice ? Math.round((1 - p.price / p.compareAtPrice) * 100) : 0);
+
+export const badgeLabel = (p: DemoProduct): string | null => {
+  if (p.badge === "preventa") return "Preventa";
+  if (p.badge === "ultimas") return "Últimas unidades";
+  if (p.compareAtPrice) return `−${discountPct(p)}%`;
+  if (p.badge === "nuevo") return "Nuevo";
+  return null;
+};
 
 export const formatCLP = (n: number) =>
   new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP", maximumFractionDigits: 0 }).format(n);
+
+export const installment = (n: number) => formatCLP(Math.round(n / store.installments));
