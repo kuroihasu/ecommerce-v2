@@ -8,7 +8,8 @@
       "outputs": [
         ".next/**",
         "!.next/cache/**",
-        "dist/**"
+        "dist/**",
+        "src/generated/**"
       ],
       "passThroughEnv": [
         "DATABASE_URL",
