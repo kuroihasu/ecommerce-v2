@@ -47,7 +47,7 @@ export function useCatalog() {
   const l = params.get("l") as Line | null;
   const t = params.get("t");
   const o = (params.get("o") as Sort | null) ?? "destacados";
-  // Mientras se escribe, el filtrado queda en segundo plano y el campo no se traba.
+  // El filtrado queda en segundo plano para que la página no se trabe con catálogos grandes.
   const query = useDeferredValue(q);
 
   // El índice de búsqueda se arma una vez por catálogo, no en cada tecla.
