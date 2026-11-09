@@ -11,7 +11,8 @@
         "dist/**"
       ],
       "passThroughEnv": [
-        "DATABASE_URL"
+        "DATABASE_URL",
+        "SEED_DEMO"
       ],
       "env": [
         "NEXT_PUBLIC_API_URL",

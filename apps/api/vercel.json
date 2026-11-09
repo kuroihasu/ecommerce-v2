@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nestjs",
-  "buildCommand": "cd ../.. && pnpm turbo run build --filter=@tienda/api^... && pnpm --filter @tienda/db migrate:deploy",
+  "buildCommand": "cd ../.. && pnpm turbo run build --filter=@tienda/api^... && pnpm --filter @tienda/db migrate:deploy && if [ \"$SEED_DEMO\" = \"true\" ]; then pnpm --filter @tienda/db seed; fi",
   "regions": [
     "gru1"
   ]
