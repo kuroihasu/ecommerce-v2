@@ -71,6 +71,20 @@ Para activarlo:
 
 El seed no crea usuarios a propósito: corre en cada deploy contra la base real.
 
+### Probar el panel en un preview de Vercel
+
+Para mostrar el panel sin tocar producción, define estas variables **solo para Preview** (y si
+quieres, solo para la rama):
+
+- En la API: `AUTH_SECRET`, `DEMO_ADMIN_EMAIL` y `ADMIN_PASSWORD`. Al desplegar, el build crea
+  (o actualiza la contraseña de) esa cuenta como dueña de la tienda demo.
+- En la web: `NEXT_PUBLIC_API_URL` con la URL del preview de la API, y `API_BYPASS_TOKEN` con el
+  secreto de *Protection Bypass for Automation* de la API (Settings → Deployment Protection),
+  porque los previews de la API piden login de Vercel.
+
+Ojo: la base es la misma de producción, así que esa cuenta también existe ahí. Al terminar,
+borra las variables y cambia la contraseña con `admin:create`.
+
 ## API disponible
 
 | Método | Ruta | Qué hace |

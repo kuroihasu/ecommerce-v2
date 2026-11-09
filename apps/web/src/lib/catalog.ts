@@ -12,10 +12,10 @@ import {
   type StoreInfo,
 } from "@/designs/catalog";
 import type { StoredTheme } from "@/themes/tokens";
+import { API_URL, apiHeaders } from "./api-base";
 
 // Datos de la tienda desde la API NestJS, traducidos al modelo que usan los diseños.
 // La tienda activa sale de STORE_SLUG (más adelante, en la plataforma, por dominio).
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 export const STORE_SLUG = process.env.STORE_SLUG ?? "demo";
 
 // ─── Forma de la respuesta de GET /stores/:slug/catalog ─────────────
@@ -126,6 +126,7 @@ async function fetchStoreData(): Promise<StoreData> {
     // que pide siempre una copia fresca (?v=) para que un cambio del panel se vea al tiro.
     const res = await fetch(`${API_URL}/stores/${STORE_SLUG}/catalog?v=${Date.now()}`, {
       signal: AbortSignal.timeout(5000),
+      headers: apiHeaders(),
     });
     if (!res.ok) throw new Error(`API ${res.status}`);
     const data = (await res.json()) as ApiCatalog;

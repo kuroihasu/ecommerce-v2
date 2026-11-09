@@ -2,8 +2,7 @@ import "server-only";
 import { redirect } from "next/navigation";
 import { STORE_SLUG } from "@/lib/catalog";
 import { getToken } from "./session";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+import { API_URL, apiHeaders } from "@/lib/api-base";
 
 export class ApiError extends Error {
   constructor(
@@ -28,7 +27,7 @@ export async function adminApi<T>(path: string, init?: { method?: string; body?:
   if (!token) redirect("/admin/login");
   const res = await fetch(`${API_URL}/admin/stores/${STORE_SLUG}${path}`, {
     method: init?.method ?? "GET",
-    headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
+    headers: apiHeaders({ authorization: `Bearer ${token}`, "content-type": "application/json" }),
     body: init?.body === undefined ? undefined : JSON.stringify(init.body),
     cache: "no-store",
     signal: AbortSignal.timeout(15000),
@@ -41,7 +40,7 @@ export async function adminApi<T>(path: string, init?: { method?: string; body?:
 export async function apiLogin(email: string, password: string) {
   const res = await fetch(`${API_URL}/auth/login`, {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: apiHeaders({ "content-type": "application/json" }),
     body: JSON.stringify({ email, password }),
     cache: "no-store",
     signal: AbortSignal.timeout(15000),
