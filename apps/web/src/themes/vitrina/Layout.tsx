@@ -28,6 +28,7 @@ export async function Layout({ children }: { children: React.ReactNode }) {
           </div>
           <div className="flex items-center gap-3">
             <Link href={`/catalogo`} className="text-base font-semibold uppercase md:hidden">Tienda</Link>
+            <Link href="/catalogo#buscar" className="text-base font-semibold uppercase transition-colors hover:text-accent">Buscar</Link>
             <Link href={`/carrito`} className="flex h-11 items-center gap-3 bg-ink px-5 text-base font-semibold text-bg transition-colors hover:bg-accent">
               Carrito <CartCount direction="tienda" />
             </Link>

@@ -120,6 +120,7 @@ model Product {
 
   @@unique([storeId, slug])
   @@index([storeId, status])
+  @@index([categoryId])
 }
 
 model ProductImage {
@@ -132,6 +133,8 @@ model ProductImage {
   color     String?
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId, position])
 }
 
 // Todo producto tiene al menos una variante: ahí viven precio, SKU y stock.
@@ -150,6 +153,8 @@ model ProductVariant {
   product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
   cartItems  CartItem[]
   orderItems OrderItem[]
+
+  @@index([productId, position])
 }
 
 // ─── Clientes ───────────────────────────────────────────────────────

@@ -28,6 +28,9 @@ export async function Layout({ children }: { children: React.ReactNode }) {
           </div>
           <div className="flex items-center gap-2">
             <Link href={`/catalogo`} className="rounded-full bg-surface px-4 py-3 text-base font-medium lg:hidden">Tienda</Link>
+            <Link href="/catalogo#buscar" aria-label="Buscar" className="grid size-12 place-items-center rounded-full bg-surface transition-colors hover:bg-ink/10">
+              <svg aria-hidden viewBox="0 0 24 24" className="size-5"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" strokeWidth="2" /><path d="m20 20-4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+            </Link>
             <Link href={`/carrito`} className="flex h-12 items-center gap-3 rounded-full bg-accent pr-2 pl-5 text-base font-medium text-accent-ink transition-transform hover:scale-[1.03] active:scale-95">
               Carrito
               <CartCount direction="tienda" className="grid h-8 min-w-8 place-items-center rounded-full bg-field px-2 text-field-ink" />

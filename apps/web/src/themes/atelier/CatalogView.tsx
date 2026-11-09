@@ -2,20 +2,22 @@
 
 import { categoryName } from "@/designs/catalog";
 import { useCatalogData } from "@/designs/CatalogProvider";
+import { SearchBox } from "@/designs/SearchBox";
 import { allSizes, sortLabels, useCatalog, type Sort } from "@/designs/useCatalog";
 import { Card } from "./Card";
 
 export function CatalogView() {
   const catalog = useCatalogData();
   const { categories } = catalog;
-  const { list, c, l, t, o, set } = useCatalog();
-  const title = c ? categoryName(catalog, c) : l === "mujer" ? "Mujer" : l === "hombre" ? "Hombre" : o === "ofertas" ? "Ofertas" : o === "nuevos" ? "Lo nuevo" : "Toda la colección";
+  const { list, q, c, l, t, o, set } = useCatalog();
+  const title = q.trim() ? `“${q.trim()}”` : c ? categoryName(catalog, c) : l === "mujer" ? "Mujer" : l === "hombre" ? "Hombre" : o === "ofertas" ? "Ofertas" : o === "nuevos" ? "Lo nuevo" : "Toda la colección";
   const chip = (on: boolean) => `h-11 px-4 text-base transition-colors ${on ? "bg-ink text-bg" : "bg-surface hover:bg-ink/10"}`;
 
   return (
     <>
       <div className="flex flex-col gap-6 pt-12 pb-10">
         <h1 className="rise font-display text-[clamp(3.5rem,7vw,7rem)] leading-[0.92] tracking-[-0.03em]">{title}</h1>
+        <SearchBox value={q} onChange={(v) => set("q", v)} className="rise rise-1 max-w-xl" inputClass="bg-surface" />
         <div className="rise rise-1 flex flex-wrap gap-2">
           <button className={chip(!c)} onClick={() => set("c", null)}>Todo</button>
           {categories.map((x) => (
@@ -51,7 +53,7 @@ export function CatalogView() {
         <div>
           <p className="mb-6 text-base">{list.length} productos</p>
           {list.length === 0 ? (
-            <p className="text-xl">No hay prendas con esos filtros. Prueba con otra talla.</p>
+            <p className="text-xl">{q.trim() ? "No encontramos prendas con esa búsqueda. Prueba con otra palabra." : "No hay prendas con esos filtros. Prueba con otra talla."}</p>
           ) : (
             <div className="grid grid-cols-2 gap-x-5 gap-y-12 xl:grid-cols-3">
               {list.map((p) => <Card key={p.slug} p={p} sizes="(max-width: 1024px) 50vw, 30vw" />)}

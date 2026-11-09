@@ -29,7 +29,7 @@ export async function Layout({ children }: { children: React.ReactNode }) {
           <Link href={`/catalogo`} className="text-base md:hidden">Catálogo</Link>
           <Link href="/" className="font-display text-4xl leading-none tracking-[0.04em]">{store.name}</Link>
           <div className="flex items-center justify-end gap-6 text-base">
-            <Link href={`/catalogo`} className="hidden hover:opacity-60 md:inline">Buscar</Link>
+            <Link href="/catalogo#buscar" className="hidden hover:opacity-60 md:inline">Buscar</Link>
             <Link href={`/carrito`} className="hover:opacity-60">Carrito (<CartCount direction="tienda" />)</Link>
           </div>
         </nav>
