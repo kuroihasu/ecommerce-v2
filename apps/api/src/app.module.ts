@@ -1,10 +1,15 @@
-import { Module } from '@nestjs/common';
+import { Module, StandardSchemaValidationPipe } from '@nestjs/common';
+import { APP_PIPE } from '@nestjs/core';
+import { AdminModule } from './admin/admin.module.js';
+import { AuthModule } from './auth/auth.module.js';
 import { CatalogModule } from './catalog/catalog.module.js';
 import { HealthController } from './health.controller.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 
 @Module({
-  imports: [PrismaModule, CatalogModule],
+  imports: [PrismaModule, AuthModule, CatalogModule, AdminModule],
   controllers: [HealthController],
+  // Valida los cuerpos con los esquemas Zod de cada ruta (`@Body({ schema })`).
+  providers: [{ provide: APP_PIPE, useValue: new StandardSchemaValidationPipe() }],
 })
 export class AppModule {}

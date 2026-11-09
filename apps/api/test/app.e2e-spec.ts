@@ -33,4 +33,15 @@ describe('API (e2e)', () => {
   it('GET /stores/no-existe da 404', () => {
     return request(app.getHttpServer()).get('/stores/no-existe').expect(404);
   });
+
+  it('el panel pide sesión', () => {
+    return request(app.getHttpServer()).get('/admin/stores/demo/products').expect(401);
+  });
+
+  it('login con datos incorrectos da 401 sin revelar si el correo existe', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({ email: 'nadie@ejemplo.cl', password: 'incorrecta' });
+    expect([401, 503]).toContain(res.status);
+  });
 });

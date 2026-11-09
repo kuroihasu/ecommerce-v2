@@ -1,4 +1,5 @@
 import { Controller, Get, Header, Param, Query } from '@nestjs/common';
+import { Public } from '@nestjs/authentication';
 
 // Lo público del catálogo cambia poco: el CDN de Vercel lo sirve desde caché por un
 // minuto y hasta 5 más mientras lo renueva en segundo plano, así la base y la función
@@ -6,6 +7,8 @@ import { Controller, Get, Header, Param, Query } from '@nestjs/common';
 const PUBLIC_CACHE = 'public, s-maxage=60, stale-while-revalidate=300';
 import { CatalogService } from './catalog.service.js';
 
+// Lectura pública: no pide sesión.
+@Public()
 @Controller('stores/:store')
 export class CatalogController {
   constructor(private readonly catalog: CatalogService) {}
