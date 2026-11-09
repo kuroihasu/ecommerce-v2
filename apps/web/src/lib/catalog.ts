@@ -115,14 +115,18 @@ export function toCatalog(data: ApiCatalog): Catalog {
   return { store, categories, lines: Array.isArray(lines) ? lines : demoCatalog.lines, products };
 }
 
-// Se cachea por unos minutos. Cuando el panel guarde productos o el tema,
-// basta con revalidateTag("store").
+// Se cachea por unos minutos. Las acciones del panel llaman a updateTag("store")
+// después de guardar, así el cambio se ve en la siguiente visita.
 async function fetchStoreData(): Promise<StoreData> {
   "use cache";
   cacheTag("store", "store-theme");
   cacheLife("minutes");
   try {
-    const res = await fetch(`${API_URL}/stores/${STORE_SLUG}/catalog`, { signal: AbortSignal.timeout(5000) });
+    // La API deja este endpoint en el CDN un minuto; la web ya cachea por su cuenta, así
+    // que pide siempre una copia fresca (?v=) para que un cambio del panel se vea al tiro.
+    const res = await fetch(`${API_URL}/stores/${STORE_SLUG}/catalog?v=${Date.now()}`, {
+      signal: AbortSignal.timeout(5000),
+    });
     if (!res.ok) throw new Error(`API ${res.status}`);
     const data = (await res.json()) as ApiCatalog;
     return {

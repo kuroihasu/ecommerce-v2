@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { findProduct, photosFor } from "./catalog";
 import { useCatalogData } from "./CatalogProvider";
-import { photoUrl } from "./images";
+import { canOptimize, photoUrl } from "./images";
 import { Photo } from "./Photo";
 import { useSelectedColor } from "./selection";
 
@@ -183,6 +183,7 @@ function Lightbox({ photos, start, name, onClose }: { photos: string[]; start: n
           <Image
             key={photos[k]}
             src={photoUrl(photos[k])}
+            unoptimized={!canOptimize(photoUrl(photos[k]))}
             alt={`${name}, foto ${k + 1}`}
             fill
             sizes="100vw"

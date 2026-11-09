@@ -44,3 +44,16 @@ export const photoUrl = (key: string) =>
   /^(https?:)?\/\//.test(key) || key.startsWith("/")
     ? key
     : `https://images.unsplash.com/${photos[key] ?? photos.rack}?auto=format&fit=crop&q=80`;
+
+// Hosts que el optimizador de imágenes de Next acepta (next.config.ts → images.remotePatterns).
+// Una foto de otro sitio (por ejemplo, subida desde el panel a otro servicio) se muestra
+// tal cual, sin optimizar, en vez de quedar rota.
+const OPTIMIZED_HOSTS = ["images.unsplash.com"];
+export const canOptimize = (src: string) => {
+  if (src.startsWith("/")) return true;
+  try {
+    return OPTIMIZED_HOSTS.includes(new URL(src).hostname);
+  } catch {
+    return false;
+  }
+};

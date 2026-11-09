@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { photoUrl } from "./images";
+import { canOptimize, photoUrl } from "./images";
 
 // Imagen con respaldo: si la foto no carga queda un campo de color de la marca con
 // el nombre, nunca un ícono roto. Con `hover`, al pasar el mouse sobre el grupo
@@ -31,6 +31,7 @@ export function Photo({
         <>
           <Image
             src={photoUrl(name)}
+            unoptimized={!canOptimize(photoUrl(name))}
             alt={alt}
             fill
             sizes={sizes}
@@ -41,6 +42,7 @@ export function Photo({
           {hover && hover !== name && (
             <Image
               src={photoUrl(hover)}
+              unoptimized={!canOptimize(photoUrl(hover))}
               alt=""
               fill
               sizes={sizes}

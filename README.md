@@ -54,6 +54,23 @@ pnpm db:seed      # carga la tienda demo (NORTE, ropa urbana)
 pnpm dev          # web en http://localhost:3000, API en http://localhost:4000
 ```
 
+## Panel de administración
+
+En `/admin` el equipo de la tienda edita productos (fotos, variantes, precios y
+stock), el diseño y los colores, y los datos de la tienda (contacto, envíos, cuotas).
+Lo que se guarda se ve en la tienda de inmediato.
+
+Para activarlo:
+
+1. Define `AUTH_SECRET` en la API (`openssl rand -hex 32`, mínimo 32 caracteres).
+2. Crea la cuenta del dueño (la contraseña va por variable para que no quede en el historial):
+
+   ```bash
+   ADMIN_PASSWORD='una-clave-larga' pnpm --filter @tienda/api admin:create dueno@tienda.cl demo
+   ```
+
+El seed no crea usuarios a propósito: corre en cada deploy contra la base real.
+
 ## API disponible
 
 | Método | Ruta | Qué hace |
@@ -64,6 +81,16 @@ pnpm dev          # web en http://localhost:3000, API en http://localhost:4000
 | GET | `/stores/:store/categories` | Categorías |
 | GET | `/stores/:store/products?category=&featured=true` | Productos activos |
 | GET | `/stores/:store/products/:slug` | Detalle de un producto |
+| POST | `/auth/login` | Entrar al panel (máx. 5 intentos por minuto por IP) |
+| GET | `/auth/me` | Usuario y tiendas a las que tiene acceso |
+| GET, PATCH | `/admin/stores/:store` | Nombre, diseño y datos de la tienda |
+| GET, POST | `/admin/stores/:store/products` | Productos (todos los estados) |
+| GET, PATCH, DELETE | `/admin/stores/:store/products/:id` | Un producto (DELETE archiva) |
+| PUT | `/admin/stores/:store/products/:id/variants` | Reemplaza las variantes |
+| PUT | `/admin/stores/:store/products/:id/images` | Reemplaza las fotos (en orden) |
+| GET, POST, PATCH | `/admin/stores/:store/categories` | Categorías |
+
+Las rutas `/admin` piden `Authorization: Bearer <token>` y ser miembro de la tienda.
 
 ## De dónde saca los datos la tienda
 
