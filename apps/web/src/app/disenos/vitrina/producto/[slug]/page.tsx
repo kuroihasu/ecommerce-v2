@@ -18,9 +18,9 @@ export default async function VitrinaProduct({ params }: PageProps<"/disenos/vit
   return (
     <div className="px-4 sm:px-6">
       <div className="grid gap-3 lg:grid-cols-[3fr_2fr]">
-        <div className="flex flex-col gap-3">
+        <div className="-mx-4 flex snap-x gap-3 overflow-x-auto px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0">
           {p.gallery.map((g, i) => (
-            <Photo key={g} name={g} alt={`${p.name}, foto ${i + 1}`} priority={i === 0} sizes="60vw" className="aspect-[4/3]" />
+            <Photo key={g} name={g} alt={`${p.name}, foto ${i + 1}`} priority={i === 0} sizes="(max-width: 1024px) 85vw, 60vw" className="aspect-[4/3] w-[85vw] shrink-0 snap-start lg:w-auto" />
           ))}
         </div>
         <div className="flex flex-col gap-8 bg-surface p-6 md:p-10 lg:sticky lg:top-[76px] lg:h-fit">

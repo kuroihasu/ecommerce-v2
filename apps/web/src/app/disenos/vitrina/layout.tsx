@@ -48,7 +48,7 @@ export default function VitrinaLayout({ children }: LayoutProps<"/disenos/vitrin
             <span>{store.whatsapp}</span>
           </div>
         </div>
-        <p className="px-2 text-[15.5vw] font-black uppercase leading-[0.8] tracking-[-0.04em] [font-stretch:62%]">{store.name}</p>
+        <p className="px-2 text-[15.5vw] font-black uppercase leading-[0.8] tracking-[-0.025em] [font-stretch:62%] [word-spacing:0.08em]">{store.name}</p>
         <p className="px-4 py-6 text-sm text-field-ink/70 sm:px-6">Fotografías de muestra: Unsplash. Se reemplazan por las de cada tienda.</p>
       </footer>
     </div>

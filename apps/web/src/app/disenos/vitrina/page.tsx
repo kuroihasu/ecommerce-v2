@@ -13,7 +13,7 @@ export default function VitrinaHome() {
     <>
       {/* Portada: titular gigante condensado sobre una foto a sangre completa */}
       <section className="px-4 sm:px-6">
-        <h1 className="rise pt-4 pb-6 text-[clamp(3.6rem,13.5vw,15rem)] font-black uppercase leading-[0.82] tracking-[-0.04em] [font-stretch:62%]">
+        <h1 className="rise pt-4 pb-6 text-[clamp(3.6rem,13.5vw,15rem)] font-black uppercase leading-[0.82] tracking-[-0.025em] [font-stretch:62%] [word-spacing:0.08em]">
           Hecho a mano en Chile
         </h1>
         <div className="grid gap-3 md:grid-cols-[2fr_1fr]">
@@ -36,7 +36,7 @@ export default function VitrinaHome() {
           <Link href={`${B}/catalogo`} className="text-lg font-semibold underline underline-offset-4 hover:text-accent">Ver todo</Link>
         </div>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          <div className="col-span-2 row-span-2"><ProductTile p={featured[0]} big /></div>
+          <div className="col-span-2 row-span-2 min-h-[480px]"><ProductTile p={featured[0]} big /></div>
           {featured.slice(1, 5).map((p) => <ProductTile key={p.slug} p={p} />)}
         </div>
       </section>

@@ -88,12 +88,12 @@ export default function TallerHome() {
       </section>
 
       {/* Categorías: dos grandes, dos chicas, alternadas */}
-      <section className="mx-auto mt-40 grid max-w-[1440px] gap-8 px-5 sm:px-8 md:grid-cols-12">
+      <section className="mx-auto mt-40 grid max-w-[1440px] items-start gap-x-8 gap-y-16 px-5 sm:px-8 md:grid-cols-12">
         {categories.map((c, i) => (
           <Link
             key={c.slug}
             href={`${B}/catalogo#${c.slug}`}
-            className={`group flex flex-col gap-4 ${["md:col-span-7", "md:col-span-5 md:mt-32", "md:col-span-5", "md:col-span-7 md:-mt-32"][i]}`}
+            className={`group flex flex-col gap-4 ${["md:col-span-7", "md:col-span-5 md:mt-32", "md:col-span-5", "md:col-span-7"][i]}`}
           >
             <Photo name={c.image} alt={c.name} sizes="60vw" className={`${i % 3 === 0 ? "aspect-[4/3]" : "aspect-[4/5]"} [&_img]:transition-transform [&_img]:duration-700 group-hover:[&_img]:scale-105`} />
             <span className="font-display text-5xl leading-none">{c.name}</span>

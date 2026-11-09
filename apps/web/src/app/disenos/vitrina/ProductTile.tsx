@@ -5,7 +5,7 @@ import { Photo } from "@/designs/Photo";
 // Ficha de vitrina: foto a sangre y la etiqueta de precio como bloque sólido.
 export function ProductTile({ p, big = false }: { p: DemoProduct; big?: boolean }) {
   return (
-    <Link href={`/disenos/vitrina/producto/${p.slug}`} className="group relative block bg-surface">
+    <Link href={`/disenos/vitrina/producto/${p.slug}`} className="group relative block h-full bg-surface">
       <Photo
         name={p.image}
         alt={p.name}
