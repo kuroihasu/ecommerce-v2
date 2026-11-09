@@ -1,9 +1,37 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "tasks": {
-    "build": { "dependsOn": ["^build"], "outputs": [".next/**", "!.next/cache/**", "dist/**"] },
-    "dev": { "dependsOn": ["^build"], "cache": false, "persistent": true },
+    "build": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "dist/**",
+        "src/generated/**"
+      ],
+      "passThroughEnv": [
+        "DATABASE_URL",
+        "SEED_DEMO"
+      ],
+      "env": [
+        "NEXT_PUBLIC_API_URL",
+        "STORE_SLUG"
+      ]
+    },
+    "dev": {
+      "dependsOn": [
+        "^build"
+      ],
+      "cache": false,
+      "persistent": true
+    },
     "lint": {},
-    "test": { "dependsOn": ["^build"] }
+    "test": {
+      "dependsOn": [
+        "^build"
+      ]
+    }
   }
 }
