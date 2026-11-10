@@ -5,6 +5,7 @@ import { useState } from "react";
 import { formatCLP, installment } from "./catalog";
 import { useCatalogData } from "./CatalogProvider";
 import { useCart } from "./cart";
+import { trackBeginCheckout } from "./tracking";
 import { Photo } from "./Photo";
 
 // Cuerpo del carrito compartido por las tres direcciones; la forma la dan los tokens.
@@ -116,7 +117,7 @@ export function CartView({ direction, base, checkoutLabel = "Ir a pagar", round 
           <div className="mt-3 flex justify-between text-2xl"><dt>Total</dt><dd className="tabular-nums">{formatCLP(total)}</dd></div>
         </dl>
         <p className="-mt-2 text-base">o {store.installments} cuotas sin interés de {installment(total, store.installments)}</p>
-        <a href="#checkout" className={`bg-bg px-6 py-4 text-center text-lg text-ink transition-transform active:scale-[0.98] ${r}`}>
+        <a href="#checkout" onClick={() => trackBeginCheckout(cart.lines.map((l) => ({ id: l.variant.id, group: l.product.slug, name: l.product.name, price: l.variant.price, qty: l.qty })))} className={`bg-bg px-6 py-4 text-center text-lg text-ink transition-transform active:scale-[0.98] ${r}`}>
           {checkoutLabel}
         </a>
         <p className="text-sm">Paga con Webpay, Mercado Pago o Venti. Cambios gratis dentro de 30 días.</p>

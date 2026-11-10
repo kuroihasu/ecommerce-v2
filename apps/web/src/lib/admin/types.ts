@@ -50,6 +50,8 @@ export type StoreSettings = {
   installments?: number;
   nextDrop?: { name: string; date: string } | null;
   hiddenSections?: string[];
+  facebook?: string;
+  tracking?: { metaPixelId?: string; ga4Id?: string; googleAdsId?: string; tiktokPixelId?: string };
 };
 export type AdminStore = { slug: string; name: string; currency: string; theme: StoredTheme; settings: StoreSettings };
 

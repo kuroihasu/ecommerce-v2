@@ -31,6 +31,17 @@ export const SettingsInput = z.object({
   installments: z.number().int().min(1).max(48).optional(),
   nextDrop: z.object({ name: text(80).min(1), date: z.iso.datetime({ offset: true }) }).nullable().optional(),
   // Ids de secciones ocultas (ver apps/web/src/themes/sections.ts).
+  facebook: text(100).optional(),
+  // Píxeles de publicidad. Cada id se valida con su formato para que la tienda nunca
+  // inyecte algo que no sea un id en el <script> del píxel.
+  tracking: z
+    .object({
+      metaPixelId: z.union([z.string().regex(/^\d{5,20}$/, 'El ID del píxel de Meta son solo números'), z.literal('')]).optional(),
+      ga4Id: z.union([z.string().trim().toUpperCase().regex(/^G-[A-Z0-9]{4,15}$/, 'El ID de Google Analytics empieza con G-'), z.literal('')]).optional(),
+      googleAdsId: z.union([z.string().trim().toUpperCase().regex(/^AW-\d{5,15}$/, 'El ID de Google Ads empieza con AW-'), z.literal('')]).optional(),
+      tiktokPixelId: z.union([z.string().trim().toUpperCase().regex(/^[A-Z0-9]{10,30}$/, 'El ID del píxel de TikTok son letras y números'), z.literal('')]).optional(),
+    })
+    .optional(),
   hiddenSections: z.array(z.string().regex(/^[a-z][a-z0-9-]{0,39}$/)).max(50).optional(),
 });
 

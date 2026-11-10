@@ -61,6 +61,7 @@ export async function Layout({ children }: { children: React.ReactNode }) {
             <a href={`mailto:${store.email}`}>{store.email}</a>
             <span>WhatsApp {store.whatsapp}</span>
             <span>Instagram {store.instagram}</span>
+            {store.facebook && <span>Facebook {store.facebook}</span>}
             <span>Santiago, Chile</span>
           </div>
         </div>

@@ -46,10 +46,14 @@ const store = {
   installments: 6,
   // Próximo lanzamiento (para la cuenta regresiva de la dirección Vitrina).
   nextDrop: { name: "Drop 027 · Invierno", date: "2026-11-21T19:00:00-03:00" } as { name: string; date: string } | null,
+  facebook: "",
+  // Píxeles de publicidad configurados en el panel (Redes y publicidad).
+  tracking: {} as Tracking,
   // Secciones ocultas desde el panel (Avanzado). Ver src/themes/sections.ts.
   hiddenSections: [] as string[],
 };
 
+export type Tracking = { metaPixelId?: string; ga4Id?: string; googleAdsId?: string; tiktokPixelId?: string };
 export type StoreInfo = typeof store;
 export type CategoryInfo = { slug: CategorySlug; name: string; blurb: string; image: string };
 export type LineInfo = { slug: Line; name: string; image: string };

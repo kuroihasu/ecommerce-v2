@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { trackAddToCart } from "./tracking";
 import { findProduct } from "./catalog";
 import { useCatalogData } from "./CatalogProvider";
 
@@ -62,6 +63,9 @@ export function useCart(direction: string) {
     subtotal,
     count,
     add(slug: string, variantId: string, qty = 1) {
+      const product = findProduct(catalog, slug);
+      const variant = product?.variants.find((x) => x.id === variantId);
+      if (product && variant) trackAddToCart({ id: variant.id, group: product.slug, name: product.name, price: variant.price, qty });
       const cur = read(key);
       const found = cur.find((l) => l.variantId === variantId);
       write(

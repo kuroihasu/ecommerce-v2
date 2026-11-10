@@ -57,6 +57,7 @@ export async function Layout({ children }: { children: React.ReactNode }) {
           <div className="flex flex-col gap-2">
             <a href={`mailto:${store.email}`} className="hover:text-accent">{store.email}</a>
             <span>Instagram {store.instagram}</span>
+            {store.facebook && <span>Facebook {store.facebook}</span>}
             <span>TikTok {store.tiktok}</span>
           </div>
         </div>

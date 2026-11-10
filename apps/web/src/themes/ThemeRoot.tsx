@@ -5,6 +5,7 @@ import { getActiveTheme } from "./resolve";
 import { tokensToCss } from "./tokens";
 import { Customizer } from "./Customizer";
 import { CatalogProvider } from "@/designs/CatalogProvider";
+import { Pixels } from "@/designs/Pixels";
 import { getCatalog } from "@/lib/catalog";
 
 // Envoltorio de la tienda: aplica los tokens del tema activo como variables CSS
@@ -17,6 +18,7 @@ export async function ThemeRoot({ children }: { children: ReactNode }) {
       <CatalogProvider catalog={catalog}>
         <def.Layout>{children}</def.Layout>
       </CatalogProvider>
+      <Pixels tracking={catalog.store.tracking} />
       {showCustomizer && (
         <Customizer
           current={def.id}

@@ -56,6 +56,7 @@ export async function Layout({ children }: { children: React.ReactNode }) {
           <div className="flex flex-col gap-2 text-lg">
             <a href={`mailto:${store.email}`}>{store.email}</a>
             <span>Instagram {store.instagram}</span>
+            {store.facebook && <span>Facebook {store.facebook}</span>}
             <span>TikTok {store.tiktok}</span>
             <span>WhatsApp {store.whatsapp}</span>
           </div>

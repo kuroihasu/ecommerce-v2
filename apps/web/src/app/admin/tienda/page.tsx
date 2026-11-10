@@ -9,7 +9,7 @@ export default async function StorePage() {
   return (
     <AdminShell current="/admin/tienda">
       <h1 className="mb-1 text-2xl font-semibold">Datos de la tienda</h1>
-      <p className="mb-6 text-zinc-600">Contacto, envíos, cuotas y categorías.</p>
+      <p className="mb-6 text-zinc-600">Nombre, contacto, envíos, cuotas y categorías. Las redes sociales están en Redes y publicidad.</p>
       <div className="flex flex-col gap-6">
         <SettingsForm store={store} />
         <Categories categories={categories} />

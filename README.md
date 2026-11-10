@@ -71,6 +71,16 @@ Para activarlo:
 
 El seed no crea usuarios a propósito: corre en cada deploy contra la base real.
 
+Secciones del panel:
+
+- **Productos**, **Diseño y colores** y **Datos de la tienda**.
+- **Redes y publicidad**: redes sociales del pie de página, píxeles de Meta, Google Analytics 4,
+  Google Ads y TikTok (la tienda envía vista de página, vio producto, agregó al carrito e
+  inició el pago; ver `apps/web/src/designs/tracking.ts`) y el enlace del catálogo
+  `/feeds/productos.xml`, un feed RSS de Google Merchant que también lee el catálogo de Meta.
+- **Avanzado**: mostrar u ocultar la barra de avisos, la suscripción y cada sección de la
+  portada (`settings.hiddenSections`, ver `apps/web/src/themes/sections.ts`).
+
 ### Probar el panel en un preview de Vercel
 
 Para mostrar el panel sin tocar producción, define estas variables **solo para Preview** (y si

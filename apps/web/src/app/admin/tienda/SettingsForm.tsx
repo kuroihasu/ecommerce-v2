@@ -35,9 +35,6 @@ export function SettingsForm({ store }: { store: AdminStore }) {
         settings: {
           tagline: s.tagline ?? "",
           email: s.email ?? "",
-          instagram: s.instagram ?? "",
-          tiktok: s.tiktok ?? "",
-          whatsapp: s.whatsapp ?? "",
           discountCode: s.discountCode ?? "",
           shippingRM: s.shippingRM ?? 0,
           shippingRegions: s.shippingRegions ?? 0,
@@ -55,9 +52,6 @@ export function SettingsForm({ store }: { store: AdminStore }) {
         <Field label="Nombre de la tienda"><input className={input} value={name} onChange={(e) => setName(e.target.value)} maxLength={80} /></Field>
         <Field label="Frase de la marca"><input className={input} value={s.tagline ?? ""} onChange={(e) => set({ tagline: e.target.value })} maxLength={160} /></Field>
         <Field label="Correo de contacto"><input type="email" className={input} value={s.email ?? ""} onChange={(e) => set({ email: e.target.value })} /></Field>
-        <Field label="WhatsApp"><input className={input} value={s.whatsapp ?? ""} onChange={(e) => set({ whatsapp: e.target.value })} placeholder="+56 9 1234 5678" /></Field>
-        <Field label="Instagram"><input className={input} value={s.instagram ?? ""} onChange={(e) => set({ instagram: e.target.value })} placeholder="@tutienda" /></Field>
-        <Field label="TikTok"><input className={input} value={s.tiktok ?? ""} onChange={(e) => set({ tiktok: e.target.value })} placeholder="@tutienda" /></Field>
 
         <h2 className="mt-2 text-lg font-semibold md:col-span-2">Envíos y pagos</h2>
         <Field label="Envío Región Metropolitana ($)"><input className={input} inputMode="numeric" value={s.shippingRM ?? 0} onChange={(e) => set({ shippingRM: num(e.target.value) })} /></Field>
