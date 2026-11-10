@@ -21,14 +21,21 @@ const options = [
     text: "Campos de color, todo redondeado, categorías en burbujas, banner de ofertas y un buscador por precio. Cercana y fácil, para tiendas de tendencia con público amplio.",
     swatch: ["#f2b705", "#f6c9c1", "#0f4c45"],
   },
+  {
+    href: "/tema/plaza",
+    name: "D · Plaza",
+    mood: "Mercado con toques de Atelier",
+    text: "La portada, las categorías en burbujas, el banner de ofertas y los bloques de envío, cambios y cuotas de Mercado, con los colores de cada prenda bajo la foto, el \"compra el look\" de Atelier y envíos y cambios en la ficha.",
+    swatch: ["#f2b705", "#f6c9c1", "#0f4c45"],
+  },
 ];
 
 export default function Disenos() {
   return (
     <main className="mx-auto max-w-[1200px] px-5 py-16 sm:px-8">
-      <h1 className="text-5xl font-semibold tracking-[-0.03em] md:text-7xl">Tres direcciones de diseño</h1>
+      <h1 className="text-5xl font-semibold tracking-[-0.03em] md:text-7xl">Cuatro direcciones de diseño</h1>
       <p className="mt-6 max-w-2xl text-xl leading-relaxed">
-        La misma tienda de ropa de muestra (NORTE) en tres estilos. Cada una tiene inicio, catálogo, ficha de
+        La misma tienda de ropa de muestra (NORTE) en cuatro estilos. Cada una tiene inicio, catálogo, ficha de
         producto y carrito funcionando. Es una sola tienda: el diseño, los colores, las tipografías y los bordes se eligen
         con el botón Personalizar (después, desde el panel de administración).
       </p>

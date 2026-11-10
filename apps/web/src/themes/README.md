@@ -1,8 +1,8 @@
 # Temas de la tienda
 
 La tienda tiene una sola URL (`/`, `/catalogo`, `/producto/[slug]`, `/carrito`) y
-muestra el diseño que diga `Store.theme` en la base de datos. Hoy hay tres:
-`atelier`, `vitrina` y `mercado`.
+muestra el diseño que diga `Store.theme` en la base de datos. Hoy hay cuatro:
+`atelier`, `vitrina`, `mercado` y `plaza` (Mercado con piezas de Atelier).
 
 ## Qué se guarda en `Store.theme`
 

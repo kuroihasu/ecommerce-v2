@@ -3,6 +3,7 @@ import type { ThemeTokens } from "./tokens";
 import * as atelier from "./atelier";
 import * as vitrina from "./vitrina";
 import * as mercado from "./mercado";
+import * as plaza from "./plaza";
 
 // Un tema = las cinco piezas de la tienda + sus valores por defecto.
 // Para agregar un diseño nuevo: crea src/themes/<id>/ con estas piezas y un
@@ -19,6 +20,6 @@ export type ThemeDefinition = {
   Cart: () => ReactNode;
 };
 
-export const themes: ThemeDefinition[] = [atelier.theme, vitrina.theme, mercado.theme];
+export const themes: ThemeDefinition[] = [atelier.theme, vitrina.theme, mercado.theme, plaza.theme];
 export const DEFAULT_THEME = "atelier";
 export const getThemeDef = (id: string | undefined) => themes.find((t) => t.id === id) ?? themes.find((t) => t.id === DEFAULT_THEME)!;
