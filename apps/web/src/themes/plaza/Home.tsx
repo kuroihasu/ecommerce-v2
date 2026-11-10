@@ -19,10 +19,10 @@ export async function Home() {
   const catalog = await getCatalog();
   const { categories, products } = catalog;
   const look = ["polera-manga-larga-special", "jeans-wide-leg", "chaqueta-mezclilla-oversize", "bolso-tote"].flatMap((s) => findProduct(catalog, s) ?? []);
-  const isWomen = (p: (typeof products)[number]) => (p.line === "mujer" ? 0 : 1);
-  // Siempre 8 (dos filas completas): primero lo nuevo y lo de mujer, y se completa con el resto.
-  const picked = products.filter((p) => p.badge === "nuevo" || p.featured || p.line === "mujer").sort((a, b) => isWomen(a) - isWomen(b));
-  const fresh = [...picked, ...products.filter((p) => !picked.includes(p))].slice(0, 8);
+  // Siempre 8 (dos filas completas): primero todo lo marcado "nuevo", luego lo de mujer,
+  // luego lo destacado, y se completa con el resto del catálogo.
+  const rank = (p: (typeof products)[number]) => (p.badge === "nuevo" ? 0 : p.line === "mujer" ? 1 : p.featured ? 2 : 3);
+  const fresh = [...products].sort((a, b) => rank(a) - rank(b)).slice(0, 8);
   const sale = products.filter((p) => p.compareAtPrice);
 
   return (
