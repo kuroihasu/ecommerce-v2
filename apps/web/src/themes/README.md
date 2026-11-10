@@ -39,7 +39,11 @@ de administración, al guardar, se escribe en `Store.theme` y se llama a
    el cliente pueda cambiar los colores. Los datos se leen con
    `await getCatalog()` (`@/lib/catalog`) en componentes de servidor y con
    `useCatalogData()` (`@/designs/CatalogProvider`) en componentes de cliente.
-3. En `nuevo/index.ts` ponle `id`, `name`, `description` y sus `defaults`.
+3. En `nuevo/index.ts` ponle `id`, `name`, `description`, sus `defaults` y sus
+   `sections`: las partes de la portada que el panel (Avanzado) puede ocultar.
+   En `Home.tsx` envuelve cada una con `show("<id>")` (ver `sections.ts`) y
+   reutiliza los ids que ya existen (`hero`, `new`, `look`, `promise`…) para
+   que ocultar una sección funcione igual en todos los diseños.
 4. Súmalo a la lista `themes` de `registry.ts`.
 
 Listo: aparece en el personalizador (y en el panel) como una opción más.

@@ -6,6 +6,7 @@ const links = [
   { href: "/admin/productos", label: "Productos" },
   { href: "/admin/diseno", label: "Diseño y colores" },
   { href: "/admin/tienda", label: "Datos de la tienda" },
+  { href: "/admin/avanzado", label: "Avanzado" },
 ];
 
 // Marco de las páginas del panel: menú lateral y contenido.

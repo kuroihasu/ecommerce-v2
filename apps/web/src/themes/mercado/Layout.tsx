@@ -3,21 +3,25 @@ import { CartCount } from "@/designs/BuyBox";
 import { AnnouncementRotator, Newsletter } from "@/designs/extras";
 import { formatCLP } from "@/designs/catalog";
 import { getCatalog } from "@/lib/catalog";
+import { sectionVisible } from "@/themes/sections";
 
 
 
 export async function Layout({ children }: { children: React.ReactNode }) {
   const { store } = await getCatalog();
+  const show = sectionVisible(store);
   return (
     <div className="flex min-h-screen flex-col bg-bg font-body text-ink">
-      <AnnouncementRotator
-        className="bg-field font-medium text-field-ink"
-        items={[
-          "Envíos a todo Chile en 2 a 5 días",
-          `Gratis sobre ${formatCLP(store.freeShippingFrom)}`,
-          `Código ${store.discountCode}: 10% en tu primera compra`,
-        ]}
-      />
+      {show("announce") && (
+        <AnnouncementRotator
+          className="bg-field font-medium text-field-ink"
+          items={[
+            "Envíos a todo Chile en 2 a 5 días",
+            `Gratis sobre ${formatCLP(store.freeShippingFrom)}`,
+            `Código ${store.discountCode}: 10% en tu primera compra`,
+          ]}
+        />
+      )}
       <header className="sticky top-0 z-30 bg-bg">
         <nav className="mx-auto flex max-w-[1440px] items-center justify-between gap-6 px-4 py-4 sm:px-6">
           <Link href="/" className="text-3xl font-extrabold tracking-[-0.03em]">{store.name.charAt(0) + store.name.slice(1).toLowerCase()}</Link>
@@ -41,10 +45,12 @@ export async function Layout({ children }: { children: React.ReactNode }) {
       <main className="flex-1">{children}</main>
       <footer className="mx-4 mt-32 mb-4 rounded-brand bg-accent px-6 pt-16 pb-8 text-accent-ink sm:mx-6 md:px-12">
         <div className="grid gap-10 text-lg md:grid-cols-[2fr_1fr_1fr]">
-          <div className="flex flex-col gap-5">
-            <p className="text-4xl font-bold leading-tight tracking-[-0.02em]">Suscríbete y te regalamos 10% en tu primera compra.</p>
-            <Newsletter inputClass="rounded-full bg-bg text-ink" buttonClass="rounded-full bg-field text-field-ink font-semibold" />
-          </div>
+          {show("newsletter") && (
+            <div className="flex flex-col gap-5">
+              <p className="text-4xl font-bold leading-tight tracking-[-0.02em]">Suscríbete y te regalamos 10% en tu primera compra.</p>
+              <Newsletter inputClass="rounded-full bg-bg text-ink" buttonClass="rounded-full bg-field text-field-ink font-semibold" />
+            </div>
+          )}
           <div className="flex flex-col gap-2">
             <Link href={`/catalogo`}>Todos los productos</Link>
             <a href="#checkout">Envíos</a>

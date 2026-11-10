@@ -2,20 +2,24 @@ import Link from "next/link";
 import { CartCount } from "@/designs/BuyBox";
 import { Newsletter } from "@/designs/extras";
 import { getCatalog } from "@/lib/catalog";
+import { sectionVisible } from "@/themes/sections";
 
 
 
 export async function Layout({ children }: { children: React.ReactNode }) {
   const { store } = await getCatalog();
+  const show = sectionVisible(store);
   return (
     <div className="flex min-h-screen flex-col bg-bg font-body text-ink">
-      <div className="overflow-hidden bg-accent py-2 text-base font-semibold text-accent-ink">
-        <div className="marquee flex w-max gap-12 whitespace-nowrap">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <span key={i}>Envíos a todo Chile · 10% OFF con el código {store.discountCode} · {store.installments} cuotas sin interés ·</span>
-          ))}
+      {show("announce") && (
+        <div className="overflow-hidden bg-accent py-2 text-base font-semibold text-accent-ink">
+          <div className="marquee flex w-max gap-12 whitespace-nowrap">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <span key={i}>Envíos a todo Chile · 10% OFF con el código {store.discountCode} · {store.installments} cuotas sin interés ·</span>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
       <header className="sticky top-0 z-30 bg-bg">
         <nav className="flex items-center justify-between gap-6 px-4 py-4 sm:px-6">
           <Link href="/" className="text-3xl font-black uppercase tracking-[-0.02em] [font-stretch:75%]">{store.name}</Link>
@@ -38,10 +42,12 @@ export async function Layout({ children }: { children: React.ReactNode }) {
       <main className="flex-1">{children}</main>
       <footer className="mt-32 bg-field text-field-ink">
         <div className="grid gap-10 px-4 py-16 text-lg sm:px-6 md:grid-cols-[2fr_1fr_1fr]">
-          <div className="flex flex-col gap-5">
-            <p className="text-5xl font-black uppercase leading-[0.85] [font-stretch:62%]">Entra al club: 10% OFF</p>
-            <Newsletter inputClass="bg-bg text-ink" buttonClass="bg-accent text-accent-ink font-semibold" label="Quiero mi código" />
-          </div>
+          {show("newsletter") && (
+            <div className="flex flex-col gap-5">
+              <p className="text-5xl font-black uppercase leading-[0.85] [font-stretch:62%]">Entra al club: 10% OFF</p>
+              <Newsletter inputClass="bg-bg text-ink" buttonClass="bg-accent text-accent-ink font-semibold" label="Quiero mi código" />
+            </div>
+          )}
           <div className="flex flex-col gap-2">
             <Link href={`/catalogo`} className="hover:text-accent">Toda la colección</Link>
             <a href="#checkout" className="hover:text-accent">Envíos en Chile</a>

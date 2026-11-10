@@ -30,6 +30,8 @@ export const SettingsInput = z.object({
   freeShippingFrom: money.optional(),
   installments: z.number().int().min(1).max(48).optional(),
   nextDrop: z.object({ name: text(80).min(1), date: z.iso.datetime({ offset: true }) }).nullable().optional(),
+  // Ids de secciones ocultas (ver apps/web/src/themes/sections.ts).
+  hiddenSections: z.array(z.string().regex(/^[a-z][a-z0-9-]{0,39}$/)).max(50).optional(),
 });
 
 export const StoreInput = z.object({

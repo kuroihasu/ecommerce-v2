@@ -46,6 +46,8 @@ const store = {
   installments: 6,
   // Próximo lanzamiento (para la cuenta regresiva de la dirección Vitrina).
   nextDrop: { name: "Drop 027 · Invierno", date: "2026-11-21T19:00:00-03:00" } as { name: string; date: string } | null,
+  // Secciones ocultas desde el panel (Avanzado). Ver src/themes/sections.ts.
+  hiddenSections: [] as string[],
 };
 
 export type StoreInfo = typeof store;

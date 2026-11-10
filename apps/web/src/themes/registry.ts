@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { ThemeTokens } from "./tokens";
+import type { SectionDef } from "./sections";
 import * as atelier from "./atelier";
 import * as vitrina from "./vitrina";
 import * as mercado from "./mercado";
@@ -13,6 +14,8 @@ export type ThemeDefinition = {
   name: string;
   description: string;
   defaults: ThemeTokens;
+  // Secciones de la portada que se pueden ocultar desde el panel (Avanzado).
+  sections: SectionDef[];
   Layout: (p: { children: ReactNode }) => ReactNode;
   Home: () => ReactNode;
   Catalog: () => ReactNode;

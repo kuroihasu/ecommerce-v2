@@ -49,6 +49,7 @@ export type StoreSettings = {
   freeShippingFrom?: number;
   installments?: number;
   nextDrop?: { name: string; date: string } | null;
+  hiddenSections?: string[];
 };
 export type AdminStore = { slug: string; name: string; currency: string; theme: StoredTheme; settings: StoreSettings };
 
