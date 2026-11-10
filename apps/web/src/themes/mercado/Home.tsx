@@ -3,6 +3,7 @@ import { getCatalog } from "@/lib/catalog";
 import { Photo } from "@/designs/Photo";
 import { Carousel } from "@/designs/Carousel";
 import { Reveal } from "@/designs/Reveal";
+import { ScrollRail } from "@/designs/ScrollRail";
 import { Card } from "./Card";
 import { GiftFinder } from "./GiftFinder";
 
@@ -41,7 +42,7 @@ export async function Home() {
 
       {/* Categorías en burbujas */}
       <section className="mx-auto mt-12 w-full max-w-[1440px]">
-        <div className="flex snap-x justify-start gap-5 overflow-x-auto pb-2 md:justify-between">
+        <ScrollRail label="Categorías" className="justify-start gap-5 md:justify-between">
           {categories.map((c, k) => (
             <Reveal key={c.slug} delay={k * 60} className="shrink-0 snap-start">
               <Link href={`/catalogo?c=${c.slug}`} className="group flex w-28 flex-col items-center gap-3 md:w-40">
@@ -50,7 +51,7 @@ export async function Home() {
               </Link>
             </Reveal>
           ))}
-        </div>
+        </ScrollRail>
       </section>
 
       {/* Lo nuevo */}
