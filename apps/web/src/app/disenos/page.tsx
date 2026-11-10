@@ -24,9 +24,9 @@ const options = [
   {
     href: "/tema/plaza",
     name: "D · Plaza",
-    mood: "Mercado con toques de Atelier",
-    text: "La portada, las categorías en burbujas, el banner de ofertas y los bloques de envío, cambios y cuotas de Mercado, con los colores de cada prenda bajo la foto, el \"compra el look\" de Atelier y envíos y cambios en la ficha.",
-    swatch: ["#f2b705", "#f6c9c1", "#0f4c45"],
+    mood: "Moda mujer en pastel",
+    text: "Rosados y lilas suaves con serif elegante. Portada, categorías en burbujas, ofertas y bloques de envío, cambios y cuotas como Mercado, con los colores de cada prenda bajo la foto, un \"compra el look\" y envíos y cambios en la ficha.",
+    swatch: ["#f7d3df", "#e9def7", "#c95b85"],
   },
 ];
 

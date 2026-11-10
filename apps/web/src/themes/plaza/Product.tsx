@@ -22,7 +22,7 @@ export async function Product({ slug }: { slug: string }) {
           <Link href={`/catalogo?c=${p.category}`} className="w-fit rounded-full bg-field px-4 py-2 text-base font-semibold text-field-ink">
             {categoryName(catalog, p.category)}
           </Link>
-          <h1 className="rise text-5xl font-extrabold leading-[0.95] tracking-[-0.04em] md:text-6xl">{p.name}</h1>
+          <h1 className="rise text-5xl font-display font-normal leading-[0.95] tracking-[-0.02em] md:text-6xl">{p.name}</h1>
           <p className="text-xl leading-relaxed">{p.description}</p>
           <BuyBox slug={p.slug} direction="tienda" cartHref={`/carrito`} round />
           <div className="flex flex-col gap-3 rounded-[calc(var(--radius)-8px)] bg-bg p-6 text-base">
@@ -45,7 +45,7 @@ export async function Product({ slug }: { slug: string }) {
         </div>
       </div>
       <section className="mt-28">
-        <h2 className="mb-8 text-5xl font-extrabold leading-[0.95] tracking-[-0.04em]">También te puede gustar</h2>
+        <h2 className="mb-8 text-5xl font-display font-normal leading-[0.95] tracking-[-0.02em]">También te puede gustar</h2>
         <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-4">
           {related.map((r) => <Card key={r.slug} p={r} />)}
         </div>

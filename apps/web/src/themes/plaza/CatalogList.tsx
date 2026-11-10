@@ -17,7 +17,7 @@ export function CatalogList() {
   return (
     <>
       <div className="mb-6 flex flex-col gap-6 rounded-brand bg-field px-6 py-12 text-field-ink md:px-12">
-        <h1 className="rise text-[clamp(3rem,7vw,7rem)] font-extrabold leading-[0.92] tracking-[-0.04em]">{title}</h1>
+        <h1 className="rise text-[clamp(3rem,7vw,7rem)] font-display font-normal leading-[0.92] tracking-[-0.02em]">{title}</h1>
         <p className="max-w-xl text-xl">{cat?.blurb ?? "Ropa y accesorios con envío a todo Chile."}</p>
         <SearchBox value={q} onChange={(v) => set("q", v)} className="max-w-xl" inputClass="rounded-full bg-bg text-ink" />
         <div className="flex flex-wrap gap-2">

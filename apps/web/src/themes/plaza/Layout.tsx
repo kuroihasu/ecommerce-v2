@@ -20,9 +20,9 @@ export async function Layout({ children }: { children: React.ReactNode }) {
       />
       <header className="sticky top-0 z-30 bg-bg">
         <nav className="mx-auto flex max-w-[1440px] items-center justify-between gap-6 px-4 py-4 sm:px-6">
-          <Link href="/" className="text-3xl font-extrabold tracking-[-0.03em]">{store.name.charAt(0) + store.name.slice(1).toLowerCase()}</Link>
+          <Link href="/" className="font-display text-4xl tracking-[-0.01em]">{store.name.charAt(0) + store.name.slice(1).toLowerCase()}</Link>
           <div className="hidden items-center gap-1 text-base font-medium lg:flex">
-            {[["Lo nuevo", "/catalogo?o=nuevos"], ["Mujer", "/catalogo?l=mujer"], ["Hombre", "/catalogo?l=hombre"], ["Vestidos", "/catalogo?c=vestidos"], ["Accesorios", "/catalogo?c=accesorios"], ["Ofertas", "/catalogo?o=ofertas"]].map(([l, h]) => (
+            {[["Lo nuevo", "/catalogo?o=nuevos"], ["Poleras", "/catalogo?c=poleras"], ["Pantalones", "/catalogo?c=pantalones"], ["Vestidos", "/catalogo?c=vestidos"], ["Accesorios", "/catalogo?c=accesorios"], ["Ofertas", "/catalogo?o=ofertas"]].map(([l, h]) => (
               <Link key={l} href={`${h}`} className={`rounded-full px-4 py-2 transition-colors hover:bg-surface ${l === "Ofertas" ? "bg-[var(--field-2)]" : ""}`}>{l}</Link>
             ))}
           </div>
@@ -42,7 +42,7 @@ export async function Layout({ children }: { children: React.ReactNode }) {
       <footer className="mx-4 mt-32 mb-4 rounded-brand bg-accent px-6 pt-16 pb-8 text-accent-ink sm:mx-6 md:px-12">
         <div className="grid gap-10 text-lg md:grid-cols-[2fr_1fr_1fr]">
           <div className="flex flex-col gap-5">
-            <p className="text-4xl font-bold leading-tight tracking-[-0.02em]">Suscríbete y te regalamos 10% en tu primera compra.</p>
+            <p className="font-display text-5xl leading-tight">Suscríbete y te regalamos 10% en tu primera compra.</p>
             <Newsletter inputClass="rounded-full bg-bg text-ink" buttonClass="rounded-full bg-field text-field-ink font-semibold" />
           </div>
           <div className="flex flex-col gap-2">
@@ -58,7 +58,7 @@ export async function Layout({ children }: { children: React.ReactNode }) {
             <span>Santiago, Chile</span>
           </div>
         </div>
-        <p className="mt-20 text-[26vw] font-extrabold leading-[0.8] tracking-[-0.05em]">Norte</p>
+        <p className="mt-20 text-[26vw] font-display font-normal leading-[0.8] tracking-[-0.02em]">{store.name.charAt(0) + store.name.slice(1).toLowerCase()}</p>
         <p className="mt-6 text-sm opacity-75">Fotografías de muestra: Unsplash. Se reemplazan por las de cada tienda.</p>
       </footer>
     </div>

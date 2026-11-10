@@ -25,7 +25,7 @@ export function Card({ p }: { p: DemoProduct }) {
       <div className="flex flex-col px-1">
         <span className="text-lg font-semibold leading-snug">{p.name}</span>
         <span className="flex items-baseline gap-2">
-          <span className={`text-lg font-semibold tabular-nums ${p.compareAtPrice ? "text-[#b3261e]" : ""}`}>{formatCLP(p.price)}</span>
+          <span className={`text-lg font-semibold tabular-nums ${p.compareAtPrice ? "text-[#b0305f]" : ""}`}>{formatCLP(p.price)}</span>
           {p.compareAtPrice && <s className="text-base text-ink/55">{formatCLP(p.compareAtPrice)}</s>}
         </span>
         {p.colors.length > 1 && (
