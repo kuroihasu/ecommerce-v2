@@ -37,6 +37,8 @@ hoy y para la plataforma de varias tiendas mañana.
 - `DiscountCode`: códigos de descuento (porcentaje o envío gratis) con compra mínima, usos máximos (vacío = ilimitado), usos hechos, activo y fecha de término.
 - `Integration`: cuentas de Meta y Google Ads conectadas (token cifrado).
 - `Subscriber`: correos para novedades (ruleta de regalos o pie de página), uno por tienda.
+- `StockMovement`: historial de cada cambio de stock (cuánto, por qué y cuánto quedó).
+- `LedgerEntry`: ingresos y gastos anotados a mano en Contabilidad (total con IVA y el IVA que incluye).
 
 Los montos son enteros en la moneda de la tienda (CLP no usa decimales).
 
@@ -76,6 +78,23 @@ El seed no crea usuarios a propósito: corre en cada deploy contra la base real.
 
 Secciones del panel:
 
+- **Productos**, **Diseño y colores** y **Datos de la tienda**. Si hay variantes publicadas con
+  stock bajo o agotadas, Productos muestra un aviso que lleva a Inventario.
+- **Inventario**: todas las variantes con su stock, costo, precio y margen. Filtros de stock bajo,
+  agotadas y sin costo; el umbral de stock bajo lo elige la tienda (`settings.lowStockThreshold`,
+  3 por defecto). Cada variante se ajusta con un motivo (llegó mercadería, venta fuera de la web,
+  devolución, pérdida o conteo físico) y queda en el historial (`StockMovement`), igual que los
+  cambios hechos en la ficha del producto. El ajuste exige que el stock no haya cambiado desde que
+  se leyó, así no pisa una venta simultánea. Una venta fuera de la web puede anotarse también como
+  ingreso en Contabilidad. Inventario e historial se descargan en CSV.
+- **Contabilidad** (solo dueños y administradores): por mes, año o rango de fechas (días de Chile).
+  Las ventas de la tienda online se leen de los pedidos pagados, despachados o entregados; los otros
+  ingresos y los gastos se anotan a mano con categoría, documento (factura, boleta o sin documento),
+  proveedor y RUT. Muestra el resultado sin IVA, el IVA estimado del período (débito de ventas e
+  ingresos menos crédito de facturas de compra; una boleta de compra no da crédito), el margen de
+  lo vendido online según el costo de cada variante y un gráfico de los últimos 12 meses. Se
+  descargan en CSV (separado por punto y coma, listo para Excel) el resumen, las ventas online y los
+  ingresos y gastos, para el contador. El IVA es referencial: asume todo afecto al 19%.
 - **Pedidos**: lista con filtros (por despachar, por pagar, despachados, entregados, anulados).
   Cada pedido muestra cliente, dirección, productos, el pago (autorización, últimos 4 dígitos,
   cuotas) y avisos «⚠ revisar» si algo no cuadró al confirmar el pago (por ejemplo, stock
@@ -84,7 +103,6 @@ Secciones del panel:
   para dueño y administradores.
 - **Pagos**: Webpay Plus (Transbank), Mercado Pago y transferencia bancaria, cada uno con su
   interruptor y su botón «Configurar». Ver [Pagos en línea](#pagos-en-línea).
-- **Productos**, **Diseño y colores** y **Datos de la tienda**.
 - **Redes y publicidad**: redes sociales del pie de página, píxeles de Meta, Google Analytics 4,
   Google Ads y TikTok (la tienda envía vista de página, vio producto, agregó al carrito e
   inició el pago; ver `apps/web/src/designs/tracking.ts`) y el enlace del catálogo

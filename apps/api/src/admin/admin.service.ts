@@ -132,12 +132,15 @@ export class AdminService {
 
   // Reemplaza la lista de variantes: las que traen id se actualizan, las nuevas
   // se crean y las que ya no vienen se borran (los pedidos guardan su propia copia).
+  // Cada cambio de stock queda en el historial del inventario como ajuste.
   async setVariants(access: StoreAccess, productId: string, input: VariantsInput) {
     const product = await this.getProduct(access, productId);
-    const own = new Set(product.variants.map((v) => v.id));
-    const foreign = input.find((v) => v.id && !own.has(v.id));
+    const before = new Map(product.variants.map((v) => [v.id, v]));
+    const foreign = input.find((v) => v.id && !before.has(v.id));
     if (foreign) throw new BadRequestException(`La variante ${foreign.id} no es de este producto`);
     const keep = input.flatMap((v) => (v.id ? [v.id] : []));
+    const move = (label: string, sku: string | null, delta: number, stockAfter: number) =>
+      delta === 0 ? undefined : { create: { storeId: access.id, label, sku, delta, stockAfter, reason: 'ADJUSTMENT' as const, note: 'Editado en la ficha del producto' } };
     await this.db.$transaction([
       this.db.productVariant.deleteMany({ where: { productId, id: { notIn: keep } } }),
       ...input.map((v, position) => {
@@ -147,12 +150,16 @@ export class AdminService {
           options: v.options,
           price: v.price,
           compareAtPrice: v.compareAtPrice ?? null,
+          ...(v.cost !== undefined ? { cost: v.cost } : {}),
           stock: v.stock,
           position,
         };
-        return v.id
-          ? this.db.productVariant.update({ where: { id: v.id }, data })
-          : this.db.productVariant.create({ data: { ...data, productId } });
+        const label = `${product.name} · ${v.name}`;
+        if (v.id) {
+          const delta = v.stock - before.get(v.id)!.stock;
+          return this.db.productVariant.update({ where: { id: v.id }, data: { ...data, stockMoves: move(label, data.sku, delta, v.stock) } });
+        }
+        return this.db.productVariant.create({ data: { ...data, productId, stockMoves: move(label, data.sku, v.stock, v.stock) } });
       }),
     ]);
     return this.getProduct(access, productId);

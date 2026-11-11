@@ -267,6 +267,7 @@ export function ProductEditor({ initial, categories }: { initial: AdminProduct; 
                 <th className="py-2 font-medium">Precio</th>
                 <th className="py-2 font-medium">Precio antes (oferta)</th>
                 <th className="py-2 font-medium">Stock</th>
+                <th className="py-2 font-medium">Costo</th>
                 <th className="py-2 font-medium">SKU</th>
                 <th />
               </tr>
@@ -281,6 +282,7 @@ export function ProductEditor({ initial, categories }: { initial: AdminProduct; 
                     <td className="py-2 pr-2"><input className={small + " w-28"} inputMode="numeric" value={v.price} onChange={(e) => set({ price: num(e.target.value) })} aria-label={`Precio de ${v.name}`} /></td>
                     <td className="py-2 pr-2"><input className={small + " w-28"} inputMode="numeric" value={v.compareAtPrice ?? ""} onChange={(e) => set({ compareAtPrice: e.target.value ? num(e.target.value) : null })} placeholder="—" aria-label={`Precio antes de ${v.name}`} /></td>
                     <td className="py-2 pr-2"><input className={small + ` w-20 ${v.stock === 0 ? "text-red-600" : ""}`} inputMode="numeric" value={v.stock} onChange={(e) => set({ stock: num(e.target.value) })} aria-label={`Stock de ${v.name}`} /></td>
+                    <td className="py-2 pr-2"><input className={small + " w-24"} inputMode="numeric" value={v.cost ?? ""} onChange={(e) => set({ cost: e.target.value ? num(e.target.value) : null })} placeholder="—" aria-label={`Costo de ${v.name}`} /></td>
                     <td className="py-2 pr-2"><input className={small + " w-36"} value={v.sku ?? ""} onChange={(e) => set({ sku: e.target.value })} aria-label={`SKU de ${v.name}`} /></td>
                     <td className="py-2 text-right">
                       <button type="button" className={btn} disabled={variants.length === 1} onClick={() => editVariants(variants.filter((_, k) => k !== i))}>Quitar</button>

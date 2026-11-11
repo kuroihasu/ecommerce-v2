@@ -281,8 +281,27 @@ export class OrdersService {
       } else {
         for (const it of order.items) {
           if (!it.variantId) continue;
-          const n = await tx.$executeRaw`UPDATE "ProductVariant" SET "stock" = "stock" - ${it.quantity} WHERE "id" = ${it.variantId} AND "stock" >= ${it.quantity}`;
-          if (!n) issues.push(`No quedaba stock suficiente de ${it.name} al confirmarse el pago.`);
+          const [left] = await tx.$queryRaw<{ stock: number; sku: string | null }[]>`
+            UPDATE "ProductVariant" SET "stock" = "stock" - ${it.quantity}
+            WHERE "id" = ${it.variantId} AND "stock" >= ${it.quantity}
+            RETURNING "stock", "sku"`;
+          if (!left) {
+            issues.push(`No quedaba stock suficiente de ${it.name} al confirmarse el pago.`);
+            continue;
+          }
+          // La venta queda en el historial de Inventario.
+          await tx.stockMovement.create({
+            data: {
+              storeId: order.storeId,
+              variantId: it.variantId,
+              label: it.name,
+              sku: left.sku,
+              delta: -it.quantity,
+              stockAfter: left.stock,
+              reason: 'SALE',
+              note: `Pedido #${order.number}`,
+            },
+          });
         }
         if (order.discountCode) {
           const rows = await tx.$queryRaw<{ id: string }[]>`

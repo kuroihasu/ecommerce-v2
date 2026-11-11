@@ -29,6 +29,23 @@ describe('AdminService', () => {
     expect($transaction).not.toHaveBeenCalled();
   });
 
+  it('los cambios de stock en la ficha quedan en el historial; el costo se conserva si no viene', async () => {
+    const findFirst = vi.fn().mockResolvedValue({ id: 'p1', name: 'Polera', variants: [{ id: 'v1', stock: 5 }, { id: 'v2', stock: 2 }], images: [] });
+    const update = vi.fn((args) => args);
+    const create = vi.fn((args) => args);
+    const $transaction = vi.fn().mockResolvedValue([]);
+    const svc = service({ product: { findFirst }, productVariant: { update, create, deleteMany: vi.fn() }, $transaction });
+    await svc.setVariants(owner, 'p1', [
+      { id: 'v1', name: 'M', options: {}, price: 1, stock: 8 },
+      { id: 'v2', name: 'L', options: {}, price: 1, stock: 2, cost: 4000 },
+      { name: 'XL', options: {}, price: 1, stock: 4 },
+    ]);
+    expect(update.mock.calls[0][0].data.stockMoves.create).toMatchObject({ storeId: 's1', label: 'Polera · M', delta: 3, stockAfter: 8, reason: 'ADJUSTMENT' });
+    expect(update.mock.calls[0][0].data).not.toHaveProperty('cost');
+    expect(update.mock.calls[1][0].data).toMatchObject({ cost: 4000, stockMoves: undefined });
+    expect(create.mock.calls[0][0].data.stockMoves.create).toMatchObject({ delta: 4, stockAfter: 4 });
+  });
+
   it('el personal no puede cambiar el diseño ni los datos de la tienda', async () => {
     const update = vi.fn();
     await expect(
