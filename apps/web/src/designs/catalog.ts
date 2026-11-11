@@ -5,6 +5,7 @@
 
 import type { StoreTexts } from "@/themes/texts";
 import type { ChatConfig } from "./chat";
+import type { HeroConfig } from "@/themes/hero";
 
 export type Badge = "nuevo" | "preventa" | "ultimas";
 export type Line = "mujer" | "hombre" | "unisex";
@@ -62,6 +63,8 @@ const store = {
   hiddenSections: [] as string[],
   // Textos propios de la barra de avisos y la suscripción. Ver src/themes/texts.ts.
   texts: {} as StoreTexts,
+  // Banners y ritmo del carrusel de la portada (Avanzado). Ver src/themes/hero.ts.
+  hero: null as Partial<HeroConfig> | null,
   // Ruleta de regalos (panel > Ruleta de regalos). La API no manda los códigos, solo
   // si cada premio trae descuento.
   wheel: null as PublicWheel | null,

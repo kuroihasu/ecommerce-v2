@@ -3,24 +3,24 @@ import { getCatalog } from "@/lib/catalog";
 import { sectionVisible } from "@/themes/sections";
 import { Photo } from "@/designs/Photo";
 import { Carousel } from "@/designs/Carousel";
+import { storeHero } from "@/themes/hero";
 import { Reveal } from "@/designs/Reveal";
 import { ScrollRail } from "@/designs/ScrollRail";
 import { Card } from "./Card";
 import { GiftFinder } from "./GiftFinder";
 
 
-const slides = [
-  { image: "woman", bg: "bg-field text-field-ink", title: "Lo nuevo de la temporada", text: "Vestidos, jeans wide leg y básicos que combinan con todo.", cta: "Ver lo nuevo", href: `/catalogo?o=nuevos` },
-  { image: "dress2", bg: "bg-[var(--field-2)] text-ink", title: "Ofertas de la semana", text: "Hasta 33% off en prendas seleccionadas. Solo hasta el domingo.", cta: "Ver ofertas", href: `/catalogo?o=ofertas` },
-  { image: "hoodie", bg: "bg-accent text-accent-ink", title: "Polerones para el frío", text: "Oversize, perchados y en tres colores. Desde $44.990.", cta: "Ver polerones", href: `/catalogo?c=polerones` },
-];
+
+// Fondo de cada banner, en orden: los campos de color de la marca.
+const fields = ["bg-field text-field-ink", "bg-[var(--field-2)] text-ink", "bg-accent text-accent-ink"];
 
 export async function Home() {
-  const { categories, products } = await getCatalog();
+  const { categories, products, store } = await getCatalog();
   const fresh = products.filter((p) => p.badge === "nuevo" || p.featured).slice(0, 8);
   const sale = products.filter((p) => p.compareAtPrice);
 
-  const show = sectionVisible((await getCatalog()).store);
+  const show = sectionVisible(store);
+  const hero = storeHero(store, "mercado");
   return (
     <div className="flex flex-col gap-4 px-4 sm:px-6">
       {/* Portada: carrusel de campos de color */}
@@ -31,12 +31,15 @@ export async function Home() {
             label="Campañas"
             controls="pill"
             className="rounded-brand"
-            slides={slides.map((s, k) => (
-              <div key={s.title} className={`grid h-full gap-6 rounded-brand p-4 md:min-h-[600px] md:grid-cols-2 md:p-6 ${s.bg}`}>
+            autoplay={hero.autoplay}
+            interval={hero.interval}
+            slides={hero.slides.map((s, k) => (
+              <div key={k} className={`grid h-full gap-6 rounded-brand p-4 md:min-h-[600px] md:grid-cols-2 md:p-6 ${fields[k % fields.length]}`}>
                 <div className="slide-text flex flex-col justify-center gap-6 p-4 pb-2 md:p-8">
+                  {s.tag && <span className="w-fit rounded-full bg-bg/80 px-4 py-1.5 text-base font-semibold text-ink">{s.tag}</span>}
                   <h1 className="text-[clamp(3rem,6.4vw,6.8rem)] font-extrabold leading-[0.92] tracking-[-0.04em]">{s.title}</h1>
-                  <p className="max-w-md text-xl leading-relaxed">{s.text}</p>
-                  <Link href={s.href} className="w-fit rounded-full bg-ink px-8 py-4 text-lg font-semibold text-bg transition-transform hover:-translate-y-0.5 active:scale-95">{s.cta}</Link>
+                  {s.text && <p className="max-w-md text-xl leading-relaxed">{s.text}</p>}
+                  {s.cta && s.href && <Link href={s.href} className="w-fit rounded-full bg-ink px-8 py-4 text-lg font-semibold text-bg transition-transform hover:-translate-y-0.5 active:scale-95">{s.cta}</Link>}
                 </div>
                 <Photo name={s.image} alt={s.title} priority={k === 0} sizes="(max-width: 768px) 100vw, 50vw" className="slide-media aspect-[4/5] rounded-[calc(var(--radius)-8px)] md:aspect-auto" />
               </div>

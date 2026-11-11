@@ -3,6 +3,7 @@ import { getCatalog } from "@/lib/catalog";
 import { sectionVisible } from "@/themes/sections";
 import { Photo } from "@/designs/Photo";
 import { Carousel } from "@/designs/Carousel";
+import { storeHero } from "@/themes/hero";
 import { Reveal } from "@/designs/Reveal";
 import { Countdown, Newsletter } from "@/designs/extras";
 import { ProductTile } from "./ProductTile";
@@ -13,11 +14,6 @@ const H = "text-6xl font-black uppercase leading-[0.85] tracking-[-0.025em] [fon
 const dropDate = (iso: string) =>
   new Intl.DateTimeFormat("es-CL", { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", timeZone: "America/Santiago" }).format(new Date(iso));
 
-const slides = [
-  { image: "streetwear", title: "Drop 026 ya disponible", cta: "Comprar el drop", href: `/catalogo?o=nuevos`, tag: "Edición limitada" },
-  { image: "hoodie2", title: "Preventa Zip Logo 3D", cta: "Reservar el mío", href: `/producto/poleron-zip-logo`, tag: "Despacho 25/11" },
-  { image: "street2", title: "Sale hasta 33% off", cta: "Ver el sale", href: `/catalogo?o=ofertas`, tag: "Hasta agotar stock" },
-];
 
 export async function Home() {
   const { categories, lines, products, store } = await getCatalog();
@@ -25,7 +21,8 @@ export async function Home() {
   const best = products.filter((p) => p.featured);
   const fresh = products.filter((p) => p.badge || p.compareAtPrice);
 
-  const show = sectionVisible((await getCatalog()).store);
+  const show = sectionVisible(store);
+  const hero = storeHero(store, "vitrina");
   return (
     <>
       {/* Portada: carrusel a sangre con titulares gigantes */}
@@ -34,16 +31,19 @@ export async function Home() {
         <Carousel
           label="Lanzamientos"
           className="h-[82vh] min-h-[540px] bg-ink"
-          slides={slides.map((s, k) => (
-            <div key={s.title} className="relative h-full">
+          autoplay={hero.autoplay}
+          interval={hero.interval}
+          slides={hero.slides.map((s, k) => (
+            <div key={k} className="relative h-full">
               <Photo name={s.image} alt={s.title} priority={k === 0} sizes="100vw" className="slide-media absolute inset-0" />
               <div className="absolute inset-0 bg-black/35" />
               <div className="slide-text absolute inset-x-0 bottom-0 flex flex-col items-start gap-5 p-4 pb-20 text-white sm:p-6 sm:pb-24">
-                <span className="bg-accent px-3 py-1 text-base font-semibold uppercase text-accent-ink">{s.tag}</span>
+                {s.tag && <span className="bg-accent px-3 py-1 text-base font-semibold uppercase text-accent-ink">{s.tag}</span>}
                 <h2 className="max-w-[14ch] text-[clamp(3.6rem,11vw,12rem)] font-black uppercase leading-[0.82] tracking-[-0.025em] [font-stretch:62%] [word-spacing:0.08em]">{s.title}</h2>
-                <Link href={s.href} className="flex h-14 items-center gap-6 bg-white px-6 text-lg font-semibold uppercase text-black transition-colors hover:bg-accent hover:text-white">
+                {s.text && <p className="max-w-xl text-xl">{s.text}</p>}
+                {s.cta && s.href && <Link href={s.href} className="flex h-14 items-center gap-6 bg-white px-6 text-lg font-semibold uppercase text-black transition-colors hover:bg-accent hover:text-white">
                   {s.cta} <span aria-hidden>→</span>
-                </Link>
+                </Link>}
               </div>
             </div>
           ))}

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 
-// Carrusel de banners: avanza solo cada 6 s, se pausa al pasar el mouse o al
+// Carrusel de banners: avanza solo (si autoplay) cada `interval` ms, se pausa al pasar el mouse o al
 // enfocar, se mueve con flechas, puntos, teclado y deslizando el dedo.
 export function Carousel({
   slides,
@@ -10,12 +10,14 @@ export function Carousel({
   className = "",
   controls = "square",
   interval = 6000,
+  autoplay = true,
 }: {
   slides: ReactNode[];
   label: string;
   className?: string;
   controls?: "square" | "pill" | "bar";
   interval?: number;
+  autoplay?: boolean;
 }) {
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -24,10 +26,10 @@ export function Carousel({
   const go = useCallback((k: number) => setI(((k % n) + n) % n), [n]);
 
   useEffect(() => {
-    if (paused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!autoplay || n < 2 || paused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const t = setTimeout(() => go(i + 1), interval);
     return () => clearTimeout(t);
-  }, [i, paused, go, interval]);
+  }, [i, paused, go, interval, autoplay, n]);
 
   const round = controls === "pill" ? "rounded-full" : "";
 
@@ -70,7 +72,8 @@ export function Carousel({
         ))}
       </div>
 
-      <div className={`absolute right-4 bottom-4 z-10 flex items-center gap-2 sm:right-6 sm:bottom-6`}>
+      {n > 1 && (
+      <div className="absolute right-4 bottom-4 z-10 flex items-center gap-2 sm:right-6 sm:bottom-6">
         <button
           type="button"
           aria-label="Banner anterior"
@@ -87,9 +90,9 @@ export function Carousel({
               aria-label={`Ir al banner ${k + 1}`}
               aria-current={k === i}
               onClick={() => go(k)}
-              className={`h-1.5 overflow-hidden bg-bg/50 transition-all ${round} ${k === i ? "w-10" : "w-4"}`}
+              className={`h-1.5 overflow-hidden transition-all ${round} ${k === i ? (autoplay ? "w-10 bg-bg/50" : "w-10 bg-bg") : "w-4 bg-bg/50"}`}
             >
-              {k === i && (
+              {k === i && autoplay && (
                 <span
                   key={`${i}-${paused}`}
                   className={`carousel-progress block h-full bg-bg ${round}`}
@@ -108,6 +111,7 @@ export function Carousel({
           →
         </button>
       </div>
+      )}
     </section>
   );
 }

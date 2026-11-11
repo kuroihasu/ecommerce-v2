@@ -48,3 +48,19 @@ describe('SettingsInput.chat', () => {
     expect(() => SettingsInput.parse({ chat: { ...chat, faqs: Array(13).fill(chat.faqs[0]) } })).toThrow();
   });
 });
+
+describe('SettingsInput.hero', () => {
+  const slide = { image: 'https://cdn.tienda.cl/banner.jpg', title: 'Invierno', text: '', tag: '', cta: 'Ver', href: '/catalogo?o=nuevos' };
+  const hero = { autoplay: true, seconds: 6, slides: [slide] };
+  it('acepta fotos https, claves de muestra y enlaces internos o https', () => {
+    expect(SettingsInput.parse({ hero }).hero?.slides).toHaveLength(1);
+    expect(() => SettingsInput.parse({ hero: { ...hero, slides: [{ ...slide, image: 'editorial', href: 'https://instagram.com/norte' }] } })).not.toThrow();
+  });
+  it('rechaza enlaces peligrosos, fotos http y más de 6 banners', () => {
+    for (const href of ['javascript:alert(1)', '//evil.com', '/\\evil.com', 'http://x.cl'])
+      expect(() => SettingsInput.parse({ hero: { ...hero, slides: [{ ...slide, href }] } })).toThrow();
+    expect(() => SettingsInput.parse({ hero: { ...hero, slides: [{ ...slide, image: 'http://x.cl/a.jpg' }] } })).toThrow();
+    expect(() => SettingsInput.parse({ hero: { ...hero, slides: Array(7).fill(slide) } })).toThrow();
+    expect(() => SettingsInput.parse({ hero: { ...hero, seconds: 1 } })).toThrow();
+  });
+});

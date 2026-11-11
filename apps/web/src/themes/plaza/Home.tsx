@@ -4,21 +4,20 @@ import { getCatalog } from "@/lib/catalog";
 import { sectionVisible } from "@/themes/sections";
 import { Photo } from "@/designs/Photo";
 import { Carousel } from "@/designs/Carousel";
+import { storeHero } from "@/themes/hero";
 import { Reveal } from "@/designs/Reveal";
 import { ScrollRail } from "@/designs/ScrollRail";
 import { Card } from "./Card";
 import { ShopTheLook } from "./ShopTheLook";
 
 
-const slides = [
-  { image: "woman3", bg: "bg-field text-field-ink", title: "Nueva colección mujer", text: "Vestidos, jeans wide leg y básicos suaves para armar tus looks de temporada.", cta: "Ver lo nuevo", href: `/catalogo?o=nuevos` },
-  { image: "dress2", bg: "bg-[var(--field-2)] text-ink", title: "Vestidos para cada ocasión", text: "Satinados, florales y midi. Desde $24.990.", cta: "Ver vestidos", href: `/catalogo?c=vestidos` },
-  { image: "woman2", bg: "bg-accent text-accent-ink", title: "Ofertas de la semana", text: "Hasta 33% off en prendas seleccionadas. Solo hasta el domingo.", cta: "Ver ofertas", href: `/catalogo?o=ofertas` },
-]
+
+// Fondo de cada banner, en orden: los campos de color de la marca.
+const fields = ["bg-field text-field-ink", "bg-[var(--field-2)] text-ink", "bg-accent text-accent-ink"];
 
 export async function Home() {
   const catalog = await getCatalog();
-  const { categories, products } = catalog;
+  const { categories, products, store } = catalog;
   const look = ["polera-manga-larga-special", "jeans-wide-leg", "chaqueta-mezclilla-oversize", "bolso-tote"].flatMap((s) => findProduct(catalog, s) ?? []);
   // Siempre 8 (dos filas completas): primero todo lo marcado "nuevo", luego lo de mujer,
   // luego lo destacado, y se completa con el resto del catálogo.
@@ -26,7 +25,8 @@ export async function Home() {
   const fresh = [...products].sort((a, b) => rank(a) - rank(b)).slice(0, 8);
   const sale = products.filter((p) => p.compareAtPrice);
 
-  const show = sectionVisible((await getCatalog()).store);
+  const show = sectionVisible(store);
+  const hero = storeHero(store, "plaza");
   return (
     <div className="flex flex-col gap-4 px-4 sm:px-6">
       {/* Portada: carrusel de campos de color */}
@@ -37,12 +37,15 @@ export async function Home() {
             label="Campañas"
             controls="pill"
             className="rounded-brand"
-            slides={slides.map((s, k) => (
-              <div key={s.title} className={`grid h-full gap-6 rounded-brand p-4 md:min-h-[600px] md:grid-cols-2 md:p-6 ${s.bg}`}>
+            autoplay={hero.autoplay}
+            interval={hero.interval}
+            slides={hero.slides.map((s, k) => (
+              <div key={k} className={`grid h-full gap-6 rounded-brand p-4 md:min-h-[600px] md:grid-cols-2 md:p-6 ${fields[k % fields.length]}`}>
                 <div className="slide-text flex flex-col justify-center gap-6 p-4 pb-2 md:p-8">
+                  {s.tag && <span className="w-fit rounded-full bg-bg/80 px-4 py-1.5 text-base font-semibold text-ink">{s.tag}</span>}
                   <h1 className="text-[clamp(3rem,6.4vw,6.8rem)] font-display font-normal leading-[0.92] tracking-[-0.02em]">{s.title}</h1>
-                  <p className="max-w-md text-xl leading-relaxed">{s.text}</p>
-                  <Link href={s.href} className="w-fit rounded-full bg-ink px-8 py-4 text-lg font-semibold text-bg transition-transform hover:-translate-y-0.5 active:scale-95">{s.cta}</Link>
+                  {s.text && <p className="max-w-md text-xl leading-relaxed">{s.text}</p>}
+                  {s.cta && s.href && <Link href={s.href} className="w-fit rounded-full bg-ink px-8 py-4 text-lg font-semibold text-bg transition-transform hover:-translate-y-0.5 active:scale-95">{s.cta}</Link>}
                 </div>
                 <Photo name={s.image} alt={s.title} priority={k === 0} sizes="(max-width: 768px) 100vw, 50vw" className="slide-media aspect-[4/5] rounded-[calc(var(--radius)-8px)] md:aspect-auto" />
               </div>

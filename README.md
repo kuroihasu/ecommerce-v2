@@ -104,6 +104,9 @@ Secciones del panel:
   portada (`settings.hiddenSections`, ver `apps/web/src/themes/sections.ts`), y los textos
   de la barra de avisos y la suscripción (`settings.texts`, ver `apps/web/src/themes/texts.ts`).
   Los textos aceptan `{codigo}`, `{porcentaje}`, `{envio_gratis}` y `{cuotas}`.
+  También el carrusel de la portada: banners propios (foto, etiqueta, título, texto, botón y
+  enlace, hasta 6), si avanza solo y cada cuántos segundos. Sin banners propios cada diseño
+  usa los suyos (`settings.hero`, ver `apps/web/src/themes/hero.ts`).
 - **Publicaciones y anuncios**: conecta Meta y Google Ads (solo lectura) para ver las últimas
   publicaciones de Instagram y los resultados de las campañas de los últimos 30 días.
 

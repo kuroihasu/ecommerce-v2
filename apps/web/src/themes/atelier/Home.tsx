@@ -4,16 +4,12 @@ import { getCatalog } from "@/lib/catalog";
 import { sectionVisible } from "@/themes/sections";
 import { Photo } from "@/designs/Photo";
 import { Carousel } from "@/designs/Carousel";
+import { storeHero } from "@/themes/hero";
 import { Reveal } from "@/designs/Reveal";
 import { Card } from "./Card";
 import { ShopTheLook } from "./ShopTheLook";
 
 
-const slides = [
-  { image: "editorial", title: "Colección Invierno", text: "Lana, mezclilla y negro. Ya disponible.", cta: "Ver la colección", href: `/catalogo?o=nuevos` },
-  { image: "dress", title: "Vestidos para salir", text: "Satinados y florales desde $24.990.", cta: "Ver vestidos", href: `/catalogo?c=vestidos` },
-  { image: "rack", title: "Hasta 30% en básicos", text: "Poleras y polerones con precio de temporada.", cta: "Ver ofertas", href: `/catalogo?o=ofertas` },
-];
 
 export async function Home() {
   const catalog = await getCatalog();
@@ -21,7 +17,8 @@ export async function Home() {
   const fresh = products.filter((p) => p.featured).slice(0, 4);
   const look = ["chaqueta-mezclilla-oversize", "polera-boxy-heavy", "jeans-wide-leg", "bolso-tote"].flatMap((s) => findProduct(catalog, s) ?? []);
 
-  const show = sectionVisible((await getCatalog()).store);
+  const show = sectionVisible(catalog.store);
+  const hero = storeHero(catalog.store, "atelier");
   return (
     <>
       {/* Portada: carrusel a pantalla completa */}
@@ -30,14 +27,17 @@ export async function Home() {
         <Carousel
           label="Campañas"
           className="h-[78vh] min-h-[520px]"
-          slides={slides.map((s, k) => (
-            <div key={s.title} className="relative h-full">
+          autoplay={hero.autoplay}
+          interval={hero.interval}
+          slides={hero.slides.map((s, k) => (
+            <div key={k} className="relative h-full">
               <Photo name={s.image} alt={s.title} priority={k === 0} sizes="100vw" className="slide-media absolute inset-0" />
               <div className="absolute inset-x-0 bottom-0 h-2/3 bg-[linear-gradient(to_top,rgba(0,0,0,0.55),transparent)]" />
               <div className="slide-text absolute bottom-0 left-0 flex max-w-3xl flex-col items-start gap-5 p-6 pb-24 text-white sm:p-10 sm:pb-24">
+                {s.tag && <span className="border border-white/70 px-3 py-1 text-sm uppercase tracking-[0.12em]">{s.tag}</span>}
                 <h2 className="font-display text-[clamp(3.2rem,8vw,8rem)] leading-[0.9] tracking-[-0.02em]">{s.title}</h2>
-                <p className="text-xl">{s.text}</p>
-                <Link href={s.href} className="bg-white px-8 py-4 text-lg text-black transition-transform hover:-translate-y-0.5 active:scale-[0.98]">{s.cta}</Link>
+                {s.text && <p className="text-xl">{s.text}</p>}
+                {s.cta && s.href && <Link href={s.href} className="bg-white px-8 py-4 text-lg text-black transition-transform hover:-translate-y-0.5 active:scale-[0.98]">{s.cta}</Link>}
               </div>
             </div>
           ))}

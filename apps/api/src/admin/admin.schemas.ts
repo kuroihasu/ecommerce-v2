@@ -72,6 +72,32 @@ export const SettingsInput = z.object({
         .max(12, 'Máximo 12 preguntas'),
     })
     .optional(),
+  // Carrusel de la portada (Avanzado). Sin banners = los del diseño.
+  hero: z
+    .object({
+      autoplay: z.boolean(),
+      seconds: z.number().int().min(3).max(15),
+      slides: z
+        .array(
+          z.object({
+            // Foto https o clave de las fotos de muestra del diseño ("editorial").
+            image: z.union([z.url({ protocol: /^https$/ }).max(2000), z.string().regex(/^[a-zA-Z0-9]{1,30}$/)], {
+              error: 'Cada banner necesita una foto (dirección https)',
+            }),
+            title: text(60).min(1, 'Cada banner necesita un título'),
+            text: text(160),
+            tag: text(30),
+            cta: text(30),
+            // Ruta dentro de la tienda (/catalogo?o=ofertas) o dirección https. Nunca
+            // javascript: ni //otro-sitio.
+            href: z.union([z.string().trim().max(300).regex(/^\/(?![/\\])\S*$/), z.url({ protocol: /^https$/ }).max(300), z.literal('')], {
+              error: 'El enlace debe empezar con / o https://',
+            }),
+          }),
+        )
+        .max(6, 'Máximo 6 banners'),
+    })
+    .optional(),
 });
 
 export const StoreInput = z.object({
