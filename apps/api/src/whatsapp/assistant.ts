@@ -1,5 +1,7 @@
-import Anthropic from '@anthropic-ai/sdk';
-import type { BetaMessage, BetaMessageParam, BetaTool, BetaToolResultBlockParam, BetaToolUseBlock } from '@anthropic-ai/sdk/resources/beta/messages/messages';
+// Import con nombre (no el default): el build de Vercel compila la API con otra
+// resolución de módulos y ahí el default del SDK no se puede construir.
+import { Anthropic } from '@anthropic-ai/sdk';
+import type { BetaMessage, BetaMessageParam, BetaTool, BetaToolResultBlockParam, BetaToolUseBlock, MessageCreateParamsNonStreaming } from '@anthropic-ai/sdk/resources/beta/messages/messages';
 
 // El asistente: Claude con tres herramientas de solo lectura (más la de pasar a una
 // persona). Las respuestas salen de los datos de la tienda, nunca de lo que "cree" el
@@ -24,7 +26,7 @@ export type AssistantTools = {
 export type AssistantResult = { reply: string; handoff: string | null };
 
 // Lo único del cliente de Anthropic que se usa (así las pruebas pasan uno falso).
-export type ClaudeClient = { beta: { messages: { create(body: Anthropic.Beta.Messages.MessageCreateParamsNonStreaming): Promise<BetaMessage> } } };
+export type ClaudeClient = { beta: { messages: { create(body: MessageCreateParamsNonStreaming): Promise<BetaMessage> } } };
 
 export const createClient = (apiKey: string): ClaudeClient => new Anthropic({ apiKey, timeout: 25_000, maxRetries: 1 });
 
