@@ -16,6 +16,7 @@ const links = [
   { href: "/admin/redes", label: "Redes y publicidad" },
   { href: "/admin/publicaciones", label: "Publicaciones y anuncios" },
   { href: "/admin/avanzado", label: "Avanzado" },
+  { href: "/admin/seguridad", label: "Seguridad" },
 ];
 
 // Marco de las páginas del panel: menú lateral y contenido.
