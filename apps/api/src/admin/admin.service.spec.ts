@@ -43,4 +43,11 @@ describe('AdminService', () => {
     await service({ store: { findUniqueOrThrow, update } }).updateStore(owner, { settings: { installments: 3 } });
     expect(update.mock.calls[0][0].data.settings).toEqual({ email: 'hola@norte.cl', installments: 3 });
   });
+
+  it('guardar los textos de la suscripción no borra los avisos', async () => {
+    const findUniqueOrThrow = vi.fn().mockResolvedValue({ settings: { texts: { announce: ['Envíos a todo Chile'], newsletterTitle: 'Viejo' } } });
+    const update = vi.fn().mockResolvedValue({});
+    await service({ store: { findUniqueOrThrow, update } }).updateStore(owner, { settings: { texts: { newsletterTitle: 'Nuevo', newsletterThanks: '' } } });
+    expect(update.mock.calls[0][0].data.settings.texts).toEqual({ announce: ['Envíos a todo Chile'], newsletterTitle: 'Nuevo', newsletterThanks: '' });
+  });
 });

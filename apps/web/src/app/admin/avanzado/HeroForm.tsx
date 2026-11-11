@@ -67,9 +67,8 @@ export function HeroForm({ initial, active, photos, links }: { initial: Partial<
     });
 
   return (
-    <section className="mt-6 rounded-xl border border-zinc-200 bg-white p-5">
-      <h2 className="text-lg font-semibold">Carrusel de la portada</h2>
-      <p className="mt-1 text-sm text-zinc-500">Los banners grandes del inicio: foto, textos, botón y a dónde lleva. Para quitarlo entero, oculta «Portada» en Secciones.</p>
+    <div>
+      <p className="text-sm text-zinc-500">Los banners grandes del inicio: foto, textos, botón y a dónde lleva. Para quitarlo entero, apaga «Portada» en la lista de secciones.</p>
 
       <h3 className="mt-6 text-sm font-semibold uppercase tracking-wide text-zinc-500">Movimiento</h3>
       <div className="mt-2 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm">
@@ -200,10 +199,10 @@ export function HeroForm({ initial, active, photos, links }: { initial: Partial<
         </div>
       </div>
 
-      <div className="mt-6 flex items-center gap-4">
+      <div className="sticky bottom-0 -mx-5 mt-6 flex items-center gap-4 border-t border-zinc-200 bg-white px-5 py-3">
         <button onClick={save} disabled={pending} className="h-11 rounded-lg bg-zinc-900 px-6 font-medium text-white disabled:opacity-60">{pending ? "Guardando…" : "Guardar carrusel"}</button>
         {msg && <p role="status" className={`text-sm ${msg.ok ? "text-emerald-700" : "text-red-700"}`}>{msg.text}</p>}
       </div>
-    </section>
+    </div>
   );
 }

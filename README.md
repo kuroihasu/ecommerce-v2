@@ -104,7 +104,9 @@ Secciones del panel:
   portada (`settings.hiddenSections`, ver `apps/web/src/themes/sections.ts`), y los textos
   de la barra de avisos y la suscripción (`settings.texts`, ver `apps/web/src/themes/texts.ts`).
   Los textos aceptan `{codigo}`, `{porcentaje}`, `{envio_gratis}` y `{cuotas}`.
-  También el carrusel de la portada: banners propios (foto, etiqueta, título, texto, botón y
+  La barra de avisos, la suscripción y la portada tienen un botón «Configurar» junto a su
+  interruptor que abre sus ajustes en una ventana (pantalla completa en el celular).
+  El carrusel de la portada: banners propios (foto, etiqueta, título, texto, botón y
   enlace, hasta 6), si avanza solo y cada cuántos segundos. Sin banners propios cada diseño
   usa los suyos (`settings.hero`, ver `apps/web/src/themes/hero.ts`).
 - **Publicaciones y anuncios**: conecta Meta y Google Ads (solo lectura) para ver las últimas

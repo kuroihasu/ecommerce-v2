@@ -9,7 +9,9 @@ const MAX = 5;
 
 // Textos de la barra de avisos y de la suscripción. Un campo vacío usa el texto del
 // diseño; los comodines ({codigo}, {porcentaje}…) se reemplazan con los datos al día.
-export function TextsForm({ initial, active, designs, data }: { initial: StoreTexts; active: string; designs: { id: string; name: string }[]; data: TextData }) {
+// `part` elige qué se edita: la barra de avisos o la suscripción. Cada una se abre en su
+// ventana desde Secciones y guarda solo lo suyo (la API mezcla settings.texts).
+export function TextsForm({ part, initial, active, designs, data }: { part: "announce" | "newsletter"; initial: StoreTexts; active: string; designs: { id: string; name: string }[]; data: TextData }) {
   const [design, setDesign] = useState(active);
   const d = defaultTexts[design] ?? defaultTexts.atelier;
   const [own, setOwn] = useState(Boolean(initial.announce?.length));
@@ -30,18 +32,17 @@ export function TextsForm({ initial, active, designs, data }: { initial: StoreTe
   const save = () =>
     start(async () => {
       const res = await saveStore({
-        settings: { texts: { announce: own ? written : [], newsletterTitle: title.trim(), newsletterThanks: thanks.trim() } },
+        settings: { texts: part === "announce" ? { announce: own ? written : [] } : { newsletterTitle: title.trim(), newsletterThanks: thanks.trim() } },
       });
       setMsg(res.ok ? { ok: true, text: "Guardado. La tienda ya muestra los textos nuevos." } : { ok: false, text: res.error });
     });
 
   return (
-    <section className="mt-6 rounded-xl border border-zinc-200 bg-white p-5">
+    <div>
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-semibold">Textos de la tienda</h2>
-          <p className="mt-1 text-sm text-zinc-500">Lo que dicen la barra de avisos y la suscripción al correo. Deja un campo vacío para usar el texto del diseño.</p>
-        </div>
+        <p className="max-w-xl text-sm text-zinc-500">
+          {part === "announce" ? "Los mensajes de la franja de arriba de la tienda." : "Lo que dice el formulario de correo del pie de página. Deja un campo vacío para usar el texto del diseño."}
+        </p>
         <label className="flex items-center gap-2 text-sm">
           Ver ejemplos de
           <select value={design} onChange={(e) => setDesign(e.target.value)} className="h-9 rounded-lg border border-zinc-300 bg-white px-2">
@@ -50,8 +51,9 @@ export function TextsForm({ initial, active, designs, data }: { initial: StoreTe
         </label>
       </div>
 
-      <h3 className="mt-6 text-sm font-semibold uppercase tracking-wide text-zinc-500">Barra de avisos</h3>
-      <div className="mt-2 flex flex-col gap-2 text-sm">
+      {part === "announce" && (
+      <>
+      <div className="mt-4 flex flex-col gap-2 text-sm">
         <label className="flex items-center gap-2">
           <input type="radio" name="announce-mode" checked={!own} onChange={() => { setOwn(false); touch(); }} className="h-4 w-4 accent-zinc-900" />
           Usar los avisos del diseño
@@ -78,9 +80,11 @@ export function TextsForm({ initial, active, designs, data }: { initial: StoreTe
       <div className="mt-3 rounded-lg bg-zinc-900 px-4 py-2.5 text-sm text-white" aria-label="Vista previa de la barra">
         {preview.length ? preview.join("  ·  ") : <span className="text-zinc-400">Sin avisos para mostrar: la barra no aparecerá.</span>}
       </div>
+      </>
+      )}
 
-      <h3 className="mt-8 text-sm font-semibold uppercase tracking-wide text-zinc-500">Suscripción al correo</h3>
-      <div className="mt-3 grid gap-4 md:grid-cols-2">
+      {part === "newsletter" && (
+      <div className="mt-4 grid gap-4 md:grid-cols-2">
         <label className="flex flex-col gap-1.5 text-sm font-medium">
           Título
           <input className={input} value={title} maxLength={120} placeholder={fillText(d.newsletterTitle, data)} onChange={(e) => { setTitle(e.target.value); touch(); }} />
@@ -90,6 +94,7 @@ export function TextsForm({ initial, active, designs, data }: { initial: StoreTe
           <input className={input} value={thanks} maxLength={160} placeholder={fillText(withMinimum(d.newsletterThanks, data), data)} onChange={(e) => { setThanks(e.target.value); touch(); }} />
         </label>
       </div>
+      )}
 
       <div className="mt-6 rounded-lg bg-zinc-50 p-4 text-sm">
         <p className="font-medium">Palabras que se reemplazan solas</p>
@@ -101,10 +106,10 @@ export function TextsForm({ initial, active, designs, data }: { initial: StoreTe
         <p className="mt-2 text-zinc-500">Si no hay un código anunciado, los avisos que lo mencionan se ocultan solos.</p>
       </div>
 
-      <div className="mt-6 flex items-center gap-4">
-        <button onClick={save} disabled={pending} className="h-11 rounded-lg bg-zinc-900 px-6 font-medium text-white disabled:opacity-60">{pending ? "Guardando…" : "Guardar textos"}</button>
+      <div className="sticky bottom-0 -mx-5 mt-6 flex items-center gap-4 border-t border-zinc-200 bg-white px-5 py-3">
+        <button onClick={save} disabled={pending} className="h-11 rounded-lg bg-zinc-900 px-6 font-medium text-white disabled:opacity-60">{pending ? "Guardando…" : "Guardar"}</button>
         {msg && <p role="status" className={`text-sm ${msg.ok ? "text-emerald-700" : "text-red-700"}`}>{msg.text}</p>}
       </div>
-    </section>
+    </div>
   );
 }

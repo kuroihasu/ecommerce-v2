@@ -42,8 +42,15 @@ export class AdminService {
       throw new ForbiddenException('Solo dueños y administradores cambian el diseño y los datos de la tienda');
     }
     const current = await this.getStore(access);
+    const prev = (current.settings ?? {}) as Record<string, unknown>;
+    // Los textos se guardan por partes (barra de avisos y suscripción, cada una desde su
+    // ventana), así que se mezclan en vez de reemplazarse.
     const settings = input.settings
-      ? { ...(current.settings as Record<string, unknown>), ...input.settings }
+      ? {
+          ...prev,
+          ...input.settings,
+          ...(input.settings.texts ? { texts: { ...(prev.texts as object | undefined), ...input.settings.texts } } : {}),
+        }
       : undefined;
     return this.db.store.update({
       where: { id: access.id },
