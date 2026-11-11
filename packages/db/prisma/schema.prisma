@@ -37,6 +37,8 @@ model Store {
   integrations  Integration[]
   discountCodes DiscountCode[]
   subscribers   Subscriber[]
+  stockMoves    StockMovement[]
+  ledger        LedgerEntry[]
 }
 
 // ─── Códigos de descuento ───────────────────────────────────────────
@@ -210,11 +212,15 @@ model ProductVariant {
   price          Int
   compareAtPrice Int?
   stock          Int     @default(0)
+  // Lo que le cuesta cada unidad a la tienda (con IVA). Sirve para valorizar el
+  // inventario y calcular el margen. Vacío = aún no se ingresa.
+  cost           Int?
   position       Int     @default(0)
 
-  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product    Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
   cartItems  CartItem[]
   orderItems OrderItem[]
+  stockMoves StockMovement[]
 
   @@index([productId, position])
 }
@@ -403,4 +409,74 @@ model Subscriber {
 
   @@unique([storeId, email])
   @@index([storeId, createdAt])
+}
+
+// ─── Inventario ─────────────────────────────────────────────────────
+
+enum StockReason {
+  ADJUSTMENT // corrección o conteo físico
+  RESTOCK // llegó mercadería
+  SALE // venta (tienda online o venta manual)
+  RETURN // devolución de un cliente
+  LOSS // pérdida, daño o robo
+}
+
+// Historial de cada cambio de stock: quién lo movió no se guarda (aún), pero sí
+// cuánto, por qué y cuánto quedó. Nombre y SKU se copian para que el historial
+// siga legible aunque la variante se borre.
+model StockMovement {
+  id         String      @id @default(cuid())
+  storeId    String
+  variantId  String?
+  label      String
+  sku        String?
+  delta      Int
+  stockAfter Int
+  reason     StockReason
+  note       String?
+  createdAt  DateTime    @default(now())
+
+  store   Store           @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  variant ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+
+  @@index([storeId, createdAt])
+  @@index([variantId, createdAt])
+}
+
+// ─── Contabilidad ───────────────────────────────────────────────────
+
+enum LedgerKind {
+  INCOME
+  EXPENSE
+}
+
+enum TaxDocument {
+  FACTURA
+  BOLETA
+  NONE
+}
+
+// Ingresos y gastos que el dueño anota a mano (arriendo, mercadería, ventas por
+// Instagram o en feria...). Las ventas de la tienda online no se anotan aquí: se
+// leen de `Order`. `amount` es el total con IVA y `taxAmount` el IVA que incluye
+// (solo una factura de compra da crédito fiscal).
+model LedgerEntry {
+  id              String      @id @default(cuid())
+  storeId         String
+  kind            LedgerKind
+  date            DateTime    @db.Date
+  category        String
+  description     String
+  amount          Int
+  taxAmount       Int         @default(0)
+  document        TaxDocument @default(NONE)
+  documentNumber  String?
+  counterparty    String?
+  counterpartyRut String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([storeId, date])
 }

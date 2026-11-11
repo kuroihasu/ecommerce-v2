@@ -29,6 +29,8 @@ export const SettingsInput = z.object({
   shippingRegions: money.optional(),
   freeShippingFrom: money.optional(),
   installments: z.number().int().min(1).max(48).optional(),
+  // Inventario: una variante con este stock o menos aparece como "stock bajo".
+  lowStockThreshold: z.number().int().min(0).max(1000).optional(),
   nextDrop: z.object({ name: text(80).min(1), date: z.iso.datetime({ offset: true }) }).nullable().optional(),
   facebook: text(100).optional(),
   // Píxeles de publicidad. Cada id se valida con su formato para que la tienda nunca
@@ -133,6 +135,8 @@ export const VariantsInput = z
       options: z.record(text(30).min(1), text(60)).default({}),
       price: money,
       compareAtPrice: money.nullable().optional(),
+      // Costo unitario. Si no viene, se conserva el que tenía la variante.
+      cost: money.nullable().optional(),
       stock: z.number().int().min(0).max(1_000_000),
     }),
   )

@@ -7,7 +7,7 @@ import { STORE_SLUG } from "@/lib/catalog";
 import { PREVIEW_COOKIE } from "@/themes/resolve";
 import { adminApi, apiLogin, ApiError } from "./api";
 import { clearSession, setSession } from "./session";
-import type { ActionResult, AdminCategory, AdminDiscount, AdminProduct, AdminStore, DiscountPayload, IntegrationSlug, ProductPayload } from "./types";
+import type { ActionResult, AdminCategory, AdminDiscount, AdminProduct, AdminStore, DiscountPayload, EntryPayload, IntegrationSlug, LedgerEntry, ProductPayload, StockAdjust, StockMovement } from "./types";
 import { adminOrigin } from "./origin";
 
 // Acciones del panel. Cada una reenvía la sesión a la API, que valida permisos;
@@ -171,6 +171,48 @@ export async function featureDiscount(id: string): Promise<ActionResult> {
   try {
     await adminApi(`/discounts/${encodeURIComponent(id)}/feature`, { method: "POST" });
     updateTag("store");
+    return { ok: true, data: undefined };
+  } catch (e) {
+    return fail(e);
+  }
+}
+
+// Inventario: ajustar stock (suma, resta o conteo) y el costo de una variante.
+// Se refresca la tienda porque el stock decide si una talla se puede comprar.
+export async function adjustStock(input: StockAdjust): Promise<ActionResult<{ variantId: string; stock: number; movement: StockMovement }>> {
+  try {
+    const data = await adminApi<{ variantId: string; stock: number; movement: StockMovement }>("/inventory/adjust", { method: "POST", body: input });
+    updateTag("store");
+    return { ok: true, data };
+  } catch (e) {
+    return fail(e);
+  }
+}
+
+export async function setVariantCost(variantId: string, cost: number | null): Promise<ActionResult> {
+  try {
+    await adminApi(`/inventory/${encodeURIComponent(variantId)}/cost`, { method: "PATCH", body: { cost } });
+    return { ok: true, data: undefined };
+  } catch (e) {
+    return fail(e);
+  }
+}
+
+// Contabilidad: movimientos anotados a mano.
+export async function saveEntry(id: string | null, payload: EntryPayload): Promise<ActionResult<LedgerEntry>> {
+  try {
+    const data = id
+      ? await adminApi<LedgerEntry>(`/accounting/entries/${encodeURIComponent(id)}`, { method: "PUT", body: payload })
+      : await adminApi<LedgerEntry>("/accounting/entries", { method: "POST", body: payload });
+    return { ok: true, data };
+  } catch (e) {
+    return fail(e);
+  }
+}
+
+export async function deleteEntry(id: string): Promise<ActionResult> {
+  try {
+    await adminApi(`/accounting/entries/${encodeURIComponent(id)}`, { method: "DELETE" });
     return { ok: true, data: undefined };
   } catch (e) {
     return fail(e);

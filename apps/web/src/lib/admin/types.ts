@@ -12,6 +12,7 @@ export type AdminVariant = {
   options: Record<string, string>;
   price: number;
   compareAtPrice: number | null;
+  cost?: number | null;
   stock: number;
 };
 export type ProductColor = { name: string; hex: string };
@@ -50,6 +51,7 @@ export type StoreSettings = {
   shippingRegions?: number;
   freeShippingFrom?: number;
   installments?: number;
+  lowStockThreshold?: number;
   nextDrop?: { name: string; date: string } | null;
   hiddenSections?: string[];
   texts?: { announce?: string[]; newsletterTitle?: string; newsletterThanks?: string };
@@ -111,3 +113,52 @@ export type DiscountPayload = Pick<AdminDiscount, "code" | "kind" | "percent" | 
 export type WheelPrizeConfig = { label: string; code: string; weight: number };
 export type WheelConfig = { enabled: boolean; title: string; subtitle: string; delaySeconds: number; prizes: WheelPrizeConfig[] };
 export type Subscriber = { email: string; source: string; prize: string | null; createdAt: string };
+
+// Inventario (ver apps/api/src/inventory).
+export type StockReason = "ADJUSTMENT" | "RESTOCK" | "SALE" | "RETURN" | "LOSS";
+export type InventoryItem = {
+  variantId: string;
+  productId: string;
+  productName: string;
+  status: ProductStatus;
+  image: string | null;
+  name: string;
+  sku: string | null;
+  stock: number;
+  cost: number | null;
+  price: number;
+};
+export type StockMovement = { id: string; variantId: string | null; label: string; sku: string | null; delta: number; stockAfter: number; reason: StockReason; note: string | null; createdAt: string };
+export type StockAdjust = { variantId: string; delta?: number; stock?: number; reason: StockReason; note?: string };
+
+// Contabilidad (ver apps/api/src/accounting). Montos con IVA salvo los "net".
+export type LedgerKind = "INCOME" | "EXPENSE";
+export type TaxDocument = "FACTURA" | "BOLETA" | "NONE";
+export type LedgerEntry = {
+  id: string;
+  kind: LedgerKind;
+  date: string;
+  category: string;
+  description: string;
+  amount: number;
+  taxAmount: number;
+  document: TaxDocument;
+  documentNumber: string | null;
+  counterparty: string | null;
+  counterpartyRut: string | null;
+};
+export type EntryPayload = Omit<LedgerEntry, "id">;
+export type SaleLine = { id: string; number: number; date: string; email: string; status: string; products: number; shipping: number; discount: number; total: number; tax: number; units: number };
+type CategoryTotal = { category: string; total: number };
+export type AccountingSummary = {
+  sales: { count: number; total: number; products: number; shipping: number; discounts: number; tax: number };
+  income: { total: number; tax: number; byCategory: CategoryTotal[] };
+  expense: { total: number; tax: number; byCategory: CategoryTotal[] };
+  margin: { revenue: number; cost: number; profit: number; percent: number | null; unitsWithoutCost: number };
+  netIncome: number;
+  netExpenses: number;
+  result: number;
+  iva: { debit: number; credit: number; balance: number };
+};
+export type AccountingReport = { period: { from: string; to: string }; summary: AccountingSummary; sales: SaleLine[]; entries: LedgerEntry[] };
+export type MonthRow = { month: string; sales: number; income: number; expenses: number };

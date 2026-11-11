@@ -4,6 +4,8 @@ import { logout } from "@/lib/admin/actions";
 
 const links = [
   { href: "/admin/productos", label: "Productos" },
+  { href: "/admin/inventario", label: "Inventario" },
+  { href: "/admin/contabilidad", label: "Contabilidad" },
   { href: "/admin/diseno", label: "Diseño y colores" },
   { href: "/admin/tienda", label: "Datos de la tienda" },
   { href: "/admin/descuentos", label: "Descuentos" },
