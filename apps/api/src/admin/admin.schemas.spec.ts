@@ -37,3 +37,14 @@ describe('SettingsInput.texts', () => {
     expect(SettingsInput.parse({ discountCode: 'OTRO' })).not.toHaveProperty('discountCode');
   });
 });
+
+describe('SettingsInput.chat', () => {
+  const chat = { enabled: true, whatsapp: '+56 9 1234 5678', greeting: 'Hola', faqs: [{ question: '¿Envíos?', answer: 'A todo Chile', handoff: false }] };
+  it('acepta preguntas y un número chileno', () => {
+    expect(SettingsInput.parse({ chat }).chat?.faqs).toHaveLength(1);
+  });
+  it('rechaza un número con letras y más de 12 preguntas', () => {
+    expect(() => SettingsInput.parse({ chat: { ...chat, whatsapp: 'javascript:alert(1)' } })).toThrow();
+    expect(() => SettingsInput.parse({ chat: { ...chat, faqs: Array(13).fill(chat.faqs[0]) } })).toThrow();
+  });
+});

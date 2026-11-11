@@ -7,6 +7,7 @@ import { Customizer } from "./Customizer";
 import { CatalogProvider } from "@/designs/CatalogProvider";
 import { Pixels } from "@/designs/Pixels";
 import { PrizeWheel } from "@/designs/PrizeWheel";
+import { ChatWidget } from "@/designs/ChatWidget";
 import { getCatalog } from "@/lib/catalog";
 
 // Envoltorio de la tienda: aplica los tokens del tema activo como variables CSS
@@ -18,9 +19,12 @@ export async function ThemeRoot({ children }: { children: ReactNode }) {
     <div id="theme-root" data-theme={def.id} style={tokensToCss(tokens)} className={`${fontVariables} flex min-h-screen flex-col`}>
       <CatalogProvider catalog={catalog}>
         <def.Layout>{children}</def.Layout>
+        {catalog.store.chat?.enabled && <ChatWidget chat={catalog.store.chat} />}
       </CatalogProvider>
       <Pixels tracking={catalog.store.tracking} />
-      {catalog.store.wheel?.enabled && catalog.store.wheel.prizes?.length >= 2 && <PrizeWheel wheel={catalog.store.wheel} storeName={catalog.store.name} />}
+      {catalog.store.wheel?.enabled && catalog.store.wheel.prizes?.length >= 2 && (
+        <PrizeWheel wheel={catalog.store.wheel} storeName={catalog.store.name} raised={Boolean(catalog.store.chat?.enabled)} />
+      )}
       {showCustomizer && (
         <Customizer
           current={def.id}

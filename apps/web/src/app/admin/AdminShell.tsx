@@ -8,6 +8,7 @@ const links = [
   { href: "/admin/tienda", label: "Datos de la tienda" },
   { href: "/admin/descuentos", label: "Descuentos" },
   { href: "/admin/ruleta", label: "Ruleta de regalos" },
+  { href: "/admin/chat", label: "Chat de WhatsApp" },
   { href: "/admin/redes", label: "Redes y publicidad" },
   { href: "/admin/publicaciones", label: "Publicaciones y anuncios" },
   { href: "/admin/avanzado", label: "Avanzado" },

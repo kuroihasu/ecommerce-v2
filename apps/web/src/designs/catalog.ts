@@ -4,6 +4,7 @@
 // cuando la API no responde, por ejemplo en desarrollo sin base de datos.
 
 import type { StoreTexts } from "@/themes/texts";
+import type { ChatConfig } from "./chat";
 
 export type Badge = "nuevo" | "preventa" | "ultimas";
 export type Line = "mujer" | "hombre" | "unisex";
@@ -64,6 +65,8 @@ const store = {
   // Ruleta de regalos (panel > Ruleta de regalos). La API no manda los códigos, solo
   // si cada premio trae descuento.
   wheel: null as PublicWheel | null,
+  // Chat con respuestas automáticas y paso a WhatsApp (panel > Chat de WhatsApp).
+  chat: null as ChatConfig | null,
 };
 
 export type PublicWheel = { enabled: boolean; title: string; subtitle: string; delaySeconds: number; prizes: { label: string; won: boolean }[] };

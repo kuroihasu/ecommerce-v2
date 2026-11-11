@@ -1,4 +1,5 @@
 import type { StoredTheme } from "@/themes/tokens";
+import type { ChatConfig } from "@/designs/chat";
 
 // Respuestas de /admin/stores/:store (ver apps/api/src/admin).
 export type ProductStatus = "DRAFT" | "ACTIVE" | "ARCHIVED";
@@ -55,6 +56,7 @@ export type StoreSettings = {
   discountKind?: "PERCENT" | "FREE_SHIPPING";
   discountMin?: number;
   wheel?: WheelConfig;
+  chat?: ChatConfig;
   facebook?: string;
   tracking?: { metaPixelId?: string; ga4Id?: string; googleAdsId?: string; tiktokPixelId?: string };
 };

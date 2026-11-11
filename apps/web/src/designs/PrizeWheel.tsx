@@ -44,7 +44,7 @@ function Gift({ className = "" }: { className?: string }) {
   );
 }
 
-export function PrizeWheel({ wheel, storeName }: { wheel: PublicWheel; storeName: string }) {
+export function PrizeWheel({ wheel, storeName, raised = false }: { wheel: PublicWheel; storeName: string; raised?: boolean }) {
   const key = `ruleta:${storeName}`;
   const [open, setOpen] = useState(false);
   const [launcher, setLauncher] = useState(false);
@@ -138,7 +138,7 @@ export function PrizeWheel({ wheel, storeName }: { wheel: PublicWheel; storeName
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="fixed right-4 bottom-4 z-[55] flex h-12 items-center gap-2 rounded-full bg-accent px-5 text-base font-medium text-accent-ink shadow-[0_8px_24px_rgba(0,0,0,0.22)] transition-transform hover:scale-[1.03] active:scale-95"
+          className={`fixed right-4 ${raised ? "bottom-20" : "bottom-4"} z-[55] flex h-12 items-center gap-2 rounded-full bg-accent px-5 text-base font-medium text-accent-ink shadow-[0_8px_24px_rgba(0,0,0,0.22)] transition-transform hover:scale-[1.03] active:scale-95`}
         >
           <Gift className="h-5 w-5" />
           {step === "result" ? "Ver mi premio" : "Gira y gana"}

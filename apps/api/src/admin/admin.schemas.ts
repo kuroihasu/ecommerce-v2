@@ -54,6 +54,24 @@ export const SettingsInput = z.object({
     .optional(),
   // Ruleta de regalos (ver src/wheel). Los códigos de los premios no salen en la API pública.
   wheel: WheelSettings.optional(),
+  // Chat de la tienda: respuestas automáticas y paso a WhatsApp con el dueño.
+  chat: z
+    .object({
+      enabled: z.boolean(),
+      whatsapp: z.union([z.string().trim().regex(/^\+?[\d\s()-]{8,20}$/, 'Número de WhatsApp inválido'), z.literal('')]),
+      greeting: text(200),
+      faqs: z
+        .array(
+          z.object({
+            question: text(80).min(1, 'Cada pregunta necesita un texto'),
+            answer: text(600).min(1, 'Cada pregunta necesita una respuesta'),
+            // Después de responder, ofrece hablar con una persona por WhatsApp.
+            handoff: z.boolean(),
+          }),
+        )
+        .max(12, 'Máximo 12 preguntas'),
+    })
+    .optional(),
 });
 
 export const StoreInput = z.object({

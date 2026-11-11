@@ -95,6 +95,11 @@ Secciones del panel:
   el sorteo. El servidor sortea y firma el resultado, los códigos no salen en la API
   pública, un premio con el código pausado, vencido o agotado no sale, y un correo participa
   una sola vez. La misma página lista los suscriptores y los descarga en CSV.
+- **Chat de WhatsApp**: botón de chat en la tienda que responde solo las preguntas frecuentes
+  (el dueño escribe preguntas y respuestas, con datos que se completan solos como el costo de
+  envío). El cliente toca una pregunta o la escribe y el chat busca la más parecida; si no hay
+  respuesta, o la pregunta lo pide, ofrece "Hablar con una persona", que abre el WhatsApp del
+  dueño con la pregunta ya escrita (`settings.chat`, ver `apps/web/src/designs/chat.ts`).
 - **Avanzado**: mostrar u ocultar la barra de avisos, la suscripción y cada sección de la
   portada (`settings.hiddenSections`, ver `apps/web/src/themes/sections.ts`), y los textos
   de la barra de avisos y la suscripción (`settings.texts`, ver `apps/web/src/themes/texts.ts`).
