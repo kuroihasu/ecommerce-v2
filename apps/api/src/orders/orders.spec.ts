@@ -167,6 +167,34 @@ describe('OrdersService', () => {
     expect(markPaid).not.toHaveBeenCalled();
   });
 
+  it('Mercado Pago: un pago en otra moneda no se usa', async () => {
+    const order = { id: 'o1', store: { id: 's1' }, payments: [{ id: 'p1', provider: 'MERCADOPAGO', status: 'PENDING', amount: 1000, raw: null }] };
+    const gw = [{ provider: 'MERCADOPAGO', enabled: true, live: false, config: {}, secretEnc: 'x' }];
+    const { service } = fakeDb({ order: { findFirst: vi.fn().mockResolvedValue(order) }, paymentGateway: { findMany: vi.fn().mockResolvedValue(gw) } });
+    vi.spyOn(service as unknown as { mpToken: () => string }, 'mpToken').mockReturnValue('APP_USR-x');
+    const markPaid = vi.spyOn(service, 'markPaid');
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({ id: 9, status: 'approved', external_reference: 'o1', transaction_amount: 1000, currency_id: 'USD' }))));
+    await service.mercadopagoCheck('norte', 'o1', '9');
+    expect(markPaid).not.toHaveBeenCalled();
+  });
+
+  it('confirmar dos veces el mismo pago no descuenta stock de nuevo', async () => {
+    const tx = {
+      payment: { findUniqueOrThrow: vi.fn().mockResolvedValue({ status: 'AUTHORIZED', orderId: 'o1' }), update: vi.fn() },
+      order: { updateMany: vi.fn() },
+      $executeRaw: vi.fn(),
+    };
+    const { service } = fakeDb({ $transaction: (fn: (t: typeof tx) => unknown) => fn(tx) });
+    await expect(service.markPaid('o1', 'p1', {})).resolves.toBe(false);
+    expect(tx.order.updateMany).not.toHaveBeenCalled();
+    expect(tx.$executeRaw).not.toHaveBeenCalled();
+  });
+
+  it('activar transferencia pide los datos de la cuenta', async () => {
+    const { service } = fakeDb();
+    await expect(service.setTransfer(owner, { enabled: true, bank: 'Banco Estado', accountType: 'Cuenta RUT', accountNumber: '', holder: '', rut: '' } as never)).rejects.toThrow('Completa banco');
+  });
+
   it('el personal no cambia los medios de pago ni marca pagado', async () => {
     const { service } = fakeDb({ order: { findFirst: vi.fn().mockResolvedValue({ id: 'o1', status: 'PENDING', payments: [] }) } });
     await expect(service.setWebpay(staff, { enabled: true, live: false, commerceCode: '' })).rejects.toBeInstanceOf(ForbiddenException);
