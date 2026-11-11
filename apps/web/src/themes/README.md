@@ -1,0 +1,52 @@
+# Temas de la tienda
+
+La tienda tiene una sola URL (`/`, `/catalogo`, `/producto/[slug]`, `/carrito`) y
+muestra el diseño que diga `Store.theme` en la base de datos. Hoy hay cuatro:
+`atelier`, `vitrina`, `mercado` y `plaza` (Mercado con piezas de Atelier).
+
+## Qué se guarda en `Store.theme`
+
+```json
+{
+  "template": "vitrina",
+  "colors": { "accent": "#1d4ed8" },
+  "fonts": { "display": "archivo", "body": "inter" },
+  "radius": 0
+}
+```
+
+Todo es opcional: lo que falte se toma de los valores por defecto del diseño
+(`defaults` en su `index.ts`). Colores inválidos se ignoran, y el texto sobre
+botones y bloques se calcula solo (blanco o negro) para que siempre se lea.
+
+Colores disponibles: `bg` (fondo), `ink` (texto), `surface` (tarjetas y filtros),
+`accent` (botones), `field` y `field2` (bloques de color). Tipografías: las de
+`fontOptions.ts`. Bordes: `radius` en píxeles, de 0 a 40.
+
+El botón **Personalizar** de la tienda hace lo mismo como vista previa (en una
+cookie) y su botón "Copiar configuración" entrega el JSON de arriba. En el panel
+de administración, al guardar, se escribe en `Store.theme` y se llama a
+`revalidateTag("store")`. Para ocultar el botón en una tienda en producción:
+`NEXT_PUBLIC_HIDE_CUSTOMIZER=1`.
+
+## Agregar un diseño nuevo
+
+1. Copia una carpeta existente, por ejemplo `cp -r vitrina nuevo`.
+2. Cambia los componentes a gusto. Cada diseño exporta cinco piezas:
+   `Layout` (menú y pie), `Home`, `Catalog`, `Product({ slug })` y `Cart`.
+   Usa solo las clases de tokens (`bg-bg`, `text-ink`, `bg-accent`,
+   `bg-field`, `rounded-brand`, `font-display`…), nunca colores fijos, para que
+   el cliente pueda cambiar los colores. Los datos se leen con
+   `await getCatalog()` (`@/lib/catalog`) en componentes de servidor y con
+   `useCatalogData()` (`@/designs/CatalogProvider`) en componentes de cliente.
+3. En `nuevo/index.ts` ponle `id`, `name`, `description`, sus `defaults` y sus
+   `sections`: las partes de la portada que el panel (Avanzado) puede ocultar.
+   En `Home.tsx` envuelve cada una con `show("<id>")` (ver `sections.ts`) y
+   reutiliza los ids que ya existen (`hero`, `new`, `look`, `promise`…) para
+   que ocultar una sección funcione igual en todos los diseños.
+4. Súmalo a la lista `themes` de `registry.ts`.
+
+Listo: aparece en el personalizador (y en el panel) como una opción más.
+
+Las piezas comunes (galería, selector de talla, carrito, carrusel, entradas al
+hacer scroll) están en `src/designs/` y se pueden reutilizar en cualquier diseño.

@@ -1,26 +1,139 @@
 @import "tailwindcss";
 
+/*
+ * Tokens de marca. Todo el front usa estos roles (bg, ink, surface, accent, field…),
+ * nunca colores sueltos. Cambiar de cliente = cambiar un bloque de variables
+ * (los valores reales los pone src/themes según Store.theme).
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #ffffff;
+  --ink: #171717;
+  --surface: #f2f2f2;
+  --accent: #171717;
+  --accent-ink: #ffffff;
+  --field: #f2f2f2;
+  --field-ink: #171717;
+  --field-2: #f2f2f2;
+  --radius: 0px;
+  --font-display: var(--font-geist-sans);
+  --font-body: var(--font-geist-sans);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-bg: var(--bg);
+  --color-ink: var(--ink);
+  --color-surface: var(--surface);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-field: var(--field);
+  --color-field-ink: var(--field-ink);
+  --radius-brand: var(--radius);
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-sans: var(--font-body);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.rise {
+  animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.rise-1 { animation-delay: 80ms; }
+.rise-2 { animation-delay: 160ms; }
+.rise-3 { animation-delay: 240ms; }
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee {
+  animation: marquee 40s linear infinite;
+}
+
+@keyframes drift {
+  from { transform: scale(1.04); }
+  to { transform: scale(1.12); }
+}
+.drift img {
+  animation: drift 18s ease-in-out infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise, .marquee, .drift img {
+    animation: none;
+  }
+}
+
+/* Entradas al hacer scroll (Reveal.tsx) */
+.reveal-pending {
+  opacity: 0;
+  transform: translateY(28px);
+}
+.reveal-pending.reveal-in {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.8s cubic-bezier(0.2, 0.7, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* Carrusel de banners (Carousel.tsx) */
+@keyframes progress {
+  from { width: 0; }
+  to { width: 100%; }
+}
+.carousel-progress {
+  animation: progress linear forwards;
+}
+@keyframes kenburns {
+  from { transform: scale(1); }
+  to { transform: scale(1.08); }
+}
+.slide-active .slide-media img {
+  animation: kenburns 7s ease-out forwards;
+}
+.slide-active .slide-text > * {
+  animation: rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.slide-active .slide-text > *:nth-child(2) { animation-delay: 120ms; }
+.slide-active .slide-text > *:nth-child(3) { animation-delay: 240ms; }
+.slide-active .slide-text > *:nth-child(4) { animation-delay: 360ms; }
+
+/* Botón "agregar" que aparece sobre la ficha al pasar el mouse */
+.quick-add {
+  transform: translateY(110%);
+  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.group:hover .quick-add,
+.group:focus-within .quick-add {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-pending { opacity: 1; transform: none; }
+  .carousel-progress, .slide-active .slide-media img, .slide-active .slide-text > * { animation: none; }
+  .carousel-progress { width: 100%; }
 }

@@ -34,6 +34,11 @@ hoy y para la plataforma de varias tiendas mañana.
 - `Customer`, `Address`: compradores, con RUT y dirección chilena (región y comuna).
 - `Cart`, `CartItem`: carrito guardado en la base.
 - `Order`, `OrderItem`, `Payment`, `Shipment`: pedidos, pagos por pasarela y despachos.
+- `DiscountCode`: códigos de descuento (porcentaje o envío gratis) con compra mínima, usos máximos (vacío = ilimitado), usos hechos, activo y fecha de término.
+- `Integration`: cuentas de Meta y Google Ads conectadas (token cifrado).
+- `Subscriber`: correos para novedades (ruleta de regalos o pie de página), uno por tienda.
+- `StockMovement`: historial de cada cambio de stock (cuánto, por qué y cuánto quedó).
+- `LedgerEntry`: ingresos y gastos anotados a mano en Contabilidad (total con IVA y el IVA que incluye).
 
 Los montos son enteros en la moneda de la tienda (CLP no usa decimales).
 
@@ -50,9 +55,167 @@ cp .env.example apps/web/.env.local
 
 pnpm db:up        # levanta Postgres en Docker
 pnpm db:migrate   # crea las tablas
-pnpm db:seed      # carga la tienda demo
+pnpm db:seed      # carga la tienda demo (NORTE, ropa urbana)
 pnpm dev          # web en http://localhost:3000, API en http://localhost:4000
 ```
+
+## Panel de administración
+
+En `/admin` el equipo de la tienda edita productos (fotos, variantes, precios y
+stock), el diseño y los colores, y los datos de la tienda (contacto, envíos, cuotas).
+Lo que se guarda se ve en la tienda de inmediato.
+
+Para activarlo:
+
+1. Define `AUTH_SECRET` en la API (`openssl rand -hex 32`, mínimo 32 caracteres).
+2. Crea la cuenta del dueño (la contraseña va por variable para que no quede en el historial):
+
+   ```bash
+   ADMIN_PASSWORD='una-clave-larga' pnpm --filter @tienda/api admin:create dueno@tienda.cl demo
+   ```
+
+El seed no crea usuarios a propósito: corre en cada deploy contra la base real.
+
+Secciones del panel:
+
+- **Productos**, **Diseño y colores** y **Datos de la tienda**. Si hay variantes publicadas con
+  stock bajo o agotadas, Productos muestra un aviso que lleva a Inventario.
+- **Inventario**: todas las variantes con su stock, costo, precio y margen. Filtros de stock bajo,
+  agotadas y sin costo; el umbral de stock bajo lo elige la tienda (`settings.lowStockThreshold`,
+  3 por defecto). Cada variante se ajusta con un motivo (llegó mercadería, venta fuera de la web,
+  devolución, pérdida o conteo físico) y queda en el historial (`StockMovement`), igual que los
+  cambios hechos en la ficha del producto. El ajuste exige que el stock no haya cambiado desde que
+  se leyó, así no pisa una venta simultánea. Una venta fuera de la web puede anotarse también como
+  ingreso en Contabilidad. Inventario e historial se descargan en CSV.
+- **Contabilidad** (solo dueños y administradores): por mes, año o rango de fechas (días de Chile).
+  Las ventas de la tienda online se leen de los pedidos pagados, despachados o entregados; los otros
+  ingresos y los gastos se anotan a mano con categoría, documento (factura, boleta o sin documento),
+  proveedor y RUT. Muestra el resultado sin IVA, el IVA estimado del período (débito de ventas e
+  ingresos menos crédito de facturas de compra; una boleta de compra no da crédito), el margen de
+  lo vendido online según el costo de cada variante y un gráfico de los últimos 12 meses. Se
+  descargan en CSV (separado por punto y coma, listo para Excel) el resumen, las ventas online y los
+  ingresos y gastos, para el contador. El IVA es referencial: asume todo afecto al 19%.
+- **Pedidos**: lista con filtros (por despachar, por pagar, despachados, entregados, anulados).
+  Cada pedido muestra cliente, dirección, productos, el pago (autorización, últimos 4 dígitos,
+  cuotas) y avisos «⚠ revisar» si algo no cuadró al confirmar el pago (por ejemplo, stock
+  insuficiente). Desde ahí se confirma una transferencia, se anula un pedido sin pagar, se marca
+  despachado (empresa y número de seguimiento) y entregado. Confirmar pagos y anular es solo
+  para dueño y administradores.
+- **Pagos**: Webpay Plus (Transbank), Mercado Pago y transferencia bancaria, cada uno con su
+  interruptor y su botón «Configurar». Ver [Pagos en línea](#pagos-en-línea).
+- **Redes y publicidad**: redes sociales del pie de página, píxeles de Meta, Google Analytics 4,
+  Google Ads y TikTok (la tienda envía vista de página, vio producto, agregó al carrito e
+  inició el pago; ver `apps/web/src/designs/tracking.ts`) y el enlace del catálogo
+  `/feeds/productos.xml`, un feed RSS de Google Merchant que también lee el catálogo de Meta.
+- **Descuentos**: varios códigos a la vez. Cada uno regala un porcentaje (1 a 90%) o el
+  envío gratis, y puede pedir una compra mínima en productos (el carrito avisa cuánto falta, y
+  la barra de avisos, la ruleta y la suscripción la muestran). Además: usos
+  ilimitados o una cantidad fija, fecha de término opcional y estado (activo, pausado,
+  vencido, agotado). Uno se marca «En la tienda»: es el que anuncian la barra de avisos y la
+  suscripción. El carrito valida el código con la API; el uso se descuenta cuando se confirma el
+  pago del pedido, en una sola sentencia para que dos compras simultáneas no gasten el
+  último uso dos veces.
+- **Ruleta de regalos**: se activa o apaga desde el panel. Aparece una vez por visitante
+  después de unos segundos; el cliente gira, ve su premio y deja su correo para ver el
+  código. Cada premio entrega uno de los códigos de Descuentos (o ninguno) con un peso en
+  el sorteo. El servidor sortea y firma el resultado, los códigos no salen en la API
+  pública, un premio con el código pausado, vencido o agotado no sale, y un correo participa
+  una sola vez. La misma página lista los suscriptores y los descarga en CSV.
+- **Chat de WhatsApp**: botón de chat en la tienda que responde solo las preguntas frecuentes
+  (el dueño escribe preguntas y respuestas, con datos que se completan solos como el costo de
+  envío). El cliente toca una pregunta o la escribe y el chat busca la más parecida; si no hay
+  respuesta, o la pregunta lo pide, ofrece "Hablar con una persona", que abre el WhatsApp del
+  dueño con la pregunta ya escrita (`settings.chat`, ver `apps/web/src/designs/chat.ts`).
+- **Avanzado**: mostrar u ocultar la barra de avisos, la suscripción y cada sección de la
+  portada (`settings.hiddenSections`, ver `apps/web/src/themes/sections.ts`), y los textos
+  de la barra de avisos y la suscripción (`settings.texts`, ver `apps/web/src/themes/texts.ts`).
+  Los textos aceptan `{codigo}`, `{porcentaje}`, `{envio_gratis}` y `{cuotas}`.
+  La barra de avisos, la suscripción y la portada tienen un botón «Configurar» junto a su
+  interruptor que abre sus ajustes en una ventana (pantalla completa en el celular).
+  El carrusel de la portada: banners propios (foto, etiqueta, título, texto, botón y
+  enlace, hasta 6), si avanza solo y cada cuántos segundos. Sin banners propios cada diseño
+  usa los suyos (`settings.hero`, ver `apps/web/src/themes/hero.ts`).
+- **Publicaciones y anuncios**: conecta Meta y Google Ads (solo lectura) para ver las últimas
+  publicaciones de Instagram y los resultados de las campañas de los últimos 30 días.
+
+### Conectar Meta y Google Ads
+
+Los tokens se guardan cifrados (AES-256-GCM con una clave derivada de `AUTH_SECRET`, o de
+`INTEGRATIONS_KEY` si se define). Si cambias esa clave, hay que volver a conectar las cuentas.
+Cada servicio se activa al definir sus variables en la API; sin ellas, el botón aparece desactivado.
+
+**Meta** (Facebook, Instagram y anuncios): `META_APP_ID` y `META_APP_SECRET`.
+
+1. En developers.facebook.com crea una app de tipo *Empresa* con el producto *Inicio de sesión con Facebook para empresas*.
+2. En *URI de redireccionamiento de OAuth válidos* agrega `https://<dominio-de-la-tienda>/admin/redes/conectar/meta`.
+3. Pide en la revisión de apps los permisos `pages_show_list`, `pages_read_engagement`,
+   `instagram_basic`, `instagram_manage_insights`, `ads_read` y `business_management`. Mientras
+   no estén aprobados, solo pueden conectar las personas con rol en la app.
+4. La cuenta de Instagram tiene que ser profesional y estar vinculada a una página de Facebook.
+
+**Google Ads**: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` y `GOOGLE_ADS_DEVELOPER_TOKEN`
+(opcional `GOOGLE_ADS_LOGIN_CUSTOMER_ID` si se entra a través de una cuenta de administrador).
+
+1. En Google Cloud crea un cliente OAuth de tipo *Aplicación web* con la URI de redirección
+   `https://<dominio-de-la-tienda>/admin/redes/conectar/google` y activa la *Google Ads API*.
+2. En Google Ads → Herramientas → Centro de API pide el token de desarrollador (el acceso básico
+   lo aprueba Google; con acceso de prueba solo funciona con cuentas de prueba).
+
+Las versiones de las APIs se pueden cambiar con `META_GRAPH_VERSION` (por defecto `v26.0`) y
+`GOOGLE_ADS_API_VERSION` (por defecto `v26`).
+
+## Pagos en línea
+
+El cliente paga en `/checkout` (contacto, dirección, medio de pago y código de descuento) y
+vuelve a `/pedido/:id?k=…`, que muestra si quedó pagado, los datos para transferir o los
+botones para reintentar con otro medio. La clave `k` es una firma del pedido: sin ella la
+página no muestra nada.
+
+- **Precios y stock** los calcula la API desde la base, nunca desde el carrito. El envío usa
+  los valores de Datos de la tienda (RM, regiones y envío gratis desde); el código de descuento
+  se aplica antes de calcular el envío gratis.
+- **Confirmación**: la pasarela devuelve al cliente a `/pago/webpay` o `/pago/mercadopago`
+  (rutas de la web, que hablan con la API del lado del servidor). La API confirma el pago con
+  la pasarela, revisa orden, monto y moneda, y en una sola transacción marca el pedido pagado,
+  descuenta stock y gasta el uso del código. Recargar la página de vuelta no descuenta dos
+  veces. Mercado Pago además avisa por `/pago/mercadopago/aviso` (solo con https), por si el
+  cliente cierra la ventana antes de volver.
+- **Transferencia**: el pedido queda «Por pagar» con los datos de la cuenta, y el stock se
+  descuenta cuando el dueño lo confirma en Pedidos.
+- Las claves de Transbank y el token de Mercado Pago se guardan cifrados (`INTEGRATIONS_KEY`
+  o `AUTH_SECRET`) y nunca vuelven al navegador.
+
+Para cobrar de verdad:
+
+1. **Webpay**: al activarlo queda en modo de prueba con el comercio de integración de
+   Transbank (tarjeta VISA `4051 8856 0044 6623`, CVV `123`, cualquier fecha futura; RUT
+   `11.111.111-1`, clave `123`). Para producción, Transbank entrega el código de comercio
+   (12 dígitos) y la llave secreta después de su validación; se ingresan en Configurar →
+   «Cobrar de verdad».
+2. **Mercado Pago**: el *Access token* de producción (`APP_USR-…`) de
+   [Tus integraciones](https://www.mercadopago.cl/developers/panel/app). Un token `TEST-…`
+   deja la tienda en modo de prueba.
+3. **Transferencia**: banco, tipo y número de cuenta, titular y RUT.
+
+Para probar sin red, `WEBPAY_BASE_URL` y `MERCADOPAGO_API_URL` en la API apuntan las llamadas
+a otra dirección (por ejemplo, un simulador local).
+
+En un preview de Vercel con protección, Webpay vuelve por POST desde otro sitio y Vercel
+puede pedir login antes de mostrar el pedido. En producción (sin protección) no pasa.
+
+### Probar el panel en un preview de Vercel
+
+Para mostrar el panel sin tocar producción, define estas variables **solo para Preview** (y si
+quieres, solo para la rama):
+
+- En la API: `AUTH_SECRET`, `DEMO_ADMIN_EMAIL` y `ADMIN_PASSWORD`. Al desplegar, el build crea
+  (o actualiza la contraseña de) esa cuenta como dueña de la tienda demo.
+- En la web: `NEXT_PUBLIC_API_URL` con la URL del preview de la API, y `API_BYPASS_TOKEN` con el
+  secreto de *Protection Bypass for Automation* de la API (Settings → Deployment Protection),
+  porque los previews de la API piden login de Vercel.
+
+Ojo: la base es la misma de producción, así que esa cuenta también existe ahí. Al terminar,
+borra las variables y cambia la contraseña con `admin:create`.
 
 ## API disponible
 
@@ -60,9 +223,53 @@ pnpm dev          # web en http://localhost:3000, API en http://localhost:4000
 | --- | --- | --- |
 | GET | `/health` | Estado de la API |
 | GET | `/stores/:store` | Datos y tema de la tienda |
+| GET | `/stores/:store/catalog` | Tienda, categorías con productos y productos, en una llamada (lo usa la vitrina) |
 | GET | `/stores/:store/categories` | Categorías |
 | GET | `/stores/:store/products?category=&featured=true` | Productos activos |
 | GET | `/stores/:store/products/:slug` | Detalle de un producto |
+| POST | `/auth/login` | Entrar al panel (máx. 5 intentos por minuto por IP) |
+| GET | `/auth/me` | Usuario y tiendas a las que tiene acceso |
+| GET, PATCH | `/admin/stores/:store` | Nombre, diseño y datos de la tienda |
+| GET, POST | `/admin/stores/:store/products` | Productos (todos los estados) |
+| GET, PATCH, DELETE | `/admin/stores/:store/products/:id` | Un producto (DELETE archiva) |
+| PUT | `/admin/stores/:store/products/:id/variants` | Reemplaza las variantes |
+| PUT | `/admin/stores/:store/products/:id/images` | Reemplaza las fotos (en orden) |
+| GET, POST, PATCH | `/admin/stores/:store/categories` | Categorías |
+| GET, POST | `/admin/stores/:store/discounts` | Códigos de descuento |
+| PATCH, DELETE | `/admin/stores/:store/discounts/:id` | Editar o borrar un código |
+| POST | `/admin/stores/:store/discounts/:id/feature` | Anunciar ese código en la tienda |
+| POST | `/stores/:store/discounts/check` | ¿Sirve este código? Devuelve el porcentaje (no gasta un uso) |
+| POST | `/stores/:store/wheel/spin` | Gira la ruleta: premio sorteado y firmado |
+| POST | `/stores/:store/wheel/claim` | Correo + giro firmado: guarda al suscriptor y entrega el código |
+| POST | `/stores/:store/subscribers` | Suscripción a novedades desde el pie de página |
+| GET | `/admin/stores/:store/subscribers` | Suscriptores de la tienda |
+| GET | `/stores/:store/payment-methods` | Medios de pago activos (y si están en modo de prueba) |
+| POST | `/stores/:store/checkout` | Crea el pedido y devuelve a dónde ir a pagar |
+| GET | `/stores/:store/orders/:id?k=` | Pedido para el cliente (con la clave firmada) |
+| POST | `/stores/:store/orders/:id/pay` | Reintentar el pago con otro medio |
+| POST | `/stores/:store/payments/webpay/return` | Confirma la vuelta de Webpay |
+| POST | `/stores/:store/payments/mercadopago/return` | Confirma la vuelta de Mercado Pago |
+| POST | `/stores/:store/payments/mercadopago/notice` | Aviso (webhook) de Mercado Pago |
+| GET | `/admin/stores/:store/orders` | Pedidos (los últimos 200) |
+| PATCH | `/admin/stores/:store/orders/:id` | Cambiar estado: pagado, anulado, despachado, entregado |
+| GET | `/admin/stores/:store/payments` | Configuración de pagos (sin secretos) |
+| PUT | `/admin/stores/:store/payments/webpay\|mercadopago\|transfer` | Guardar un medio de pago |
+
+Las rutas `/admin` piden `Authorization: Bearer <token>` y ser miembro de la tienda.
+
+## De dónde saca los datos la tienda
+
+La vitrina (`apps/web`) pide `GET /stores/:store/catalog` y lo traduce al modelo de
+los diseños en `src/lib/catalog.ts`. Cada producto usa:
+
+- `tags`: `nuevo`, `preventa` o `ultimas` para la etiqueta, y `mujer` u `hombre` para la línea.
+- `attributes`: `{ short, details[], colors: [{ name, hex }] }` para la ficha.
+- Variantes con `options: { Color, Talla }`; fotos con `color` si son de un color.
+
+Los datos de tienda (envíos, cuotas, código de descuento, redes, próximo drop) van en
+`Store.settings`. La respuesta se cachea unos minutos; al guardar desde el panel,
+`revalidateTag("store")`. Si la API no responde, la tienda se muestra con el catálogo
+de muestra de `src/designs/catalog.ts`.
 
 ## Pruebas
 

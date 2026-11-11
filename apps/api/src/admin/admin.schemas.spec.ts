@@ -1,0 +1,66 @@
+import { describe, expect, it } from 'vitest';
+import { SettingsInput } from './admin.schemas.js';
+
+describe('SettingsInput.tracking', () => {
+  it('acepta ids válidos y normaliza mayúsculas', () => {
+    const r = SettingsInput.parse({
+      tracking: { metaPixelId: '123456789012345', ga4Id: 'g-ab12cd34ef', googleAdsId: 'aw-123456789', tiktokPixelId: 'c4abcdef1234567890' },
+    });
+    expect(r.tracking).toEqual({ metaPixelId: '123456789012345', ga4Id: 'G-AB12CD34EF', googleAdsId: 'AW-123456789', tiktokPixelId: 'C4ABCDEF1234567890' });
+  });
+
+  it('acepta vacío para desactivar un píxel', () => {
+    expect(SettingsInput.parse({ tracking: { metaPixelId: '' } }).tracking).toEqual({ metaPixelId: '' });
+  });
+
+  it('rechaza cualquier cosa que no sea un id (no se puede inyectar código)', () => {
+    expect(() => SettingsInput.parse({ tracking: { metaPixelId: "1');alert(1)//" } })).toThrow();
+    expect(() => SettingsInput.parse({ tracking: { ga4Id: "G-ABC'</script>" } })).toThrow();
+  });
+});
+
+describe('SettingsInput.hiddenSections', () => {
+  it('solo acepta ids simples', () => {
+    expect(SettingsInput.parse({ hiddenSections: ['look', 'announce'] }).hiddenSections).toEqual(['look', 'announce']);
+    expect(() => SettingsInput.parse({ hiddenSections: ['<b>'] })).toThrow();
+  });
+});
+
+describe('SettingsInput.texts', () => {
+  it('acepta hasta 5 avisos y limpia espacios', () => {
+    expect(SettingsInput.parse({ texts: { announce: [' Envío gratis '] } }).texts?.announce).toEqual(['Envío gratis']);
+    expect(() => SettingsInput.parse({ texts: { announce: Array(6).fill('aviso') } })).toThrow();
+    expect(() => SettingsInput.parse({ texts: { announce: ['x'.repeat(121)] } })).toThrow();
+  });
+
+  it('el código destacado ya no se cambia desde los datos de la tienda', () => {
+    expect(SettingsInput.parse({ discountCode: 'OTRO' })).not.toHaveProperty('discountCode');
+  });
+});
+
+describe('SettingsInput.chat', () => {
+  const chat = { enabled: true, whatsapp: '+56 9 1234 5678', greeting: 'Hola', faqs: [{ question: '¿Envíos?', answer: 'A todo Chile', handoff: false }] };
+  it('acepta preguntas y un número chileno', () => {
+    expect(SettingsInput.parse({ chat }).chat?.faqs).toHaveLength(1);
+  });
+  it('rechaza un número con letras y más de 12 preguntas', () => {
+    expect(() => SettingsInput.parse({ chat: { ...chat, whatsapp: 'javascript:alert(1)' } })).toThrow();
+    expect(() => SettingsInput.parse({ chat: { ...chat, faqs: Array(13).fill(chat.faqs[0]) } })).toThrow();
+  });
+});
+
+describe('SettingsInput.hero', () => {
+  const slide = { image: 'https://cdn.tienda.cl/banner.jpg', title: 'Invierno', text: '', tag: '', cta: 'Ver', href: '/catalogo?o=nuevos' };
+  const hero = { autoplay: true, seconds: 6, slides: [slide] };
+  it('acepta fotos https, claves de muestra y enlaces internos o https', () => {
+    expect(SettingsInput.parse({ hero }).hero?.slides).toHaveLength(1);
+    expect(() => SettingsInput.parse({ hero: { ...hero, slides: [{ ...slide, image: 'editorial', href: 'https://instagram.com/norte' }] } })).not.toThrow();
+  });
+  it('rechaza enlaces peligrosos, fotos http y más de 6 banners', () => {
+    for (const href of ['javascript:alert(1)', '//evil.com', '/\\evil.com', 'http://x.cl'])
+      expect(() => SettingsInput.parse({ hero: { ...hero, slides: [{ ...slide, href }] } })).toThrow();
+    expect(() => SettingsInput.parse({ hero: { ...hero, slides: [{ ...slide, image: 'http://x.cl/a.jpg' }] } })).toThrow();
+    expect(() => SettingsInput.parse({ hero: { ...hero, slides: Array(7).fill(slide) } })).toThrow();
+    expect(() => SettingsInput.parse({ hero: { ...hero, seconds: 1 } })).toThrow();
+  });
+});
