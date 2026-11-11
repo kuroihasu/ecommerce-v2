@@ -63,3 +63,21 @@ export type ProductPayload = {
 };
 
 export type ActionResult<T = undefined> = { ok: true; data: T } | { ok: false; error: string };
+
+// Cuentas de Meta y Google conectadas (ver apps/api/src/integrations).
+export type IntegrationSlug = "meta" | "google";
+export type IntegrationStatus = {
+  provider: IntegrationSlug;
+  name: string;
+  available: boolean;
+  connected: boolean;
+  expired: boolean;
+  accountName: string | null;
+  connectedAt: string | null;
+};
+export type SocialPost = { id: string; caption: string; type: string; image: string | null; url: string; date: string; likes: number | null; comments: number | null };
+export type Campaign = { name: string; status?: string; spend: number; impressions: number; clicks: number; ctr: number; purchases: number; revenue: number };
+export type Insights = {
+  instagram: { username: string; followers: number | null; posts: SocialPost[] } | null;
+  ads: { account: string | null; currency: string; campaigns: Campaign[] } | null;
+};

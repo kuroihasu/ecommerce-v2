@@ -7,7 +7,8 @@ import { STORE_SLUG } from "@/lib/catalog";
 import { PREVIEW_COOKIE } from "@/themes/resolve";
 import { adminApi, apiLogin, ApiError } from "./api";
 import { clearSession, setSession } from "./session";
-import type { ActionResult, AdminCategory, AdminProduct, AdminStore, ProductPayload } from "./types";
+import type { ActionResult, AdminCategory, AdminProduct, AdminStore, IntegrationSlug, ProductPayload } from "./types";
+import { adminOrigin } from "./origin";
 
 // Acciones del panel. Cada una reenvía la sesión a la API, que valida permisos;
 // después de escribir se refresca la tienda (updateTag) para que el cambio se vea al tiro.
@@ -102,5 +103,32 @@ export async function createCategory(_: unknown, form: FormData): Promise<{ erro
     return { ok: true };
   } catch (e) {
     return { error: fail(e).error };
+  }
+}
+
+// Conectar Meta o Google: la API arma el login con un state firmado y aquí se
+// redirige al navegador a esa página. Al volver, /admin/redes/conectar/<proveedor>
+// termina la conexión.
+const isProvider = (p: string): p is IntegrationSlug => p === "meta" || p === "google";
+
+export async function connectIntegration(provider: string): Promise<{ error: string }> {
+  if (!isProvider(provider)) return { error: "Proveedor desconocido" };
+  let url: string;
+  try {
+    const redirectUri = `${await adminOrigin()}/admin/redes/conectar/${provider}`;
+    ({ url } = await adminApi<{ url: string }>(`/integrations/${provider}/start`, { method: "POST", body: { redirectUri } }));
+  } catch (e) {
+    return { error: fail(e).error };
+  }
+  redirect(url);
+}
+
+export async function disconnectIntegration(provider: string): Promise<ActionResult> {
+  if (!isProvider(provider)) return { ok: false, error: "Proveedor desconocido" };
+  try {
+    await adminApi(`/integrations/${provider}`, { method: "DELETE" });
+    return { ok: true, data: undefined };
+  } catch (e) {
+    return fail(e);
   }
 }

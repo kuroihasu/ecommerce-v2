@@ -80,6 +80,34 @@ Secciones del panel:
   `/feeds/productos.xml`, un feed RSS de Google Merchant que también lee el catálogo de Meta.
 - **Avanzado**: mostrar u ocultar la barra de avisos, la suscripción y cada sección de la
   portada (`settings.hiddenSections`, ver `apps/web/src/themes/sections.ts`).
+- **Publicaciones y anuncios**: conecta Meta y Google Ads (solo lectura) para ver las últimas
+  publicaciones de Instagram y los resultados de las campañas de los últimos 30 días.
+
+### Conectar Meta y Google Ads
+
+Los tokens se guardan cifrados (AES-256-GCM con una clave derivada de `AUTH_SECRET`, o de
+`INTEGRATIONS_KEY` si se define). Si cambias esa clave, hay que volver a conectar las cuentas.
+Cada servicio se activa al definir sus variables en la API; sin ellas, el botón aparece desactivado.
+
+**Meta** (Facebook, Instagram y anuncios): `META_APP_ID` y `META_APP_SECRET`.
+
+1. En developers.facebook.com crea una app de tipo *Empresa* con el producto *Inicio de sesión con Facebook para empresas*.
+2. En *URI de redireccionamiento de OAuth válidos* agrega `https://<dominio-de-la-tienda>/admin/redes/conectar/meta`.
+3. Pide en la revisión de apps los permisos `pages_show_list`, `pages_read_engagement`,
+   `instagram_basic`, `instagram_manage_insights`, `ads_read` y `business_management`. Mientras
+   no estén aprobados, solo pueden conectar las personas con rol en la app.
+4. La cuenta de Instagram tiene que ser profesional y estar vinculada a una página de Facebook.
+
+**Google Ads**: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` y `GOOGLE_ADS_DEVELOPER_TOKEN`
+(opcional `GOOGLE_ADS_LOGIN_CUSTOMER_ID` si se entra a través de una cuenta de administrador).
+
+1. En Google Cloud crea un cliente OAuth de tipo *Aplicación web* con la URI de redirección
+   `https://<dominio-de-la-tienda>/admin/redes/conectar/google` y activa la *Google Ads API*.
+2. En Google Ads → Herramientas → Centro de API pide el token de desarrollador (el acceso básico
+   lo aprueba Google; con acceso de prueba solo funciona con cuentas de prueba).
+
+Las versiones de las APIs se pueden cambiar con `META_GRAPH_VERSION` (por defecto `v26.0`) y
+`GOOGLE_ADS_API_VERSION` (por defecto `v26`).
 
 ### Probar el panel en un preview de Vercel
 

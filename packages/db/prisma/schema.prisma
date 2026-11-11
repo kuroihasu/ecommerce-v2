@@ -4,8 +4,8 @@
 // Los montos se guardan como enteros en la moneda de la tienda (CLP no tiene decimales).
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
   moduleFormat = "esm"
 }
 
@@ -28,12 +28,42 @@ model Store {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  members    StoreMember[]
-  categories Category[]
-  products   Product[]
-  customers  Customer[]
-  carts      Cart[]
-  orders     Order[]
+  members      StoreMember[]
+  categories   Category[]
+  products     Product[]
+  customers    Customer[]
+  carts        Cart[]
+  orders       Order[]
+  integrations Integration[]
+}
+
+// ─── Cuentas externas (Meta, Google) ────────────────────────────────
+
+enum IntegrationProvider {
+  META
+  GOOGLE
+}
+
+// Cuenta de Meta o Google conectada desde el panel para ver publicaciones y
+// resultados de anuncios. Los tokens se guardan cifrados (AES-256-GCM, ver
+// apps/api/src/integrations/crypto.ts): una copia de la base no los expone.
+model Integration {
+  id              String              @id @default(cuid())
+  storeId         String
+  provider        IntegrationProvider
+  // Nombre que se muestra en el panel ("NORTE · @norte.cl").
+  accountName     String
+  // Ids de las cuentas elegidas: página e Instagram de Meta, cuenta publicitaria, cliente de Google Ads.
+  accounts        Json                @default("{}")
+  accessTokenEnc  String
+  refreshTokenEnc String?
+  expiresAt       DateTime?
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@unique([storeId, provider])
 }
 
 model User {
@@ -222,7 +252,7 @@ model CartItem {
 // ─── Pedidos, pagos y envíos ────────────────────────────────────────
 
 enum OrderStatus {
-  PENDING   // creado, esperando pago
+  PENDING // creado, esperando pago
   PAID
   FULFILLED // despachado
   DELIVERED
