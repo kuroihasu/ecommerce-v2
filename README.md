@@ -169,7 +169,8 @@ Las versiones de las APIs se pueden cambiar con `META_GRAPH_VERSION` (por defect
 El cliente paga en `/checkout` (contacto, dirección, medio de pago y código de descuento) y
 vuelve a `/pedido/:id?k=…`, que muestra si quedó pagado, los datos para transferir o los
 botones para reintentar con otro medio. La clave `k` es una firma del pedido: sin ella la
-página no muestra nada.
+página no muestra nada. Apenas llega, `src/proxy.ts` la guarda en una cookie solo para esa
+página y la saca de la URL, para que no la lean los píxeles de publicidad.
 
 - **Precios y stock** los calcula la API desde la base, nunca desde el carrito. El envío usa
   los valores de Datos de la tienda (RM, regiones y envío gratis desde); el código de descuento
@@ -198,7 +199,17 @@ Para cobrar de verdad:
 3. **Transferencia**: banco, tipo y número de cuenta, titular y RUT.
 
 Para probar sin red, `WEBPAY_BASE_URL` y `MERCADOPAGO_API_URL` en la API apuntan las llamadas
-a otra dirección (por ejemplo, un simulador local).
+a otra dirección (por ejemplo, un simulador local). En producción (`VERCEL_ENV=production`)
+se ignoran.
+
+**Mientras una pasarela esté en modo de prueba**, cualquiera puede "pagar" con las tarjetas de
+prueba. Esos pedidos quedan pagados (para poder probar la tienda) pero con la nota
+«⚠ PAGO DE PRUEBA … No lo despaches». Cambia a «Cobrar de verdad» antes de abrir la tienda.
+
+**Dominio de la tienda**: en producción la API solo devuelve al comprador a las direcciones
+que están en `WEB_ORIGIN` (o en `CHECKOUT_ORIGINS`, si la defines), separadas por coma. Si
+conectas un dominio propio (p. ej. `https://mitienda.cl`), agrégalo ahí o el checkout dirá
+«Dirección de la tienda inválida».
 
 En un preview de Vercel con protección, Webpay vuelve por POST desde otro sitio y Vercel
 puede pedir login antes de mostrar el pedido. En producción (sin protección) no pasa.

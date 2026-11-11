@@ -38,7 +38,7 @@ export async function login(_: unknown, form: FormData): Promise<{ error?: strin
     await setSession(res.accessToken, res.expiresIn);
   } catch (e) {
     if (!(e instanceof ApiError)) return { error: "No pudimos conectar con el servidor. Intenta de nuevo.", email };
-    if (e.status === 429) return { error: "Demasiados intentos. Espera un minuto y vuelve a probar.", email };
+    if (e.status === 429) return { error: e.message || "Demasiados intentos. Espera un minuto y vuelve a probar.", email };
     return { error: e.status === 401 ? "Correo o contraseña incorrectos." : e.message, email };
   }
   redirect("/admin/productos");

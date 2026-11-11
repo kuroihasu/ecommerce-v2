@@ -1,15 +1,20 @@
-import { Body, Controller, Get, HttpCode, Post, ServiceUnavailableException, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpException, HttpStatus, Post, ServiceUnavailableException, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { CurrentUser, PasswordHasher, Public, TokenService } from '@nestjs/authentication';
 import { z } from 'zod';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { authEnabled } from './auth.config.js';
 import { LoginRateLimitGuard } from './login-rate-limit.guard.js';
+import { FailureCounter } from './rate-limit.js';
 import type { AuthUser } from './auth.types.js';
 
 const LoginBody = z.object({
   email: z.string().trim().toLowerCase().email().max(254),
   password: z.string().min(1).max(1024),
 });
+
+// Además del límite por IP: 10 contraseñas malas para una misma cuenta la bloquean 15
+// minutos, aunque los intentos vengan de muchas IP distintas.
+const failures = new FailureCounter(10, 15 * 60_000);
 
 @Controller('auth')
 export class AuthController {
@@ -26,11 +31,16 @@ export class AuthController {
   @HttpCode(200)
   async login(@Body({ schema: LoginBody }) body: z.infer<typeof LoginBody>) {
     if (!authEnabled()) throw new ServiceUnavailableException('El panel no está configurado (falta AUTH_SECRET)');
+    if (failures.blocked(body.email)) throw new HttpException('Demasiados intentos para esta cuenta. Espera 15 minutos y vuelve a probar.', HttpStatus.TOO_MANY_REQUESTS);
     const user = await this.prisma.client.user.findUnique({ where: { email: body.email } });
     // Con un correo desconocido igual se verifica contra un hash de relleno: la
     // respuesta tarda lo mismo y no revela qué cuentas existen.
     const ok = await this.hasher.verify(body.password, user?.passwordHash);
-    if (!user || !ok) throw new UnauthorizedException('Correo o contraseña incorrectos');
+    if (!user || !ok) {
+      failures.fail(body.email);
+      throw new UnauthorizedException('Correo o contraseña incorrectos');
+    }
+    failures.reset(body.email);
     if (this.hasher.needsRehash(user.passwordHash)) {
       await this.prisma.client.user.update({
         where: { id: user.id },
