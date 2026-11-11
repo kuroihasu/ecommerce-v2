@@ -76,6 +76,14 @@ El seed no crea usuarios a propósito: corre en cada deploy contra la base real.
 
 Secciones del panel:
 
+- **Pedidos**: lista con filtros (por despachar, por pagar, despachados, entregados, anulados).
+  Cada pedido muestra cliente, dirección, productos, el pago (autorización, últimos 4 dígitos,
+  cuotas) y avisos «⚠ revisar» si algo no cuadró al confirmar el pago (por ejemplo, stock
+  insuficiente). Desde ahí se confirma una transferencia, se anula un pedido sin pagar, se marca
+  despachado (empresa y número de seguimiento) y entregado. Confirmar pagos y anular es solo
+  para dueño y administradores.
+- **Pagos**: Webpay Plus (Transbank), Mercado Pago y transferencia bancaria, cada uno con su
+  interruptor y su botón «Configurar». Ver [Pagos en línea](#pagos-en-línea).
 - **Productos**, **Diseño y colores** y **Datos de la tienda**.
 - **Redes y publicidad**: redes sociales del pie de página, píxeles de Meta, Google Analytics 4,
   Google Ads y TikTok (la tienda envía vista de página, vio producto, agregó al carrito e
@@ -86,9 +94,9 @@ Secciones del panel:
   la barra de avisos, la ruleta y la suscripción la muestran). Además: usos
   ilimitados o una cantidad fija, fecha de término opcional y estado (activo, pausado,
   vencido, agotado). Uno se marca «En la tienda»: es el que anuncian la barra de avisos y la
-  suscripción. El carrito valida el código con la API; el uso se descuenta al confirmar el
-  pedido con `DiscountsService.redeem`, que lo hace en una sola sentencia para que dos
-  compras simultáneas no gasten el último uso dos veces.
+  suscripción. El carrito valida el código con la API; el uso se descuenta cuando se confirma el
+  pago del pedido, en una sola sentencia para que dos compras simultáneas no gasten el
+  último uso dos veces.
 - **Ruleta de regalos**: se activa o apaga desde el panel. Aparece una vez por visitante
   después de unos segundos; el cliente gira, ve su premio y deja su correo para ver el
   código. Cada premio entrega uno de los códigos de Descuentos (o ninguno) con un peso en
@@ -138,6 +146,45 @@ Cada servicio se activa al definir sus variables en la API; sin ellas, el botón
 Las versiones de las APIs se pueden cambiar con `META_GRAPH_VERSION` (por defecto `v26.0`) y
 `GOOGLE_ADS_API_VERSION` (por defecto `v26`).
 
+## Pagos en línea
+
+El cliente paga en `/checkout` (contacto, dirección, medio de pago y código de descuento) y
+vuelve a `/pedido/:id?k=…`, que muestra si quedó pagado, los datos para transferir o los
+botones para reintentar con otro medio. La clave `k` es una firma del pedido: sin ella la
+página no muestra nada.
+
+- **Precios y stock** los calcula la API desde la base, nunca desde el carrito. El envío usa
+  los valores de Datos de la tienda (RM, regiones y envío gratis desde); el código de descuento
+  se aplica antes de calcular el envío gratis.
+- **Confirmación**: la pasarela devuelve al cliente a `/pago/webpay` o `/pago/mercadopago`
+  (rutas de la web, que hablan con la API del lado del servidor). La API confirma el pago con
+  la pasarela, revisa orden, monto y moneda, y en una sola transacción marca el pedido pagado,
+  descuenta stock y gasta el uso del código. Recargar la página de vuelta no descuenta dos
+  veces. Mercado Pago además avisa por `/pago/mercadopago/aviso` (solo con https), por si el
+  cliente cierra la ventana antes de volver.
+- **Transferencia**: el pedido queda «Por pagar» con los datos de la cuenta, y el stock se
+  descuenta cuando el dueño lo confirma en Pedidos.
+- Las claves de Transbank y el token de Mercado Pago se guardan cifrados (`INTEGRATIONS_KEY`
+  o `AUTH_SECRET`) y nunca vuelven al navegador.
+
+Para cobrar de verdad:
+
+1. **Webpay**: al activarlo queda en modo de prueba con el comercio de integración de
+   Transbank (tarjeta VISA `4051 8856 0044 6623`, CVV `123`, cualquier fecha futura; RUT
+   `11.111.111-1`, clave `123`). Para producción, Transbank entrega el código de comercio
+   (12 dígitos) y la llave secreta después de su validación; se ingresan en Configurar →
+   «Cobrar de verdad».
+2. **Mercado Pago**: el *Access token* de producción (`APP_USR-…`) de
+   [Tus integraciones](https://www.mercadopago.cl/developers/panel/app). Un token `TEST-…`
+   deja la tienda en modo de prueba.
+3. **Transferencia**: banco, tipo y número de cuenta, titular y RUT.
+
+Para probar sin red, `WEBPAY_BASE_URL` y `MERCADOPAGO_API_URL` en la API apuntan las llamadas
+a otra dirección (por ejemplo, un simulador local).
+
+En un preview de Vercel con protección, Webpay vuelve por POST desde otro sitio y Vercel
+puede pedir login antes de mostrar el pedido. En producción (sin protección) no pasa.
+
 ### Probar el panel en un preview de Vercel
 
 Para mostrar el panel sin tocar producción, define estas variables **solo para Preview** (y si
@@ -178,6 +225,17 @@ borra las variables y cambia la contraseña con `admin:create`.
 | POST | `/stores/:store/wheel/claim` | Correo + giro firmado: guarda al suscriptor y entrega el código |
 | POST | `/stores/:store/subscribers` | Suscripción a novedades desde el pie de página |
 | GET | `/admin/stores/:store/subscribers` | Suscriptores de la tienda |
+| GET | `/stores/:store/payment-methods` | Medios de pago activos (y si están en modo de prueba) |
+| POST | `/stores/:store/checkout` | Crea el pedido y devuelve a dónde ir a pagar |
+| GET | `/stores/:store/orders/:id?k=` | Pedido para el cliente (con la clave firmada) |
+| POST | `/stores/:store/orders/:id/pay` | Reintentar el pago con otro medio |
+| POST | `/stores/:store/payments/webpay/return` | Confirma la vuelta de Webpay |
+| POST | `/stores/:store/payments/mercadopago/return` | Confirma la vuelta de Mercado Pago |
+| POST | `/stores/:store/payments/mercadopago/notice` | Aviso (webhook) de Mercado Pago |
+| GET | `/admin/stores/:store/orders` | Pedidos (los últimos 200) |
+| PATCH | `/admin/stores/:store/orders/:id` | Cambiar estado: pagado, anulado, despachado, entregado |
+| GET | `/admin/stores/:store/payments` | Configuración de pagos (sin secretos) |
+| PUT | `/admin/stores/:store/payments/webpay\|mercadopago\|transfer` | Guardar un medio de pago |
 
 Las rutas `/admin` piden `Authorization: Bearer <token>` y ser miembro de la tienda.
 

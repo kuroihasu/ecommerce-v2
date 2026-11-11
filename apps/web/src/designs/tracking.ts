@@ -41,6 +41,17 @@ export const trackViewItem = (item: Item) => send("ViewContent", "view_item", "V
 export const trackAddToCart = (item: Item) => send("AddToCart", "add_to_cart", "AddToCart", [item]);
 export const trackBeginCheckout = (items: Item[]) => send("InitiateCheckout", "begin_checkout", "InitiateCheckout", items);
 
+// Compra confirmada (página del pedido pagado). value = total cobrado, con envío.
+export function trackPurchase(orderNumber: number, total: number, items: { id: string; name: string; price: number; qty: number }[]) {
+  if (typeof window === "undefined") return;
+  const w = window as Win;
+  try {
+    w.fbq?.("track", "Purchase", { content_ids: items.map((i) => i.id), content_type: "product", value: total, currency: CURRENCY, num_items: items.reduce((s, i) => s + i.qty, 0) });
+    w.gtag?.("event", "purchase", { transaction_id: String(orderNumber), currency: CURRENCY, value: total, items: items.map((i) => ({ item_id: i.id, item_name: i.name, price: i.price, quantity: i.qty })) });
+    w.ttq?.track("CompletePayment", { contents: items.map((i) => ({ content_id: i.id, content_name: i.name, price: i.price, quantity: i.qty })), content_type: "product", value: total, currency: CURRENCY });
+  } catch {}
+}
+
 // Vista de página al navegar dentro de la tienda (la primera la manda cada píxel al cargar;
 // Google Analytics cuenta los cambios de página por su cuenta).
 export function trackPageView() {

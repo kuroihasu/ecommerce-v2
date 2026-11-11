@@ -3,9 +3,11 @@ import type { ReactNode } from "react";
 import { logout } from "@/lib/admin/actions";
 
 const links = [
+  { href: "/admin/pedidos", label: "Pedidos" },
   { href: "/admin/productos", label: "Productos" },
   { href: "/admin/diseno", label: "Diseño y colores" },
   { href: "/admin/tienda", label: "Datos de la tienda" },
+  { href: "/admin/pagos", label: "Pagos" },
   { href: "/admin/descuentos", label: "Descuentos" },
   { href: "/admin/ruleta", label: "Ruleta de regalos" },
   { href: "/admin/chat", label: "Chat de WhatsApp" },

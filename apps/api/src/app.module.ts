@@ -6,11 +6,12 @@ import { CatalogModule } from './catalog/catalog.module.js';
 import { IntegrationsModule } from './integrations/integrations.module.js';
 import { DiscountsModule } from './discounts/discounts.module.js';
 import { WheelModule } from './wheel/wheel.module.js';
+import { OrdersModule } from './orders/orders.module.js';
 import { HealthController } from './health.controller.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 
 @Module({
-  imports: [PrismaModule, AuthModule, CatalogModule, AdminModule, IntegrationsModule, DiscountsModule, WheelModule],
+  imports: [PrismaModule, AuthModule, CatalogModule, AdminModule, IntegrationsModule, DiscountsModule, WheelModule, OrdersModule],
   controllers: [HealthController],
   // Valida los cuerpos con los esquemas Zod de cada ruta (`@Body({ schema })`).
   providers: [{ provide: APP_PIPE, useValue: new StandardSchemaValidationPipe() }],
