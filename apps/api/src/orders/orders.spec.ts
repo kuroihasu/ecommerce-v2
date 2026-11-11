@@ -188,6 +188,18 @@ describe('OrdersService', () => {
     expect(markPaid).not.toHaveBeenCalled();
   });
 
+  it('al confirmar un pago se emite la boleta, y si no se marcó no', async () => {
+    const billing = { afterPaid: vi.fn() };
+    const service = new OrdersService({ client: {} } as unknown as PrismaService, billing as never);
+    const confirm = vi.spyOn(service as unknown as { confirmPaid: () => Promise<boolean> }, 'confirmPaid').mockResolvedValue(true);
+    await expect(service.markPaid('o1', 'p1', {}, true)).resolves.toBe(true);
+    expect(billing.afterPaid).toHaveBeenCalledWith('o1', true);
+    confirm.mockResolvedValue(false);
+    billing.afterPaid.mockClear();
+    await service.markPaid('o1', 'p1', {});
+    expect(billing.afterPaid).not.toHaveBeenCalled();
+  });
+
   it('confirmar dos veces el mismo pago no descuenta stock de nuevo', async () => {
     const tx = {
       payment: { findUniqueOrThrow: vi.fn().mockResolvedValue({ status: 'AUTHORIZED', orderId: 'o1' }), updateMany: vi.fn().mockResolvedValue({ count: 0 }) },

@@ -130,6 +130,15 @@ export function OrderView({ order, orderKey }: { order: PublicOrder; orderKey: s
         </p>
       </section>
 
+      {order.receipt && (
+        <p className="-mt-4 text-base">
+          <a href={`/pedido/${order.id}/boleta`} target="_blank" rel="noopener" className="underline">
+            Descargar {order.receipt.type === 41 ? "boleta exenta" : "boleta electrónica"}{order.receipt.folio ? ` N° ${order.receipt.folio}` : ""} (PDF)
+          </a>
+          {order.receipt.test ? " · documento de prueba, sin validez tributaria" : ""}
+        </p>
+      )}
+
       <p className="text-base">
         Guarda este enlace para revisar tu pedido. ¿Dudas? Escríbenos{store.email ? ` a ${store.email}` : ""} con el número de pedido.{" "}
         <Link href="/" className="underline">Seguir comprando</Link>

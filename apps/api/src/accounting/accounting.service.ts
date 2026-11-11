@@ -45,6 +45,8 @@ export class AccountingService {
         total: o.total,
         tax: ivaOf(o.total),
         units: o.items.reduce((s, i) => s + i.quantity, 0),
+        // Boleta electrónica emitida (folio y tipo), si la hay.
+        receipt: o.dte?.status === 'ISSUED' ? { type: o.dte.type, folio: o.dte.folio, test: o.dte.test } : null,
       })),
       entries: entries.map(entryOut),
     };
@@ -112,6 +114,7 @@ export class AccountingService {
         discountTotal: true,
         total: true,
         items: { select: { quantity: true, unitPrice: true, variant: { select: { cost: true } } } },
+        dte: { select: { status: true, type: true, folio: true, test: true } },
       },
     });
   }

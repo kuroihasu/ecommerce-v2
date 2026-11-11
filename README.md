@@ -39,6 +39,7 @@ hoy y para la plataforma de varias tiendas mañana.
 - `Subscriber`: correos para novedades (ruleta de regalos o pie de página), uno por tienda.
 - `StockMovement`: historial de cada cambio de stock (cuánto, por qué y cuánto quedó).
 - `LedgerEntry`: ingresos y gastos anotados a mano en Contabilidad (total con IVA y el IVA que incluye).
+- `BillingConfig`, `Dte`: boletas electrónicas del SII (proveedor, emisor y API key cifrada; una boleta por pedido con folio, neto, IVA y estado).
 
 Los montos son enteros en la moneda de la tienda (CLP no usa decimales).
 
@@ -95,6 +96,8 @@ Secciones del panel:
   lo vendido online según el costo de cada variante y un gráfico de los últimos 12 meses. Se
   descargan en CSV (separado por punto y coma, listo para Excel) el resumen, las ventas online y los
   ingresos y gastos, para el contador. El IVA es referencial: asume todo afecto al 19%.
+- **Boletas**: boleta electrónica del SII para cada pedido pagado, emitida sola con OpenFactura.
+  Ver [Boletas electrónicas](#boletas-electrónicas).
 - **Pedidos**: lista con filtros (por despachar, por pagar, despachados, entregados, anulados).
   Cada pedido muestra cliente, dirección, productos, el pago (autorización, últimos 4 dígitos,
   cuotas) y avisos «⚠ revisar» si algo no cuadró al confirmar el pago (por ejemplo, stock
@@ -214,6 +217,43 @@ conectas un dominio propio (p. ej. `https://mitienda.cl`), agrégalo ahí o el c
 En un preview de Vercel con protección, Webpay vuelve por POST desde otro sitio y Vercel
 puede pedir login antes de mostrar el pedido. En producción (sin protección) no pasa.
 
+### Boletas electrónicas
+
+Cada pedido pagado (Webpay, Mercado Pago o una transferencia confirmada en Pedidos) genera su
+boleta electrónica (tipo 39, o boleta exenta tipo 41 si la tienda lo marca) a través de
+[OpenFactura](https://www.openfactura.cl) de Haulmer, un proveedor autorizado por el SII. El
+certificado digital y los folios (CAF) quedan en OpenFactura: la tienda solo guarda la API key
+(cifrada) y los datos del emisor que salen impresos (RUT, razón social, giro, dirección, comuna).
+
+- **Cuándo**: justo después de confirmar el pago, fuera de la transacción del pago. Si
+  OpenFactura falla, el pago queda confirmado igual y la boleta queda «Con error» en
+  Panel → Boletas, con el motivo y un botón «Reintentar». Los pedidos pagados sin boleta (por
+  ejemplo, de antes de activarlas) se emiten desde la misma página.
+- **Una por pedido**: la fila se reserva antes de llamar al proveedor (`Dte.orderId` único) y
+  cada envío lleva `Idempotency-Key`. Si se corta la conexión, el reintento usa la misma llave
+  y recupera la boleta ya emitida; después de un rechazo, la llave cambia.
+- **Montos**: los precios del detalle van con IVA (así son las boletas), el despacho es una
+  línea más y el descuento va como descuento global. Neto = total / 1,19. Receptor: el RUT
+  que dio el cliente en el checkout o `66666666-6` (consumidor final).
+- **PDF**: no se guarda; se pide a OpenFactura al descargarlo. El cliente lo baja desde la
+  página de su pedido (`/pedido/:id/boleta`, con la misma llave del pedido) y el panel desde
+  Boletas o el detalle del pedido. Contabilidad muestra el folio en el libro de ventas y el CSV.
+- **Modo de prueba** (por defecto): usa el ambiente de prueba de OpenFactura (folios
+  simulados, no llega al SII). Sin API key propia usa la llave pública de prueba y la empresa
+  de prueba de OpenFactura. **Con boletas de verdad, un pedido pagado en modo de prueba de la
+  pasarela no lleva boleta.**
+- Guardar la configuración pide el código de 2FA. Solo dueños y administradores.
+
+Para emitir de verdad:
+
+1. La empresa debe estar autorizada como emisor electrónico en el SII.
+2. Crea la cuenta en openfactura.cl, sube el certificado digital y pide los folios de boleta.
+3. En Panel → Boletas → Configurar elige «Emitir de verdad», pega la API key y completa los
+   datos del emisor. Emite primero un pedido en modo de prueba para revisar el PDF.
+
+`OPENFACTURA_BASE_URL` en la API apunta las llamadas a un simulador local (se ignora en producción).
+Las boletas sobre 135 UF piden medio de pago y razón social del receptor: aún no se envían.
+
 ### Verificación en dos pasos
 
 En **Panel → Seguridad** cada persona puede activar la verificación en dos pasos: escanea un
@@ -224,7 +264,7 @@ cada código sirve una vez y 5 códigos malos bloquean la cuenta 15 minutos.
 
 **Cambios críticos** piden el código aunque ya hayas entrado: medios de pago y cuenta para
 transferencias, marcar un pedido pagado o anularlo, crear o activar códigos de descuento, y
-conectar o desconectar Meta/Google. Quien no tiene 2FA activado no puede hacer esos cambios
+conectar o desconectar Meta/Google, y la configuración de boletas electrónicas. Quien no tiene 2FA activado no puede hacer esos cambios
 hasta activarlo. Después de un código válido hay 5 minutos de gracia (un permiso firmado por la
 API, `x-2fa-grant`, que la web guarda en una cookie httpOnly). En la API se marca una ruta con
 `@RequireTwoFactor()` (ver `apps/api/src/auth/step-up.ts`).
@@ -288,6 +328,11 @@ borra las variables y cambia la contraseña con `admin:create`.
 | PATCH | `/admin/stores/:store/orders/:id` | Cambiar estado: pagado, anulado, despachado, entregado |
 | GET | `/admin/stores/:store/payments` | Configuración de pagos (sin secretos) |
 | PUT | `/admin/stores/:store/payments/webpay\|mercadopago\|transfer` | Guardar un medio de pago |
+| GET | `/stores/:store/orders/:id/receipt?k=` | PDF de la boleta del pedido (con la clave firmada) |
+| GET | `/admin/stores/:store/receipts` | Boletas y pedidos pagados sin boleta |
+| GET, PUT | `/admin/stores/:store/receipts/config` | Configuración de boletas (PUT pide 2FA) |
+| POST | `/admin/stores/:store/receipts/orders/:orderId` | Emitir o reintentar la boleta de un pedido |
+| GET | `/admin/stores/:store/receipts/:id/pdf` | PDF de una boleta |
 
 Las rutas `/admin` piden `Authorization: Bearer <token>` y ser miembro de la tienda.
 

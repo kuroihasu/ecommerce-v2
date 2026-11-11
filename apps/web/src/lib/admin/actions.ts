@@ -7,7 +7,7 @@ import { STORE_SLUG } from "@/lib/catalog";
 import { PREVIEW_COOKIE } from "@/themes/resolve";
 import { adminApi, apiLogin, ApiError, authApi, authApiRaw } from "./api";
 import { clearSession, setGrant, setSession } from "./session";
-import type { ActionResult, StepUp, AdminCategory, AdminDiscount, AdminOrder, AdminProduct, AdminStore, DiscountPayload, EntryPayload, GatewayConfig, IntegrationSlug, LedgerEntry, ProductPayload, StockAdjust, StockMovement } from "./types";
+import type { ActionResult, StepUp, BillingConfig, Receipt, AdminCategory, AdminDiscount, AdminOrder, AdminProduct, AdminStore, DiscountPayload, EntryPayload, GatewayConfig, IntegrationSlug, LedgerEntry, ProductPayload, StockAdjust, StockMovement } from "./types";
 import { adminOrigin } from "./origin";
 
 // Acciones del panel. Cada una reenvía la sesión a la API, que valida permisos;
@@ -198,6 +198,24 @@ export async function adjustStock(input: StockAdjust): Promise<ActionResult<{ va
 export async function saveGateway(provider: "webpay" | "mercadopago" | "transfer", body: Record<string, unknown>): Promise<ActionResult<GatewayConfig>> {
   try {
     return { ok: true, data: await adminApi<GatewayConfig>(`/payments/${provider}`, { method: "PUT", body }) };
+  } catch (e) {
+    return fail(e);
+  }
+}
+
+// Boletas electrónicas (panel > Boletas). La API key viaja a la API, que la guarda cifrada.
+export async function saveBilling(body: Record<string, unknown>): Promise<ActionResult<BillingConfig>> {
+  try {
+    return { ok: true, data: await adminApi<BillingConfig>("/receipts/config", { method: "PUT", body }) };
+  } catch (e) {
+    return fail(e);
+  }
+}
+
+// Emitir (o reintentar) la boleta de un pedido pagado.
+export async function issueReceipt(orderId: string): Promise<ActionResult<Receipt>> {
+  try {
+    return { ok: true, data: await adminApi<Receipt>(`/receipts/orders/${encodeURIComponent(orderId)}`, { method: "POST" }) };
   } catch (e) {
     return fail(e);
   }

@@ -150,7 +150,7 @@ export type LedgerEntry = {
   counterpartyRut: string | null;
 };
 export type EntryPayload = Omit<LedgerEntry, "id">;
-export type SaleLine = { id: string; number: number; date: string; email: string; status: string; products: number; shipping: number; discount: number; total: number; tax: number; units: number };
+export type SaleLine = { id: string; number: number; date: string; email: string; status: string; products: number; shipping: number; discount: number; total: number; tax: number; units: number; receipt: ReceiptRef | null };
 type CategoryTotal = { category: string; total: number };
 export type AccountingSummary = {
   sales: { count: number; total: number; products: number; shipping: number; discounts: number; tax: number };
@@ -187,4 +187,32 @@ export type AdminOrder = {
   items: { name: string; sku: string | null; unitPrice: number; quantity: number }[];
   payments: { method: "webpay" | "mercadopago" | "transfer"; status: "PENDING" | "AUTHORIZED" | "FAILED" | "REFUNDED"; amount: number; raw: Record<string, unknown> | null; createdAt: string }[];
   shipments: { carrier: string; trackingNumber: string | null; status: string }[];
+  dte: { id: string; type: number; folio: number | null; status: ReceiptStatus; test: boolean; error: string | null } | null;
+};
+
+// Boletas electrónicas (ver apps/api/src/billing). 39 = boleta, 41 = boleta exenta.
+export type ReceiptStatus = "ISSUING" | "ISSUED" | "FAILED";
+export type ReceiptRef = { type: number; folio: number | null; test: boolean };
+export type Issuer = { rut: string; name: string; activity: string; address: string; comuna: string; branchCode: string };
+export type BillingConfig = { provider: "openfactura"; enabled: boolean; live: boolean; exempt: boolean; hasKey: boolean; issuer: Issuer; demo: boolean };
+export type Receipt = {
+  id: string;
+  orderId: string | null;
+  type: number;
+  folio: number | null;
+  status: ReceiptStatus;
+  test: boolean;
+  total: number;
+  netAmount: number;
+  taxAmount: number;
+  exemptAmount: number;
+  receiverRut: string;
+  issueDate: string | null;
+  error: string | null;
+  createdAt: string;
+  order?: { number: number; email: string; name: string | null } | null;
+};
+export type ReceiptList = {
+  receipts: Receipt[];
+  missing: { id: string; number: number; email: string; total: number; createdAt: string; testPayment: boolean }[];
 };
