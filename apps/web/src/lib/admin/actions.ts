@@ -5,16 +5,16 @@ import { redirect } from "next/navigation";
 import { updateTag } from "next/cache";
 import { STORE_SLUG } from "@/lib/catalog";
 import { PREVIEW_COOKIE } from "@/themes/resolve";
-import { adminApi, apiLogin, ApiError, authApi } from "./api";
-import { clearSession, setSession } from "./session";
-import type { ActionResult, AdminCategory, AdminDiscount, AdminOrder, AdminProduct, AdminStore, DiscountPayload, EntryPayload, GatewayConfig, IntegrationSlug, LedgerEntry, ProductPayload, StockAdjust, StockMovement } from "./types";
+import { adminApi, apiLogin, ApiError, authApi, authApiRaw } from "./api";
+import { clearSession, setGrant, setSession } from "./session";
+import type { ActionResult, StepUp, AdminCategory, AdminDiscount, AdminOrder, AdminProduct, AdminStore, DiscountPayload, EntryPayload, GatewayConfig, IntegrationSlug, LedgerEntry, ProductPayload, StockAdjust, StockMovement } from "./types";
 import { adminOrigin } from "./origin";
 
 // Acciones del panel. Cada una reenvía la sesión a la API, que valida permisos;
 // después de escribir se refresca la tienda (updateTag) para que el cambio se vea al tiro.
 
-const fail = (e: unknown): { ok: false; error: string } => {
-  if (e instanceof ApiError) return { ok: false, error: e.message };
+const fail = (e: unknown): { ok: false; error: string; stepUp?: StepUp } => {
+  if (e instanceof ApiError) return { ok: false, error: e.message, ...(e.stepUp ? { stepUp: e.stepUp } : {}) };
   throw e; // redirect() y errores inesperados siguen su curso
 };
 
@@ -115,14 +115,15 @@ export async function createCategory(_: unknown, form: FormData): Promise<{ erro
 // termina la conexión.
 const isProvider = (p: string): p is IntegrationSlug => p === "meta" || p === "google";
 
-export async function connectIntegration(provider: string): Promise<{ error: string }> {
+export async function connectIntegration(provider: string): Promise<{ error: string; stepUp?: StepUp }> {
   if (!isProvider(provider)) return { error: "Proveedor desconocido" };
   let url: string;
   try {
     const redirectUri = `${await adminOrigin()}/admin/redes/conectar/${provider}`;
     ({ url } = await adminApi<{ url: string }>(`/integrations/${provider}/start`, { method: "POST", body: { redirectUri } }));
   } catch (e) {
-    return { error: fail(e).error };
+    const f = fail(e);
+    return { error: f.error, stepUp: f.stepUp };
   }
   redirect(url);
 }
@@ -280,6 +281,19 @@ export async function disableTwoFactor(code: string): Promise<ActionResult<TwoFa
 export async function newRecoveryCodes(code: string): Promise<ActionResult<{ recoveryCodes: string[] }>> {
   try {
     return { ok: true, data: await authApi<{ recoveryCodes: string[] }>("/2fa/recovery-codes", { method: "POST", body: { code: code.replace(/\s/g, "") } }) };
+  } catch (e) {
+    return fail(e);
+  }
+}
+
+// Confirmar un cambio crítico con el código de 2FA: la API lo valida y entrega un
+// permiso de 5 minutos, que queda en una cookie y viaja en las llamadas siguientes.
+export async function verifyStepUp(code: string): Promise<ActionResult> {
+  try {
+    const { res } = await authApiRaw<{ ok: true }>("/2fa/step-up", { method: "POST", body: {}, headers: { "x-2fa-code": code.replace(/\s/g, "") } });
+    const grant = res.headers.get("x-2fa-grant");
+    if (grant) await setGrant(grant);
+    return { ok: true, data: undefined };
   } catch (e) {
     return fail(e);
   }

@@ -2,7 +2,8 @@
 
 import { useState, useTransition, type ReactNode } from "react";
 import { deleteDiscount, featureDiscount, saveDiscount, setDiscountActive } from "@/lib/admin/actions";
-import type { AdminDiscount, DiscountPayload } from "@/lib/admin/types";
+import type { AdminDiscount, DiscountPayload, StepUp } from "@/lib/admin/types";
+import { useTwoFactor } from "../StepUp";
 
 const clp = (n: number) => `$${n.toLocaleString("es-CL")}`;
 const benefit = (d: Pick<AdminDiscount, "kind" | "percent">) => (d.kind === "FREE_SHIPPING" ? "Envío gratis" : `${d.percent}%`);
@@ -62,6 +63,7 @@ function Editor({ editing, onDone, onCancel }: { editing: AdminDiscount | null; 
   const [f, setF] = useState<Draft>(editing ? toDraft(editing) : empty);
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
+  const withTwoFactor = useTwoFactor();
   const set = (patch: Partial<Draft>) => {
     setF((cur) => ({ ...cur, ...patch }));
     setError(null);
@@ -88,7 +90,7 @@ function Editor({ editing, onDone, onCancel }: { editing: AdminDiscount | null; 
       active: f.active,
     };
     start(async () => {
-      const res = await saveDiscount(editing?.id ?? null, payload);
+      const res = await withTwoFactor(() => saveDiscount(editing?.id ?? null, payload));
       if (res.ok) onDone({ ...res.data, featured: res.data.featured ?? false });
       else setError(res.error);
     });
@@ -182,9 +184,11 @@ export function DiscountManager({ initial }: { initial: AdminDiscount[] }) {
   const live = codes.filter((d) => status(d).live).length;
   const shown = codes.filter((d) => filter === "todos" || (filter === "activos") === status(d).live);
 
-  const run = <T,>(fn: () => Promise<{ ok: true; data: T } | { ok: false; error: string }>, apply: (data: T) => void, text: string) =>
+  const withTwoFactor = useTwoFactor();
+  const run = <T,>(fn: () => Promise<{ ok: true; data: T } | { ok: false; error: string; stepUp?: StepUp }>, apply: (data: T) => void, text: string) =>
     start(async () => {
-      const res = await fn();
+      // Activar un código pide el código de 2FA; pausar o borrar no (la API decide).
+      const res = await withTwoFactor(fn);
       if (res.ok) apply(res.data);
       setMsg(res.ok ? { ok: true, text } : { ok: false, text: res.error });
     });

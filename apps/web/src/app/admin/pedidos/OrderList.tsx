@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { updateOrder } from "@/lib/admin/actions";
 import type { AdminOrder, OrderStatus } from "@/lib/admin/types";
+import { useTwoFactor } from "../StepUp";
 
 const clp = (n: number) => `$${n.toLocaleString("es-CL")}`;
 const date = (iso: string) => new Intl.DateTimeFormat("es-CL", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "America/Santiago" }).format(new Date(iso));
@@ -32,13 +33,15 @@ function Detail({ o, onChange }: { o: AdminOrder; onChange: (o: AdminOrder) => v
   const [tracking, setTracking] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
   const [pending, start] = useTransition();
+  const withTwoFactor = useTwoFactor();
   const a = o.shippingAddress;
   const pay = o.payments[0];
   const act = (status: string, confirmText?: string) => {
     if (confirmText && !window.confirm(confirmText)) return;
     start(async () => {
       setMsg(null);
-      const r = await updateOrder(o.id, { status, ...(status === "FULFILLED" ? { carrier, trackingNumber: tracking } : {}) });
+      // Marcar pagado o anular piden el código de 2FA (la API decide; aquí se pide si hace falta).
+      const r = await withTwoFactor(() => updateOrder(o.id, { status, ...(status === "FULFILLED" ? { carrier, trackingNumber: tracking } : {}) }));
       if (r.ok) onChange(r.data);
       else setMsg(r.error);
     });

@@ -21,5 +21,25 @@ export async function setSession(token: string, maxAge: number) {
 }
 
 export async function clearSession() {
-  (await cookies()).delete(COOKIE);
+  const jar = await cookies();
+  jar.delete(COOKIE);
+  jar.delete(GRANT_COOKIE);
+}
+
+// Permiso de 5 minutos para cambios críticos, después de validar un código de 2FA
+// (lo firma la API; aquí solo se guarda y se reenvía).
+const GRANT_COOKIE = "admin_2fa";
+
+export async function getGrant() {
+  return (await cookies()).get(GRANT_COOKIE)?.value;
+}
+
+export async function setGrant(grant: string) {
+  (await cookies()).set(GRANT_COOKIE, grant, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    path: "/",
+    maxAge: 5 * 60,
+  });
 }

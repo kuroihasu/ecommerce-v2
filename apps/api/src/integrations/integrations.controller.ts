@@ -3,6 +3,7 @@ import { CurrentUser } from '@nestjs/authentication';
 import { z } from 'zod';
 import { CurrentStore, StoreAccessGuard, type StoreAccess } from '../auth/store-access.guard.js';
 import type { AuthUser } from '../auth/auth.types.js';
+import { RequireTwoFactor } from '../auth/step-up.js';
 import { IntegrationsService, PROVIDERS, type ProviderSlug } from './integrations.service.js';
 
 const StartBody = z.object({ redirectUri: z.string().url().max(500) });
@@ -25,7 +26,10 @@ export class IntegrationsController {
     return this.integrations.list(store);
   }
 
+  // Conectar o desconectar cuentas de publicidad pide el código de 2FA. (finish no: es la
+  // vuelta desde Meta/Google y ya está atada al usuario y la tienda por el state firmado).
   @Post(':provider/start')
+  @RequireTwoFactor()
   start(@CurrentStore() store: StoreAccess, @CurrentUser() user: AuthUser, @Param('provider') p: string, @Body({ schema: StartBody }) body: z.infer<typeof StartBody>) {
     return this.integrations.start(store, user.id, slugOf(p), body.redirectUri);
   }
@@ -41,6 +45,7 @@ export class IntegrationsController {
   }
 
   @Delete(':provider')
+  @RequireTwoFactor()
   disconnect(@CurrentStore() store: StoreAccess, @Param('provider') p: string) {
     return this.integrations.disconnect(store, slugOf(p));
   }

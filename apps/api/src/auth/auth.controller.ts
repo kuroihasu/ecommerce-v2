@@ -6,6 +6,7 @@ import { authEnabled } from './auth.config.js';
 import { LoginRateLimitGuard } from './login-rate-limit.guard.js';
 import { FailureCounter } from './rate-limit.js';
 import type { AuthUser } from './auth.types.js';
+import { RequireTwoFactor } from './step-up.js';
 
 const totp = z.string().trim().regex(/^\d{6}$/, 'El código son 6 números');
 const recovery = z.string().trim().min(6).max(40);
@@ -130,6 +131,15 @@ export class AuthController {
   async newRecoveryCodes(@CurrentUser() user: AuthUser, @Body({ schema: CodeBody }) body: z.infer<typeof CodeBody>) {
     await this.secondFactor(user.id, body);
     return { recoveryCodes: await this.mfa.generateRecoveryCodes(user.id) };
+  }
+
+  // Confirmar un cambio crítico: el guard valida el código de x-2fa-code y responde el
+  // permiso de 5 minutos en x-2fa-grant, que la web guarda y reenvía.
+  @Post('2fa/step-up')
+  @HttpCode(200)
+  @RequireTwoFactor()
+  stepUp() {
+    return { ok: true };
   }
 
   private async secondFactor(userId: string, b: { code?: string; recoveryCode?: string }) {

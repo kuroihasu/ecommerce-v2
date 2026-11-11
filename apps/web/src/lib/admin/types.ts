@@ -73,7 +73,9 @@ export type ProductPayload = {
   variants: AdminVariant[];
 };
 
-export type ActionResult<T = undefined> = { ok: true; data: T } | { ok: false; error: string };
+// stepUp: la API pide el código de 2FA para este cambio ('code') o que se active primero ('setup').
+export type StepUp = "code" | "setup";
+export type ActionResult<T = undefined> = { ok: true; data: T } | { ok: false; error: string; stepUp?: StepUp };
 
 // Cuentas de Meta y Google conectadas (ver apps/api/src/integrations).
 export type IntegrationSlug = "meta" | "google";

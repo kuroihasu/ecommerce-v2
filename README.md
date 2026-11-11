@@ -222,6 +222,13 @@ pide el código de 6 números además de la contraseña. Al activarla se entrega
 respaldo de un solo uso. Los secretos se guardan cifrados (`INTEGRATIONS_KEY` o `AUTH_SECRET`),
 cada código sirve una vez y 5 códigos malos bloquean la cuenta 15 minutos.
 
+**Cambios críticos** piden el código aunque ya hayas entrado: medios de pago y cuenta para
+transferencias, marcar un pedido pagado o anularlo, crear o activar códigos de descuento, y
+conectar o desconectar Meta/Google. Quien no tiene 2FA activado no puede hacer esos cambios
+hasta activarlo. Después de un código válido hay 5 minutos de gracia (un permiso firmado por la
+API, `x-2fa-grant`, que la web guarda en una cookie httpOnly). En la API se marca una ruta con
+`@RequireTwoFactor()` (ver `apps/api/src/auth/step-up.ts`).
+
 Si alguien pierde el teléfono y los códigos de respaldo, el dueño la apaga desde la terminal:
 
 ```bash

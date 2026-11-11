@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { logout } from "@/lib/admin/actions";
+import { StepUpProvider } from "./StepUp";
 
 const links = [
   { href: "/admin/pedidos", label: "Pedidos" },
@@ -43,7 +44,9 @@ export function AdminShell({ current, children }: { current: string; children: R
           </form>
         </div>
       </aside>
-      <main className="min-w-0 flex-1">{children}</main>
+      <main className="min-w-0 flex-1">
+        <StepUpProvider>{children}</StepUpProvider>
+      </main>
     </div>
   );
 }
