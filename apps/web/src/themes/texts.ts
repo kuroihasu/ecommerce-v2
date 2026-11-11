@@ -13,7 +13,8 @@ export const placeholders = [
   { key: "{cuotas}", label: "las cuotas sin interés" },
 ];
 
-const thanks = "Listo. Revisa tu correo: ahí va tu código de {porcentaje}.";
+// La tienda todavía no envía correos: el código se muestra al suscribirse.
+const thanks = "Listo, ya estás suscrito. Tu código de bienvenida es {codigo} ({porcentaje}).";
 
 export const defaultTexts: Record<string, ThemeTexts> = {
   atelier: {
@@ -38,8 +39,8 @@ export const defaultTexts: Record<string, ThemeTexts> = {
   },
 };
 
-const hasDiscount = (store: StoreInfo) =>
-  Boolean(store.discountCode && store.discountPercent) && !(store.discountExpiresAt && new Date(store.discountExpiresAt) <= new Date());
+// Si el código anunciado venció, la API ya lo manda vacío (ver catalog.service.ts).
+const hasDiscount = (store: StoreInfo) => Boolean(store.discountCode && store.discountPercent);
 const needsDiscount = (t: string) => t.includes("{codigo}") || t.includes("{porcentaje}");
 
 export type TextData = Pick<StoreInfo, "discountCode" | "discountPercent" | "freeShippingFrom" | "installments">;

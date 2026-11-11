@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState, useTransition } from "react";
+import { subscribe } from "@/lib/wheel";
 
 // Barra de anuncios que rota sus mensajes cada 4 s.
 export function AnnouncementRotator({ items, className = "" }: { items: string[]; className?: string }) {
@@ -26,7 +27,7 @@ export function AnnouncementRotator({ items, className = "" }: { items: string[]
   );
 }
 
-// Suscripción con descuento de bienvenida (en la preview no envía nada).
+// Suscripción a novedades: guarda el correo en la tienda (panel > Ruleta de regalos > Suscriptores).
 export function Newsletter({ className = "", inputClass = "", buttonClass = "", label = "Suscribirme", thanks = "Listo. Ya estás suscrito." }: {
   className?: string;
   thanks?: string;
@@ -35,18 +36,27 @@ export function Newsletter({ className = "", inputClass = "", buttonClass = "", 
   label?: string;
 }) {
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, start] = useTransition();
+  const id = useId();
   if (sent) return <p className={`text-xl ${className}`}>{thanks}</p>;
   return (
     <form
-      className={`flex flex-col gap-3 sm:flex-row ${className}`}
+      className={`flex flex-col gap-3 sm:flex-row sm:flex-wrap ${className}`}
       onSubmit={(e) => {
         e.preventDefault();
-        setSent(true);
+        const email = String(new FormData(e.currentTarget).get("email") ?? "");
+        start(async () => {
+          const res = await subscribe(email);
+          if (res.ok) setSent(true);
+          else setError(res.error);
+        });
       }}
     >
-      <label htmlFor="nl-email" className="sr-only">Tu correo</label>
-      <input id="nl-email" type="email" required placeholder="tu@correo.cl" className={`h-14 min-w-0 flex-1 px-5 text-lg ${inputClass}`} />
-      <button className={`h-14 px-8 text-lg transition-transform active:scale-[0.98] ${buttonClass}`}>{label}</button>
+      <label htmlFor={id} className="sr-only">Tu correo</label>
+      <input id={id} name="email" type="email" required placeholder="tu@correo.cl" className={`h-14 min-w-0 flex-1 px-5 text-lg ${inputClass}`} />
+      <button disabled={pending} className={`h-14 px-8 text-lg transition-transform active:scale-[0.98] disabled:opacity-70 ${buttonClass}`}>{label}</button>
+      {error && <p role="alert" className="basis-full text-base">{error}</p>}
     </form>
   );
 }

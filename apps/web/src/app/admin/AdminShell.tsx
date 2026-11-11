@@ -7,6 +7,7 @@ const links = [
   { href: "/admin/diseno", label: "Diseño y colores" },
   { href: "/admin/tienda", label: "Datos de la tienda" },
   { href: "/admin/descuentos", label: "Descuentos" },
+  { href: "/admin/ruleta", label: "Ruleta de regalos" },
   { href: "/admin/redes", label: "Redes y publicidad" },
   { href: "/admin/publicaciones", label: "Publicaciones y anuncios" },
   { href: "/admin/avanzado", label: "Avanzado" },

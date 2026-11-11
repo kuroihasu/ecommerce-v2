@@ -6,6 +6,7 @@ import { tokensToCss } from "./tokens";
 import { Customizer } from "./Customizer";
 import { CatalogProvider } from "@/designs/CatalogProvider";
 import { Pixels } from "@/designs/Pixels";
+import { PrizeWheel } from "@/designs/PrizeWheel";
 import { getCatalog } from "@/lib/catalog";
 
 // Envoltorio de la tienda: aplica los tokens del tema activo como variables CSS
@@ -19,6 +20,7 @@ export async function ThemeRoot({ children }: { children: ReactNode }) {
         <def.Layout>{children}</def.Layout>
       </CatalogProvider>
       <Pixels tracking={catalog.store.tracking} />
+      {catalog.store.wheel?.enabled && catalog.store.wheel.prizes?.length >= 2 && <PrizeWheel wheel={catalog.store.wheel} storeName={catalog.store.name} />}
       {showCustomizer && (
         <Customizer
           current={def.id}

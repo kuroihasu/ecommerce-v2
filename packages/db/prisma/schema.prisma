@@ -36,6 +36,7 @@ model Store {
   orders        Order[]
   integrations  Integration[]
   discountCodes DiscountCode[]
+  subscribers   Subscriber[]
 }
 
 // ─── Códigos de descuento ───────────────────────────────────────────
@@ -378,4 +379,19 @@ model Shipment {
   updatedAt      DateTime       @updatedAt
 
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+// Correos que dejan los clientes para recibir novedades (ruleta de regalos o el
+// formulario del pie de página). Un correo por tienda.
+model Subscriber {
+  id        String   @id @default(cuid())
+  storeId   String
+  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  email     String
+  source    String   @default("pie")
+  prize     String?
+  createdAt DateTime @default(now())
+
+  @@unique([storeId, email])
+  @@index([storeId, createdAt])
 }

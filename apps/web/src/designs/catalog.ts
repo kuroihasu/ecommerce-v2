@@ -58,8 +58,12 @@ const store = {
   hiddenSections: [] as string[],
   // Textos propios de la barra de avisos y la suscripción. Ver src/themes/texts.ts.
   texts: {} as StoreTexts,
+  // Ruleta de regalos (panel > Ruleta de regalos). La API no manda los códigos, solo
+  // si cada premio trae descuento.
+  wheel: null as PublicWheel | null,
 };
 
+export type PublicWheel = { enabled: boolean; title: string; subtitle: string; delaySeconds: number; prizes: { label: string; won: boolean }[] };
 export type Tracking = { metaPixelId?: string; ga4Id?: string; googleAdsId?: string; tiktokPixelId?: string };
 export type StoreInfo = typeof store;
 export type CategoryInfo = { slug: CategorySlug; name: string; blurb: string; image: string };

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { WheelSettings } from '../wheel/wheel.schemas.js';
 
 // Lo que acepta el panel. Todo se valida aquí antes de tocar la base.
 const hex = z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Color en formato #rrggbb');
@@ -51,6 +52,8 @@ export const SettingsInput = z.object({
       newsletterThanks: text(160).optional(),
     })
     .optional(),
+  // Ruleta de regalos (ver src/wheel). Los códigos de los premios no salen en la API pública.
+  wheel: WheelSettings.optional(),
 });
 
 export const StoreInput = z.object({

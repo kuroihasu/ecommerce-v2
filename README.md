@@ -36,6 +36,7 @@ hoy y para la plataforma de varias tiendas mañana.
 - `Order`, `OrderItem`, `Payment`, `Shipment`: pedidos, pagos por pasarela y despachos.
 - `DiscountCode`: códigos de descuento con porcentaje, usos máximos (vacío = ilimitado), usos hechos, activo y fecha de término.
 - `Integration`: cuentas de Meta y Google Ads conectadas (token cifrado).
+- `Subscriber`: correos para novedades (ruleta de regalos o pie de página), uno por tienda.
 
 Los montos son enteros en la moneda de la tienda (CLP no usa decimales).
 
@@ -86,6 +87,12 @@ Secciones del panel:
   suscripción. El carrito valida el código con la API; el uso se descuenta al confirmar el
   pedido con `DiscountsService.redeem`, que lo hace en una sola sentencia para que dos
   compras simultáneas no gasten el último uso dos veces.
+- **Ruleta de regalos**: se activa o apaga desde el panel. Aparece una vez por visitante
+  después de unos segundos; el cliente gira, ve su premio y deja su correo para ver el
+  código. Cada premio entrega uno de los códigos de Descuentos (o ninguno) con un peso en
+  el sorteo. El servidor sortea y firma el resultado, los códigos no salen en la API
+  pública, un premio con el código pausado, vencido o agotado no sale, y un correo participa
+  una sola vez. La misma página lista los suscriptores y los descarga en CSV.
 - **Avanzado**: mostrar u ocultar la barra de avisos, la suscripción y cada sección de la
   portada (`settings.hiddenSections`, ver `apps/web/src/themes/sections.ts`), y los textos
   de la barra de avisos y la suscripción (`settings.texts`, ver `apps/web/src/themes/texts.ts`).
@@ -155,6 +162,10 @@ borra las variables y cambia la contraseña con `admin:create`.
 | PATCH, DELETE | `/admin/stores/:store/discounts/:id` | Editar o borrar un código |
 | POST | `/admin/stores/:store/discounts/:id/feature` | Anunciar ese código en la tienda |
 | POST | `/stores/:store/discounts/check` | ¿Sirve este código? Devuelve el porcentaje (no gasta un uso) |
+| POST | `/stores/:store/wheel/spin` | Gira la ruleta: premio sorteado y firmado |
+| POST | `/stores/:store/wheel/claim` | Correo + giro firmado: guarda al suscriptor y entrega el código |
+| POST | `/stores/:store/subscribers` | Suscripción a novedades desde el pie de página |
+| GET | `/admin/stores/:store/subscribers` | Suscriptores de la tienda |
 
 Las rutas `/admin` piden `Authorization: Bearer <token>` y ser miembro de la tienda.
 
