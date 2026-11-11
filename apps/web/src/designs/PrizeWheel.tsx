@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { claimWheel, spinWheel } from "@/lib/wheel";
-import type { PublicWheel } from "./catalog";
+import { formatCLP, type PublicWheel } from "./catalog";
 import { targetRotation, WheelDisc, type Slice } from "./WheelDisc";
 
 // Ruleta de regalos: aparece una vez por visitante después de unos segundos. El
@@ -17,7 +17,7 @@ const PALETTE: Slice[] = [
 ];
 const SPIN_MS = 5200;
 
-type Saved = { step: "result" | "done"; index: number; label: string; won: boolean; token: string; code?: string | null; percent?: number | null };
+type Saved = { step: "result" | "done"; index: number; label: string; won: boolean; token: string; minSubtotal?: number; code?: string | null; kind?: "PERCENT" | "FREE_SHIPPING" | null; percent?: number | null };
 type Step = "intro" | "spinning" | "result" | "done";
 
 const read = (key: string): Saved | "closed" | null => {
@@ -96,7 +96,7 @@ export function PrizeWheel({ wheel, storeName }: { wheel: PublicWheel; storeName
     setBusy(false);
     if (!res.ok) return setError(res.error);
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const saved: Saved = { step: "result", index: res.index, label: res.label, won: res.won, token: res.token };
+    const saved: Saved = { step: "result", index: res.index, label: res.label, won: res.won, minSubtotal: res.minSubtotal, token: res.token };
     setStep("spinning");
     setRotation((r) => targetRotation(r, res.index, labels.length));
     write(key, saved);
@@ -114,7 +114,7 @@ export function PrizeWheel({ wheel, storeName }: { wheel: PublicWheel; storeName
     const res = await claimWheel(email, spin.token);
     setBusy(false);
     if (!res.ok) return setError(res.error);
-    const done: Saved = { ...spin, step: "done", code: res.code, percent: res.percent };
+    const done: Saved = { ...spin, step: "done", code: res.code, kind: res.kind, percent: res.percent, minSubtotal: res.minSubtotal };
     setSpin(done);
     setStep("done");
     setLauncher(false);
@@ -188,6 +188,7 @@ export function PrizeWheel({ wheel, storeName }: { wheel: PublicWheel; storeName
                 <div className="flex flex-col gap-2">
                   <p className="text-sm font-medium uppercase tracking-wide text-ink/60">{spin.won ? "¡Ganaste!" : "¡Casi!"}</p>
                   <h2 id="ruleta-titulo" className="font-display text-4xl leading-tight">{spin.label}</h2>
+                  {spin.won && (spin.minSubtotal ?? 0) > 0 && <p className="text-base font-medium">En compras desde {formatCLP(spin.minSubtotal ?? 0)}</p>}
                   <p className="text-base text-ink/70">
                     {spin.won
                       ? "Déjanos tu correo para ver tu código y enterarte primero de las novedades y ofertas."
@@ -218,11 +219,12 @@ export function PrizeWheel({ wheel, storeName }: { wheel: PublicWheel; storeName
                 <Gift className="h-12 w-12 text-accent" />
                 {spin.code ? (
                   <>
-                    <h2 id="ruleta-titulo" className="font-display text-3xl leading-tight">Tu código de {spin.percent}%</h2>
+                    <h2 id="ruleta-titulo" className="font-display text-3xl leading-tight">{spin.kind === "FREE_SHIPPING" ? "Tu código de envío gratis" : `Tu código de ${spin.percent}%`}</h2>
                     <button type="button" onClick={copy} className={`w-full border-2 border-dashed border-ink/30 bg-surface px-6 py-4 font-mono text-2xl font-bold tracking-wider ${r}`} aria-label={`Copiar el código ${spin.code}`}>
                       {spin.code}
                     </button>
                     <p className="text-base text-ink/70" aria-live="polite">{copied ? "Copiado." : "Tócalo para copiarlo y escríbelo en el carrito."}</p>
+                    {(spin.minSubtotal ?? 0) > 0 && <p className="-mt-2 text-base font-medium">Válido en compras desde {formatCLP(spin.minSubtotal ?? 0)} en productos.</p>}
                   </>
                 ) : (
                   <>

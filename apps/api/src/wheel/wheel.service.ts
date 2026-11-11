@@ -9,6 +9,7 @@ import type { WheelSettings } from './wheel.schemas.js';
 const KEY = Buffer.from(hkdfSync('sha256', process.env.AUTH_SECRET || randomBytes(32), 'tienda-wheel', 'spin-token', 32));
 const TTL = 30 * 60_000;
 
+type Benefit = { kind: 'PERCENT' | 'FREE_SHIPPING'; percent: number; minSubtotal: number };
 type Spin = { s: string; i: number; c: string; exp: number };
 
 export function signSpin(spin: Omit<Spin, 'exp'>, ttl = TTL): string {
@@ -59,12 +60,14 @@ export class WheelService {
 
   // Códigos que hoy se pueden entregar (activos, vigentes y con usos disponibles).
   private async usable(storeId: string, codes: string[]) {
-    if (!codes.length) return new Map<string, number>();
+    if (!codes.length) return new Map<string, Benefit>();
     const rows = await this.db.discountCode.findMany({
       where: { storeId, code: { in: codes }, active: true, OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }] },
-      select: { code: true, percent: true, maxUses: true, usedCount: true },
+      select: { code: true, kind: true, percent: true, minSubtotal: true, maxUses: true, usedCount: true },
     });
-    return new Map(rows.filter((r) => r.maxUses === null || r.usedCount < r.maxUses).map((r) => [r.code, r.percent]));
+    return new Map(
+      rows.filter((r) => r.maxUses === null || r.usedCount < r.maxUses).map((r): [string, Benefit] => [r.code, { kind: r.kind, percent: r.percent, minSubtotal: r.minSubtotal }]),
+    );
   }
 
   async spin(slug: string) {
@@ -76,7 +79,9 @@ export class WheelService {
     if (!weights.some((w) => w > 0)) throw new NotFoundException('La ruleta no tiene premios disponibles');
     const i = pick(weights);
     const prize = wheel.prizes[i];
-    return { index: i, label: prize.label, won: Boolean(prize.code), token: signSpin({ s: id, i, c: prize.code }) };
+    // La compra mínima se muestra junto al premio, antes de pedir el correo.
+    const benefit = prize.code ? ok.get(prize.code) : undefined;
+    return { index: i, label: prize.label, won: Boolean(prize.code), minSubtotal: benefit?.minSubtotal ?? 0, token: signSpin({ s: id, i, c: prize.code }) };
   }
 
   async claim(slug: string, email: string, token: string) {
@@ -92,9 +97,8 @@ export class WheelService {
       await this.db.subscriber.create({ data: { storeId: id, email, source: 'ruleta', prize: code || null } });
     }
     const repeated = before?.source === 'ruleta';
-    if (!code) return { code: null, percent: null, repeated };
-    const percent = (await this.usable(id, [code])).get(code);
-    return percent ? { code, percent, repeated } : { code: null, percent: null, repeated };
+    const benefit = code ? (await this.usable(id, [code])).get(code) : undefined;
+    return benefit ? { code, ...benefit, repeated } : { code: null, kind: null, percent: null, minSubtotal: 0, repeated };
   }
 
   async subscribe(slug: string, email: string) {

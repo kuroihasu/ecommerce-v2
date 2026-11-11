@@ -34,7 +34,7 @@ hoy y para la plataforma de varias tiendas mañana.
 - `Customer`, `Address`: compradores, con RUT y dirección chilena (región y comuna).
 - `Cart`, `CartItem`: carrito guardado en la base.
 - `Order`, `OrderItem`, `Payment`, `Shipment`: pedidos, pagos por pasarela y despachos.
-- `DiscountCode`: códigos de descuento con porcentaje, usos máximos (vacío = ilimitado), usos hechos, activo y fecha de término.
+- `DiscountCode`: códigos de descuento (porcentaje o envío gratis) con compra mínima, usos máximos (vacío = ilimitado), usos hechos, activo y fecha de término.
 - `Integration`: cuentas de Meta y Google Ads conectadas (token cifrado).
 - `Subscriber`: correos para novedades (ruleta de regalos o pie de página), uno por tienda.
 
@@ -81,7 +81,9 @@ Secciones del panel:
   Google Ads y TikTok (la tienda envía vista de página, vio producto, agregó al carrito e
   inició el pago; ver `apps/web/src/designs/tracking.ts`) y el enlace del catálogo
   `/feeds/productos.xml`, un feed RSS de Google Merchant que también lee el catálogo de Meta.
-- **Descuentos**: varios códigos a la vez, cada uno con su porcentaje (1 a 90%), usos
+- **Descuentos**: varios códigos a la vez. Cada uno regala un porcentaje (1 a 90%) o el
+  envío gratis, y puede pedir una compra mínima en productos (el carrito avisa cuánto falta, y
+  la barra de avisos, la ruleta y la suscripción la muestran). Además: usos
   ilimitados o una cantidad fija, fecha de término opcional y estado (activo, pausado,
   vencido, agotado). Uno se marca «En la tienda»: es el que anuncian la barra de avisos y la
   suscripción. El carrito valida el código con la API; el uso se descuenta al confirmar el

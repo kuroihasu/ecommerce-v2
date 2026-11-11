@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { saveStore } from "@/lib/admin/actions";
-import { defaultTexts, fillText, placeholders, type StoreTexts, type TextData } from "@/themes/texts";
+import { defaultTexts, fillText, hasDiscount, placeholders, withMinimum, type StoreTexts, type TextData } from "@/themes/texts";
 
 const input = "h-10 w-full rounded-lg border border-zinc-300 bg-white px-3 text-[15px]";
 const MAX = 5;
@@ -24,8 +24,8 @@ export function TextsForm({ initial, active, designs, data }: { initial: StoreTe
   // está el interruptor de arriba).
   const written = lines.map((l) => l.trim()).filter(Boolean);
   const announce = own && written.length ? written : d.announce;
-  const usesCode = (t: string) => t.includes("{codigo}") || t.includes("{porcentaje}");
-  const preview = announce.filter((l) => (data.discountCode && data.discountPercent) || !usesCode(l)).map((l) => fillText(l, data));
+  const usesCode = (t: string) => /\{(codigo|porcentaje|descuento|minimo)\}/.test(t);
+  const preview = announce.filter((l) => hasDiscount(data) || !usesCode(l)).map((l) => fillText(withMinimum(l, data), data));
 
   const save = () =>
     start(async () => {
@@ -87,7 +87,7 @@ export function TextsForm({ initial, active, designs, data }: { initial: StoreTe
         </label>
         <label className="flex flex-col gap-1.5 text-sm font-medium">
           Mensaje después de suscribirse
-          <input className={input} value={thanks} maxLength={160} placeholder={fillText(d.newsletterThanks, data)} onChange={(e) => { setThanks(e.target.value); touch(); }} />
+          <input className={input} value={thanks} maxLength={160} placeholder={fillText(withMinimum(d.newsletterThanks, data), data)} onChange={(e) => { setThanks(e.target.value); touch(); }} />
         </label>
       </div>
 

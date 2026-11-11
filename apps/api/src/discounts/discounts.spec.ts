@@ -31,6 +31,11 @@ describe('schemas', () => {
     expect(codeSchema.safeParse('AÑO').success).toBe(false);
   });
 
+  it('un código de envío gratis no pide porcentaje; uno de porcentaje sí', () => {
+    expect(DiscountInput.parse({ code: 'ENVIOGRATIS', kind: 'FREE_SHIPPING', percent: 30, minSubtotal: 30000 })).toMatchObject({ percent: 0, minSubtotal: 30000 });
+    expect(DiscountInput.safeParse({ code: 'VERANO' }).success).toBe(false);
+  });
+
   it('sin cantidad de usos el código queda ilimitado', () => {
     expect(DiscountInput.parse({ code: 'VERANO', percent: 15 }).maxUses).toBeNull();
     expect(DiscountInput.safeParse({ code: 'VERANO', percent: 95 }).success).toBe(false);
@@ -47,7 +52,7 @@ describe('DiscountsService', () => {
 
   it('check devuelve el porcentaje de un código disponible', async () => {
     const { svc } = fake({ code: 'VERANO', percent: 15, maxUses: null, usedCount: 40 });
-    await expect(svc.check('demo', 'VERANO')).resolves.toEqual({ code: 'VERANO', percent: 15 });
+    await expect(svc.check('demo', 'VERANO')).resolves.toMatchObject({ code: 'VERANO', percent: 15 });
   });
 
   it('check rechaza un código sin usos restantes o inexistente', async () => {
@@ -56,9 +61,9 @@ describe('DiscountsService', () => {
   });
 
   it('al editar el código destacado, la tienda muestra el nuevo porcentaje', async () => {
-    const { svc, store } = fake({ id: 'd1', code: 'CLUB', percent: 10, active: true, expiresAt: null }, { discountCode: 'CLUB', name: 'Norte' });
+    const { svc, store } = fake({ id: 'd1', code: 'CLUB', kind: 'PERCENT', percent: 10, minSubtotal: 0, active: true, expiresAt: null }, { discountCode: 'CLUB', name: 'Norte' });
     await svc.update(owner, 'd1', { percent: 20 });
-    expect(store.update.mock.calls[0][0].data.settings).toEqual({ name: 'Norte', discountCode: 'CLUB', discountPercent: 20, discountExpiresAt: null });
+    expect(store.update.mock.calls[0][0].data.settings).toEqual({ name: 'Norte', discountCode: 'CLUB', discountKind: 'PERCENT', discountPercent: 20, discountMin: 0, discountExpiresAt: null });
   });
 
   it('al pausar el código destacado, la tienda deja de anunciarlo', async () => {
@@ -66,6 +71,11 @@ describe('DiscountsService', () => {
     const r = await svc.update(owner, 'd1', { active: false });
     expect(r.featured).toBe(false);
     expect(store.update.mock.calls[0][0].data.settings).toMatchObject({ discountCode: '', discountPercent: 0 });
+  });
+
+  it('no deja cambiar un código de envío gratis a porcentaje sin indicar el porcentaje', async () => {
+    const { svc } = fake({ id: 'd1', code: 'ENVIO', kind: 'FREE_SHIPPING', percent: 0, active: true });
+    await expect(svc.update(owner, 'd1', { kind: 'PERCENT' })).rejects.toThrow('porcentaje');
   });
 
   it('al borrar el código destacado, la tienda deja de anunciarlo', async () => {

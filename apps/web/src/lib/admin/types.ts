@@ -52,6 +52,8 @@ export type StoreSettings = {
   hiddenSections?: string[];
   texts?: { announce?: string[]; newsletterTitle?: string; newsletterThanks?: string };
   discountPercent?: number;
+  discountKind?: "PERCENT" | "FREE_SHIPPING";
+  discountMin?: number;
   wheel?: WheelConfig;
   facebook?: string;
   tracking?: { metaPixelId?: string; ga4Id?: string; googleAdsId?: string; tiktokPixelId?: string };
@@ -89,7 +91,9 @@ export type Insights = {
 export type AdminDiscount = {
   id: string;
   code: string;
+  kind: "PERCENT" | "FREE_SHIPPING";
   percent: number;
+  minSubtotal: number;
   maxUses: number | null;
   usedCount: number;
   active: boolean;
@@ -97,7 +101,7 @@ export type AdminDiscount = {
   createdAt: string;
   featured: boolean;
 };
-export type DiscountPayload = Pick<AdminDiscount, "code" | "percent" | "maxUses" | "active" | "expiresAt">;
+export type DiscountPayload = Pick<AdminDiscount, "code" | "kind" | "percent" | "minSubtotal" | "maxUses" | "active" | "expiresAt">;
 
 // Ruleta de regalos (settings.wheel). code vacío = premio sin descuento.
 export type WheelPrizeConfig = { label: string; code: string; weight: number };

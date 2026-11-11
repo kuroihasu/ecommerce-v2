@@ -43,7 +43,10 @@ const store = {
   whatsapp: "+56 9 1234 5678",
   // Código destacado (Descuentos): lo anuncian la barra de avisos y la suscripción.
   discountCode: "NORTECLUB",
+  discountKind: "PERCENT" as "PERCENT" | "FREE_SHIPPING",
   discountPercent: 10,
+  // Compra mínima en productos para usar el código destacado (0 = sin mínimo).
+  discountMin: 0,
   discountExpiresAt: null as string | null,
   shippingRM: 3500,
   shippingRegions: 5990,

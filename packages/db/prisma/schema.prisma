@@ -43,17 +43,26 @@ model Store {
 
 // Código que el cliente escribe en el carrito. `maxUses` vacío = usos ilimitados.
 // `usedCount` lo suma el checkout al confirmar un pago (ver DiscountsService.redeem).
+// PERCENT descuenta `percent` de los productos; FREE_SHIPPING deja el envío en $0
+// (percent queda en 0). minSubtotal: compra mínima en productos para usarlo (0 = sin mínimo).
+enum DiscountKind {
+  PERCENT
+  FREE_SHIPPING
+}
+
 model DiscountCode {
-  id        String    @id @default(cuid())
-  storeId   String
-  code      String
-  percent   Int
-  maxUses   Int?
-  usedCount Int       @default(0)
-  active    Boolean   @default(true)
-  expiresAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id          String       @id @default(cuid())
+  storeId     String
+  code        String
+  kind        DiscountKind @default(PERCENT)
+  percent     Int
+  minSubtotal Int          @default(0)
+  maxUses     Int?
+  usedCount   Int          @default(0)
+  active      Boolean      @default(true)
+  expiresAt   DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 
   store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
 

@@ -9,7 +9,7 @@ import { SubscriberList } from "./SubscriberList";
 // Ruleta por defecto: los códigos activos (hasta 4) y un "Sigue participando".
 function starter(codes: AdminDiscount[]): WheelConfig {
   const live = codes.filter((c) => c.active).slice(0, 4);
-  const prizes = live.map((c) => ({ label: `${c.percent}% OFF`, code: c.code, weight: 25 }));
+  const prizes = live.map((c) => ({ label: c.kind === "FREE_SHIPPING" ? "Envío gratis" : `${c.percent}% OFF`, code: c.code, weight: 25 }));
   prizes.push({ label: "Sigue participando", code: "", weight: 10 });
   if (prizes.length < 2) prizes.push({ label: "Sorpresa", code: "", weight: 10 });
   return { enabled: false, title: "Gira y gana", subtitle: "Prueba tu suerte y llévate un descuento para tu compra.", delaySeconds: 8, prizes };

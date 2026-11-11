@@ -26,7 +26,9 @@ export default async function AdvancedPage() {
         designs={themes.map((t) => ({ id: t.id, name: t.name }))}
         data={{
           discountCode: store.settings.discountCode ?? "",
+          discountKind: store.settings.discountKind ?? "PERCENT",
           discountPercent: store.settings.discountPercent ?? 0,
+          discountMin: store.settings.discountMin ?? 0,
           freeShippingFrom: store.settings.freeShippingFrom ?? demoCatalog.store.freeShippingFrom,
           installments: store.settings.installments ?? demoCatalog.store.installments,
         }}

@@ -9,7 +9,7 @@ export default async function DiscountsPage() {
     <AdminShell current="/admin/descuentos">
       <h1 className="mb-1 text-2xl font-semibold">Descuentos</h1>
       <p className="mb-6 text-zinc-600">
-        Crea los códigos que tus clientes escriben en el carrito. Cada uno tiene su porcentaje, cuántas veces se puede usar y, si quieres, una fecha de término.
+        Crea los códigos que tus clientes escriben en el carrito. Cada uno regala un porcentaje o el envío gratis, y puede pedir una compra mínima, tener un límite de usos y una fecha de término.
       </p>
       <DiscountManager initial={codes} />
     </AdminShell>

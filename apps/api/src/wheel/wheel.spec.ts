@@ -17,7 +17,7 @@ const wheel = {
   ],
 };
 
-function fake(opts: { codes?: { code: string; percent: number; maxUses: number | null; usedCount: number }[]; subscriber?: Record<string, unknown> | null; w?: unknown } = {}) {
+function fake(opts: { codes?: { code: string; kind: string; percent: number; minSubtotal: number; maxUses: number | null; usedCount: number }[]; subscriber?: Record<string, unknown> | null; w?: unknown } = {}) {
   const subscriber = {
     findUnique: vi.fn().mockResolvedValue(opts.subscriber ?? null),
     create: vi.fn().mockResolvedValue({}),
@@ -71,25 +71,31 @@ describe('WheelService', () => {
   });
 
   it('un premio con el código pausado o agotado no sale', async () => {
-    const { svc } = fake({ codes: [{ code: 'RULETA20', percent: 20, maxUses: null, usedCount: 0 }, { code: 'RULETA10', percent: 10, maxUses: 5, usedCount: 5 }] });
+    const { svc } = fake({ codes: [{ code: 'RULETA20', kind: 'PERCENT', percent: 20, minSubtotal: 0, maxUses: null, usedCount: 0 }, { code: 'RULETA10', kind: 'PERCENT', percent: 10, minSubtotal: 0, maxUses: 5, usedCount: 5 }] });
     for (let n = 0; n < 20; n++) expect((await svc.spin('demo')).label).toBe('20% OFF');
   });
 
   it('al dejar el correo entrega el código del giro y guarda al suscriptor', async () => {
-    const { svc, subscriber } = fake({ codes: [{ code: 'RULETA20', percent: 20, maxUses: null, usedCount: 0 }] });
+    const { svc, subscriber } = fake({ codes: [{ code: 'RULETA20', kind: 'PERCENT', percent: 20, minSubtotal: 0, maxUses: null, usedCount: 0 }] });
     const r = await svc.claim('demo', 'ana@correo.cl', signSpin({ s: 's1', i: 1, c: 'RULETA20' }));
-    expect(r).toEqual({ code: 'RULETA20', percent: 20, repeated: false });
+    expect(r).toEqual({ code: 'RULETA20', kind: 'PERCENT', percent: 20, minSubtotal: 0, repeated: false });
     expect(subscriber.create.mock.calls[0][0].data).toMatchObject({ email: 'ana@correo.cl', source: 'ruleta', prize: 'RULETA20' });
   });
 
   it('un correo que ya participó recibe su premio anterior, no uno nuevo', async () => {
     const { svc, subscriber } = fake({
       subscriber: { id: 'x', source: 'ruleta', prize: 'RULETA10' },
-      codes: [{ code: 'RULETA10', percent: 10, maxUses: null, usedCount: 0 }],
+      codes: [{ code: 'RULETA10', kind: 'PERCENT', percent: 10, minSubtotal: 0, maxUses: null, usedCount: 0 }],
     });
     const r = await svc.claim('demo', 'ana@correo.cl', signSpin({ s: 's1', i: 1, c: 'RULETA20' }));
-    expect(r).toEqual({ code: 'RULETA10', percent: 10, repeated: true });
+    expect(r).toEqual({ code: 'RULETA10', kind: 'PERCENT', percent: 10, minSubtotal: 0, repeated: true });
     expect(subscriber.create).not.toHaveBeenCalled();
+  });
+
+  it('un premio de envío gratis entrega el código con su compra mínima', async () => {
+    const { svc } = fake({ codes: [{ code: 'ENVIO', kind: 'FREE_SHIPPING', percent: 0, minSubtotal: 30000, maxUses: null, usedCount: 0 }] });
+    const r = await svc.claim('demo', 'b@correo.cl', signSpin({ s: 's1', i: 0, c: 'ENVIO' }));
+    expect(r).toMatchObject({ code: 'ENVIO', kind: 'FREE_SHIPPING', minSubtotal: 30000 });
   });
 
   it('rechaza un giro de otra tienda', async () => {

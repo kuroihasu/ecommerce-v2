@@ -8,6 +8,7 @@ import { targetRotation, WheelDisc, type Slice } from "@/designs/WheelDisc";
 
 const input = "h-10 w-full rounded-lg border border-zinc-300 bg-white px-3 text-[15px] font-normal";
 const MAX = 8;
+const autoLabel = (d: AdminDiscount) => (d.kind === "FREE_SHIPPING" ? "Envío gratis" : `${d.percent}% OFF`);
 
 function usable(c: AdminDiscount | undefined) {
   if (!c) return false;
@@ -39,8 +40,8 @@ export function WheelForm({ initial, codes, palette }: { initial: WheelConfig; c
     const prev = byCode.get(p.code);
     const next = byCode.get(code);
     // Si el texto era el automático del código anterior, se actualiza solo.
-    const auto = !p.label || (prev && p.label === `${prev.percent}% OFF`) || (!p.code && p.label === "Sigue participando");
-    setPrize(i, { code, ...(auto ? { label: next ? `${next.percent}% OFF` : "Sigue participando" } : {}) });
+    const auto = !p.label || (prev && p.label === autoLabel(prev)) || (!p.code && p.label === "Sigue participando");
+    setPrize(i, { code, ...(auto ? { label: next ? autoLabel(next) : "Sigue participando" } : {}) });
   };
 
   const test = () => {
@@ -117,7 +118,7 @@ export function WheelForm({ initial, codes, palette }: { initial: WheelConfig; c
                     <select className={`${input} col-span-2 sm:col-span-1`} value={p.code} onChange={(e) => pickCode(i, e.target.value)} aria-label={`Código del premio ${i + 1}`}>
                       <option value="">Sin premio (solo suscribirse)</option>
                       {codes.map((d) => (
-                        <option key={d.id} value={d.code}>{d.code} · {d.percent}%{usable(d) ? "" : " (no disponible)"}</option>
+                        <option key={d.id} value={d.code}>{d.code} · {d.kind === "FREE_SHIPPING" ? "envío gratis" : `${d.percent}%`}{d.minSubtotal > 0 ? ` desde $${d.minSubtotal.toLocaleString("es-CL")}` : ""}{usable(d) ? "" : " (no disponible)"}</option>
                       ))}
                       {p.code && !c && <option value={p.code}>{p.code} (borrado)</option>}
                     </select>

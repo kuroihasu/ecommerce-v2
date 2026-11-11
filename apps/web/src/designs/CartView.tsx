@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useTransition } from "react";
-import { checkDiscount } from "@/lib/discounts";
+import { checkDiscount, type DiscountKind } from "@/lib/discounts";
 import { formatCLP, installment } from "./catalog";
 import { useCatalogData } from "./CatalogProvider";
 import { useCart } from "./cart";
@@ -20,14 +20,20 @@ export function CartView({ direction, base, checkoutLabel = "Ir a pagar", round 
   const { store } = useCatalogData();
   const [region, setRegion] = useState<"rm" | "regiones">("rm");
   const [code, setCode] = useState("");
-  const [applied, setApplied] = useState<{ code: string; percent: number } | null>(null);
+  const [applied, setApplied] = useState<{ code: string; kind: DiscountKind; percent: number; minSubtotal: number } | null>(null);
   const [codeError, setCodeError] = useState<string | null>(null);
   const [checking, startCheck] = useTransition();
   const r = round ? "rounded-full" : "rounded-brand";
 
-  const discount = applied ? Math.round((cart.subtotal * applied.percent) / 100) : 0;
+  // El código vale si el subtotal de productos llega a su compra mínima; si no, queda
+  // aplicado pero en espera, con un aviso de cuánto falta.
+  const shortBy = applied ? Math.max(0, applied.minSubtotal - cart.subtotal) : 0;
+  const active = applied && shortBy === 0 ? applied : null;
+  const freeByCode = active?.kind === "FREE_SHIPPING";
+  const discount = active?.kind === "PERCENT" ? Math.round((cart.subtotal * active.percent) / 100) : 0;
   const afterDiscount = cart.subtotal - discount;
-  const shipping = afterDiscount >= store.freeShippingFrom ? 0 : region === "rm" ? store.shippingRM : store.shippingRegions;
+  const baseShipping = afterDiscount >= store.freeShippingFrom ? 0 : region === "rm" ? store.shippingRM : store.shippingRegions;
+  const shipping = freeByCode ? 0 : baseShipping;
   const total = afterDiscount + shipping;
   const missing = store.freeShippingFrom - afterDiscount;
 
@@ -47,10 +53,10 @@ export function CartView({ direction, base, checkoutLabel = "Ir a pagar", round 
       <div className="flex flex-col gap-4">
         <div className="rounded-brand bg-surface p-5">
           <p className="mb-3 text-base">
-            {missing > 0 ? `Te faltan ${formatCLP(missing)} para el envío gratis.` : "¡Tu pedido tiene envío gratis!"}
+            {freeByCode || missing <= 0 ? "¡Tu pedido tiene envío gratis!" : `Te faltan ${formatCLP(missing)} para el envío gratis.`}
           </p>
           <div className="h-2 overflow-hidden rounded-full bg-bg">
-            <div className="h-full rounded-full bg-accent transition-[width] duration-700" style={{ width: `${Math.min(100, (afterDiscount / store.freeShippingFrom) * 100)}%` }} />
+            <div className="h-full rounded-full bg-accent transition-[width] duration-700" style={{ width: `${freeByCode ? 100 : Math.min(100, (afterDiscount / store.freeShippingFrom) * 100)}%` }} />
           </div>
         </div>
         <ul className="flex flex-col gap-4">
@@ -82,7 +88,7 @@ export function CartView({ direction, base, checkoutLabel = "Ir a pagar", round 
             e.preventDefault();
             startCheck(async () => {
               const res = await checkDiscount(code);
-              setApplied(res.ok ? { code: res.code, percent: res.percent } : null);
+              setApplied(res.ok ? { code: res.code, kind: res.kind, percent: res.percent, minSubtotal: res.minSubtotal } : null);
               setCodeError(res.ok ? null : res.error);
             });
           }}
@@ -97,7 +103,14 @@ export function CartView({ direction, base, checkoutLabel = "Ir a pagar", round 
           />
           <button disabled={checking} className={`h-12 bg-ink px-5 text-base text-bg disabled:opacity-60 ${r}`}>{checking ? "Revisando…" : "Aplicar"}</button>
         </form>
-        <p aria-live="polite" className="-mt-3 text-base empty:hidden">{codeError}</p>
+        <p aria-live="polite" className="-mt-3 text-base empty:hidden">
+          {codeError ??
+            (applied && shortBy > 0
+              ? `${applied.code} pide una compra mínima de ${formatCLP(applied.minSubtotal)}. Te faltan ${formatCLP(shortBy)} en productos para usarlo.`
+              : applied && applied.minSubtotal > 0
+                ? `${applied.code} aplicado (compra mínima ${formatCLP(applied.minSubtotal)}).`
+                : null)}
+        </p>
 
         <fieldset className="flex gap-2 text-base">
           <legend className="mb-2">Envío</legend>
@@ -116,8 +129,8 @@ export function CartView({ direction, base, checkoutLabel = "Ir a pagar", round 
 
         <dl className="flex flex-col gap-2 text-lg">
           <div className="flex justify-between"><dt>Subtotal</dt><dd className="tabular-nums">{formatCLP(cart.subtotal)}</dd></div>
-          {discount > 0 && <div className="flex justify-between"><dt>{applied?.code} (−{applied?.percent}%)</dt><dd className="tabular-nums">−{formatCLP(discount)}</dd></div>}
-          <div className="flex justify-between"><dt>Envío</dt><dd className="tabular-nums">{shipping === 0 ? "Gratis" : formatCLP(shipping)}</dd></div>
+          {discount > 0 && <div className="flex justify-between"><dt>{active?.code} (−{active?.percent}%)</dt><dd className="tabular-nums">−{formatCLP(discount)}</dd></div>}
+          <div className="flex justify-between"><dt>Envío{freeByCode && baseShipping > 0 ? ` (${active?.code})` : ""}</dt><dd className="tabular-nums">{shipping === 0 ? (freeByCode && baseShipping > 0 ? <><s className="mr-2 opacity-60">{formatCLP(baseShipping)}</s>Gratis</> : "Gratis") : formatCLP(shipping)}</dd></div>
           <div className="mt-3 flex justify-between text-2xl"><dt>Total</dt><dd className="tabular-nums">{formatCLP(total)}</dd></div>
         </dl>
         <p className="-mt-2 text-base">o {store.installments} cuotas sin interés de {installment(total, store.installments)}</p>

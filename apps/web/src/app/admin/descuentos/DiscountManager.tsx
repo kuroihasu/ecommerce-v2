@@ -4,6 +4,9 @@ import { useState, useTransition, type ReactNode } from "react";
 import { deleteDiscount, featureDiscount, saveDiscount, setDiscountActive } from "@/lib/admin/actions";
 import type { AdminDiscount, DiscountPayload } from "@/lib/admin/types";
 
+const clp = (n: number) => `$${n.toLocaleString("es-CL")}`;
+const benefit = (d: Pick<AdminDiscount, "kind" | "percent">) => (d.kind === "FREE_SHIPPING" ? "Envío gratis" : `${d.percent}%`);
+
 const input = "h-10 w-full rounded-lg border border-zinc-300 bg-white px-3 font-normal";
 const TZ = "America/Santiago";
 
@@ -21,11 +24,14 @@ function status(d: AdminDiscount): Status {
   return { label: "Activo", tone: "bg-emerald-50 text-emerald-800", live: true };
 }
 
-type Draft = { code: string; percent: string; limited: boolean; maxUses: string; expires: boolean; day: string; active: boolean };
-const empty: Draft = { code: "", percent: "10", limited: false, maxUses: "100", expires: false, day: "", active: true };
+type Draft = { code: string; kind: AdminDiscount["kind"]; percent: string; hasMin: boolean; min: string; limited: boolean; maxUses: string; expires: boolean; day: string; active: boolean };
+const empty: Draft = { code: "", kind: "PERCENT", percent: "10", hasMin: false, min: "30000", limited: false, maxUses: "100", expires: false, day: "", active: true };
 const toDraft = (d: AdminDiscount): Draft => ({
   code: d.code,
-  percent: String(d.percent),
+  kind: d.kind,
+  percent: String(d.percent || 10),
+  hasMin: d.minSubtotal > 0,
+  min: String(d.minSubtotal || 30000),
   limited: d.maxUses !== null,
   maxUses: String(d.maxUses ?? 100),
   expires: d.expiresAt !== null,
@@ -65,13 +71,18 @@ function Editor({ editing, onDone, onCancel }: { editing: AdminDiscount | null; 
     e.preventDefault();
     const percent = Number(f.percent);
     const maxUses = Number(f.maxUses);
+    const min = Number(f.min);
+    const free = f.kind === "FREE_SHIPPING";
     if (!/^[A-Z0-9_-]{3,30}$/.test(f.code)) return setError("El código debe tener entre 3 y 30 letras sin tilde, números o guiones, sin espacios.");
-    if (!Number.isInteger(percent) || percent < 1 || percent > 90) return setError("El porcentaje va de 1% a 90%.");
+    if (!free && (!Number.isInteger(percent) || percent < 1 || percent > 90)) return setError("El porcentaje va de 1% a 90%.");
+    if (f.hasMin && (!Number.isInteger(min) || min < 1)) return setError("Indica el monto de la compra mínima.");
     if (f.limited && (!Number.isInteger(maxUses) || maxUses < 1)) return setError("Indica cuántas veces se puede usar el código (1 o más).");
     if (f.expires && !f.day) return setError("Elige hasta qué día vale el código.");
     const payload: DiscountPayload = {
       code: f.code,
-      percent,
+      kind: f.kind,
+      percent: free ? 0 : percent,
+      minSubtotal: f.hasMin ? min : 0,
       maxUses: f.limited ? maxUses : null,
       expiresAt: f.expires ? fromDay(f.day) : null,
       active: f.active,
@@ -90,12 +101,36 @@ function Editor({ editing, onDone, onCancel }: { editing: AdminDiscount | null; 
         <Field label="Código" hint="Lo que el cliente escribe en el carrito. Ej: VERANO15">
           <input className={`${input} uppercase`} value={f.code} onChange={(e) => set({ code: e.target.value.toUpperCase().replace(/\s/g, "") })} maxLength={30} required />
         </Field>
+        <fieldset className="flex flex-col gap-2">
+          <legend className="mb-1.5 text-sm font-medium">¿Qué regala?</legend>
+          <Choice name="kind" checked={f.kind === "PERCENT"} onChange={() => set({ kind: "PERCENT" })}>Un porcentaje de descuento</Choice>
+          <Choice name="kind" checked={f.kind === "FREE_SHIPPING"} onChange={() => set({ kind: "FREE_SHIPPING" })}>Envío gratis</Choice>
+        </fieldset>
+        {f.kind === "PERCENT" ? (
         <Field label="Descuento">
           <span className="relative">
             <input className={`${input} pr-8`} inputMode="numeric" value={f.percent} onChange={(e) => set({ percent: e.target.value.replace(/\D/g, "").slice(0, 2) })} aria-label="Porcentaje de descuento" required />
             <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-zinc-500">%</span>
           </span>
         </Field>
+        ) : (
+          <p className="self-end rounded-lg bg-zinc-50 p-3 text-sm text-zinc-600">El envío queda en $0 en el carrito, a Santiago y a regiones.</p>
+        )}
+
+        <fieldset className="flex flex-col gap-2 md:col-span-2">
+          <legend className="mb-1.5 text-sm font-medium">¿Pide una compra mínima?</legend>
+          <Choice name="min" checked={!f.hasMin} onChange={() => set({ hasMin: false })}>No, sirve para cualquier compra</Choice>
+          <Choice name="min" checked={f.hasMin} onChange={() => set({ hasMin: true })}>Sí, desde un monto en productos</Choice>
+          {f.hasMin && (
+            <span className="ml-6 flex flex-col gap-1">
+              <span className="relative w-40">
+                <span className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-zinc-500">$</span>
+                <input className={`${input} pl-7`} inputMode="numeric" value={f.min} onChange={(e) => set({ min: e.target.value.replace(/\D/g, "").slice(0, 9) })} aria-label="Compra mínima" />
+              </span>
+              <span className="text-xs text-zinc-500">El carrito avisa cuánto le falta al cliente, y la barra de avisos, la ruleta y la suscripción muestran el mínimo.</span>
+            </span>
+          )}
+        </fieldset>
 
         <fieldset className="flex flex-col gap-2">
           <legend className="mb-1.5 text-sm font-medium">¿Cuántas veces se puede usar?</legend>
@@ -205,7 +240,10 @@ export function DiscountManager({ initial }: { initial: AdminDiscount[] }) {
                         <span className="font-mono font-medium">{d.code}</span>
                         {d.featured && <span className="ml-2 rounded bg-zinc-900 px-1.5 py-0.5 text-[11px] font-medium text-white">En la tienda</span>}
                       </td>
-                      <td className="py-3 pr-3 tabular-nums">{d.percent}%</td>
+                      <td className="py-3 pr-3 tabular-nums">
+                        {benefit(d)}
+                        {d.minSubtotal > 0 && <span className="block text-xs text-zinc-500">desde {clp(d.minSubtotal)}</span>}
+                      </td>
                       <td className="py-3 pr-3 tabular-nums">{d.maxUses === null ? `${d.usedCount} · ilimitado` : `${d.usedCount} de ${d.maxUses}`}</td>
                       <td className="py-3 pr-3">{d.expiresAt ? showDay(d.expiresAt) : <span className="text-zinc-500">Sin fecha</span>}</td>
                       <td className="py-3 pr-3"><span className={`rounded-full px-2 py-0.5 text-xs font-medium ${st.tone}`}>{st.label}</span></td>
