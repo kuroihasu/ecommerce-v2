@@ -134,10 +134,10 @@ export function CartView({ direction, base, checkoutLabel = "Ir a pagar", round 
           <div className="mt-3 flex justify-between text-2xl"><dt>Total</dt><dd className="tabular-nums">{formatCLP(total)}</dd></div>
         </dl>
         <p className="-mt-2 text-base">o {store.installments} cuotas sin interés de {installment(total, store.installments)}</p>
-        <a href="#checkout" onClick={() => trackBeginCheckout(cart.lines.map((l) => ({ id: l.variant.id, group: l.product.slug, name: l.product.name, price: l.variant.price, qty: l.qty })))} className={`bg-bg px-6 py-4 text-center text-lg text-ink transition-transform active:scale-[0.98] ${r}`}>
+        <Link href={`${base}/checkout?${new URLSearchParams({ ...(active ? { codigo: active.code } : {}), envio: region })}`} onClick={() => trackBeginCheckout(cart.lines.map((l) => ({ id: l.variant.id, group: l.product.slug, name: l.product.name, price: l.variant.price, qty: l.qty })))} className={`bg-bg px-6 py-4 text-center text-lg text-ink transition-transform active:scale-[0.98] ${r}`}>
           {checkoutLabel}
-        </a>
-        <p className="text-sm">Paga con Webpay, Mercado Pago o Venti. Cambios gratis dentro de 30 días.</p>
+        </Link>
+        <p className="text-sm">Pago seguro en el sitio de la pasarela. Cambios gratis dentro de 30 días.</p>
       </aside>
     </div>
   );

@@ -39,6 +39,7 @@ model Store {
   subscribers   Subscriber[]
   stockMoves    StockMovement[]
   ledger        LedgerEntry[]
+  gateways      PaymentGateway[]
 }
 
 // ─── Códigos de descuento ───────────────────────────────────────────
@@ -313,6 +314,8 @@ model Order {
   // Copia de la dirección al momento de la compra.
   shippingAddress Json
   notes           String?
+  // Código de descuento usado (su uso se descuenta al confirmarse el pago).
+  discountCode    String?
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 
@@ -370,6 +373,26 @@ model Payment {
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@index([provider, externalId])
+}
+
+// Medios de pago de cada tienda (panel > Pagos). Webpay guarda el código de comercio en
+// `config` y la llave secreta cifrada en `secretEnc`; Mercado Pago, su access token
+// cifrado; la transferencia, los datos de la cuenta en `config`. `live` = cobra de
+// verdad (si no, usa el ambiente de prueba de la pasarela).
+model PaymentGateway {
+  id        String          @id @default(cuid())
+  storeId   String
+  provider  PaymentProvider
+  enabled   Boolean         @default(false)
+  live      Boolean         @default(false)
+  config    Json            @default("{}")
+  secretEnc String?
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@unique([storeId, provider])
 }
 
 enum ShipmentStatus {

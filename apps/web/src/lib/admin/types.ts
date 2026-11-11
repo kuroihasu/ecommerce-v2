@@ -162,3 +162,27 @@ export type AccountingSummary = {
 };
 export type AccountingReport = { period: { from: string; to: string }; summary: AccountingSummary; sales: SaleLine[]; entries: LedgerEntry[] };
 export type MonthRow = { month: string; sales: number; income: number; expenses: number };
+// Pagos y pedidos (panel > Pagos y Pedidos).
+export type GatewayConfig = {
+  webpay: { enabled: boolean; live: boolean; commerceCode: string; hasKey: boolean };
+  mercadopago: { enabled: boolean; hasToken: boolean; test: boolean };
+  transfer: { enabled: boolean; bank: string; accountType: string; accountNumber: string; holder: string; rut: string; email: string };
+};
+export type OrderStatus = "PENDING" | "PAID" | "FULFILLED" | "DELIVERED" | "CANCELLED" | "REFUNDED";
+export type AdminOrder = {
+  id: string;
+  number: number;
+  email: string;
+  status: OrderStatus;
+  subtotal: number;
+  shippingTotal: number;
+  discountTotal: number;
+  discountCode: string | null;
+  total: number;
+  notes: string | null;
+  createdAt: string;
+  shippingAddress: { name?: string; phone?: string; rut?: string | null; region?: string; comuna?: string; street?: string; number?: string; apartment?: string | null };
+  items: { name: string; sku: string | null; unitPrice: number; quantity: number }[];
+  payments: { method: "webpay" | "mercadopago" | "transfer"; status: "PENDING" | "AUTHORIZED" | "FAILED" | "REFUNDED"; amount: number; raw: Record<string, unknown> | null; createdAt: string }[];
+  shipments: { carrier: string; trackingNumber: string | null; status: string }[];
+};

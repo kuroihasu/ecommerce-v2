@@ -7,7 +7,7 @@ import { STORE_SLUG } from "@/lib/catalog";
 import { PREVIEW_COOKIE } from "@/themes/resolve";
 import { adminApi, apiLogin, ApiError } from "./api";
 import { clearSession, setSession } from "./session";
-import type { ActionResult, AdminCategory, AdminDiscount, AdminProduct, AdminStore, DiscountPayload, EntryPayload, IntegrationSlug, LedgerEntry, ProductPayload, StockAdjust, StockMovement } from "./types";
+import type { ActionResult, AdminCategory, AdminDiscount, AdminOrder, AdminProduct, AdminStore, DiscountPayload, EntryPayload, GatewayConfig, IntegrationSlug, LedgerEntry, ProductPayload, StockAdjust, StockMovement } from "./types";
 import { adminOrigin } from "./origin";
 
 // Acciones del panel. Cada una reenvía la sesión a la API, que valida permisos;
@@ -189,6 +189,15 @@ export async function adjustStock(input: StockAdjust): Promise<ActionResult<{ va
   }
 }
 
+// Medios de pago (panel > Pagos). Las llaves viajan a la API, que las guarda cifradas.
+export async function saveGateway(provider: "webpay" | "mercadopago" | "transfer", body: Record<string, unknown>): Promise<ActionResult<GatewayConfig>> {
+  try {
+    return { ok: true, data: await adminApi<GatewayConfig>(`/payments/${provider}`, { method: "PUT", body }) };
+  } catch (e) {
+    return fail(e);
+  }
+}
+
 export async function setVariantCost(variantId: string, cost: number | null): Promise<ActionResult> {
   try {
     await adminApi(`/inventory/${encodeURIComponent(variantId)}/cost`, { method: "PATCH", body: { cost } });
@@ -214,6 +223,17 @@ export async function deleteEntry(id: string): Promise<ActionResult> {
   try {
     await adminApi(`/accounting/entries/${encodeURIComponent(id)}`, { method: "DELETE" });
     return { ok: true, data: undefined };
+  } catch (e) {
+    return fail(e);
+  }
+}
+
+export async function updateOrder(id: string, patch: { status?: string; carrier?: string; trackingNumber?: string }): Promise<ActionResult<AdminOrder>> {
+  try {
+    const order = await adminApi<AdminOrder>(`/orders/${encodeURIComponent(id)}`, { method: "PATCH", body: patch });
+    // El stock cambia al marcar un pago: la tienda se refresca.
+    if (patch.status === "PAID") updateTag("store");
+    return { ok: true, data: order };
   } catch (e) {
     return fail(e);
   }

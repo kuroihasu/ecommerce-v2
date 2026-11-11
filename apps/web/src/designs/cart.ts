@@ -79,5 +79,8 @@ export function useCart(direction: string) {
       const cur = read(key);
       write(key, qty <= 0 ? cur.filter((l) => l.variantId !== variantId) : cur.map((l) => (l.variantId === variantId ? { ...l, qty } : l)));
     },
+    clear() {
+      write(key, []);
+    },
   };
 }

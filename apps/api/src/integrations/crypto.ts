@@ -50,3 +50,15 @@ export function verifyState(state: string): OAuthState | null {
     return null;
   }
 }
+
+// Llave de acceso a un pedido para el comprador (va en el enlace de la página del
+// pedido): sin sesión, solo quien tiene el enlace puede ver el pedido.
+const orderMac = (orderId: string) => createHmac('sha256', derive('order-access')).update(orderId).digest('base64url').slice(0, 32);
+
+export const orderKey = (orderId: string) => orderMac(orderId);
+
+export function verifyOrderKey(orderId: string, key: string) {
+  const a = Buffer.from(orderMac(orderId));
+  const b = Buffer.from(String(key));
+  return a.length === b.length && timingSafeEqual(a, b);
+}

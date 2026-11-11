@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { claimWheel, spinWheel } from "@/lib/wheel";
 import { formatCLP, type PublicWheel } from "./catalog";
 import { targetRotation, WheelDisc, type Slice } from "./WheelDisc";
@@ -44,7 +45,15 @@ function Gift({ className = "" }: { className?: string }) {
   );
 }
 
-export function PrizeWheel({ wheel, storeName, raised = false }: { wheel: PublicWheel; storeName: string; raised?: boolean }) {
+// Mientras el cliente paga o mira su pedido, la ruleta no aparece: no lo distrae ni le
+// ofrece un descuento que ya no puede usar.
+export function PrizeWheel(props: { wheel: PublicWheel; storeName: string; raised?: boolean }) {
+  const path = usePathname();
+  if (path.startsWith("/checkout") || path.startsWith("/pedido") || path.startsWith("/pago")) return null;
+  return <Wheel {...props} />;
+}
+
+function Wheel({ wheel, storeName, raised = false }: { wheel: PublicWheel; storeName: string; raised?: boolean }) {
   const key = `ruleta:${storeName}`;
   const [open, setOpen] = useState(false);
   const [launcher, setLauncher] = useState(false);
