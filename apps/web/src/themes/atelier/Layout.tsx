@@ -1,25 +1,22 @@
 import Link from "next/link";
 import { CartCount } from "@/designs/BuyBox";
 import { AnnouncementRotator, Newsletter } from "@/designs/extras";
-import { formatCLP } from "@/designs/catalog";
 import { getCatalog } from "@/lib/catalog";
 import { sectionVisible } from "@/themes/sections";
+import { storeTexts } from "@/themes/texts";
 
 
 
 export async function Layout({ children }: { children: React.ReactNode }) {
   const { store } = await getCatalog();
   const show = sectionVisible(store);
+  const texts = storeTexts(store, "atelier");
   return (
     <div className="flex min-h-screen flex-col bg-bg font-body text-ink">
-      {show("announce") && (
+      {show("announce") && texts.announce.length > 0 && (
         <AnnouncementRotator
           className="bg-field text-field-ink"
-          items={[
-            `Envío gratis sobre ${formatCLP(store.freeShippingFrom)}`,
-            `${store.installments} cuotas sin interés con Mercado Pago`,
-            `10% en tu primera compra con el código ${store.discountCode}`,
-          ]}
+          items={texts.announce}
         />
       )}
       <header className="sticky top-0 z-30 bg-bg">
@@ -43,8 +40,8 @@ export async function Layout({ children }: { children: React.ReactNode }) {
         <div className="mx-auto grid max-w-[1440px] gap-12 md:grid-cols-[2fr_1fr_1fr]">
           {show("newsletter") && (
             <div className="flex flex-col gap-5">
-              <p className="font-display text-4xl leading-tight">10% en tu primera compra</p>
-              <Newsletter inputClass="bg-bg text-ink" buttonClass="bg-ink text-bg" />
+              <p className="font-display text-4xl leading-tight">{texts.newsletterTitle}</p>
+              <Newsletter thanks={texts.newsletterThanks} inputClass="bg-bg text-ink" buttonClass="bg-ink text-bg" />
             </div>
           )}
           <div className="flex flex-col gap-2 text-lg">

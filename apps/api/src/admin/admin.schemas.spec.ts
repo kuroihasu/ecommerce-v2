@@ -25,3 +25,15 @@ describe('SettingsInput.hiddenSections', () => {
     expect(() => SettingsInput.parse({ hiddenSections: ['<b>'] })).toThrow();
   });
 });
+
+describe('SettingsInput.texts', () => {
+  it('acepta hasta 5 avisos y limpia espacios', () => {
+    expect(SettingsInput.parse({ texts: { announce: [' Envío gratis '] } }).texts?.announce).toEqual(['Envío gratis']);
+    expect(() => SettingsInput.parse({ texts: { announce: Array(6).fill('aviso') } })).toThrow();
+    expect(() => SettingsInput.parse({ texts: { announce: ['x'.repeat(121)] } })).toThrow();
+  });
+
+  it('el código destacado ya no se cambia desde los datos de la tienda', () => {
+    expect(SettingsInput.parse({ discountCode: 'OTRO' })).not.toHaveProperty('discountCode');
+  });
+});

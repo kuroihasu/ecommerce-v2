@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { checkDiscount } from "@/lib/discounts";
 import { formatCLP, installment } from "./catalog";
 import { useCatalogData } from "./CatalogProvider";
 import { useCart } from "./cart";
@@ -19,11 +20,12 @@ export function CartView({ direction, base, checkoutLabel = "Ir a pagar", round 
   const { store } = useCatalogData();
   const [region, setRegion] = useState<"rm" | "regiones">("rm");
   const [code, setCode] = useState("");
-  const [applied, setApplied] = useState(false);
-  const [codeError, setCodeError] = useState(false);
+  const [applied, setApplied] = useState<{ code: string; percent: number } | null>(null);
+  const [codeError, setCodeError] = useState<string | null>(null);
+  const [checking, startCheck] = useTransition();
   const r = round ? "rounded-full" : "rounded-brand";
 
-  const discount = applied ? Math.round(cart.subtotal * 0.1) : 0;
+  const discount = applied ? Math.round((cart.subtotal * applied.percent) / 100) : 0;
   const afterDiscount = cart.subtotal - discount;
   const shipping = afterDiscount >= store.freeShippingFrom ? 0 : region === "rm" ? store.shippingRM : store.shippingRegions;
   const total = afterDiscount + shipping;
@@ -78,9 +80,11 @@ export function CartView({ direction, base, checkoutLabel = "Ir a pagar", round 
           className="flex gap-2"
           onSubmit={(e) => {
             e.preventDefault();
-            const ok = code.trim().toUpperCase() === store.discountCode;
-            setApplied(ok);
-            setCodeError(!ok);
+            startCheck(async () => {
+              const res = await checkDiscount(code);
+              setApplied(res.ok ? { code: res.code, percent: res.percent } : null);
+              setCodeError(res.ok ? null : res.error);
+            });
           }}
         >
           <label className="sr-only" htmlFor={`code-${direction}`}>Código de descuento</label>
@@ -88,12 +92,12 @@ export function CartView({ direction, base, checkoutLabel = "Ir a pagar", round 
             id={`code-${direction}`}
             value={code}
             onChange={(e) => setCode(e.target.value)}
-            placeholder={`Código (prueba ${store.discountCode})`}
+            placeholder={store.discountCode ? `Código (prueba ${store.discountCode})` : "Código de descuento"}
             className={`h-12 min-w-0 flex-1 bg-bg px-4 text-base text-ink ${r}`}
           />
-          <button className={`h-12 bg-ink px-5 text-base text-bg ${r}`}>Aplicar</button>
+          <button disabled={checking} className={`h-12 bg-ink px-5 text-base text-bg disabled:opacity-60 ${r}`}>{checking ? "Revisando…" : "Aplicar"}</button>
         </form>
-        {codeError && <p className="-mt-3 text-base">Ese código no existe.</p>}
+        <p aria-live="polite" className="-mt-3 text-base empty:hidden">{codeError}</p>
 
         <fieldset className="flex gap-2 text-base">
           <legend className="mb-2">Envío</legend>
@@ -112,7 +116,7 @@ export function CartView({ direction, base, checkoutLabel = "Ir a pagar", round 
 
         <dl className="flex flex-col gap-2 text-lg">
           <div className="flex justify-between"><dt>Subtotal</dt><dd className="tabular-nums">{formatCLP(cart.subtotal)}</dd></div>
-          {discount > 0 && <div className="flex justify-between"><dt>{store.discountCode} (−10%)</dt><dd className="tabular-nums">−{formatCLP(discount)}</dd></div>}
+          {discount > 0 && <div className="flex justify-between"><dt>{applied?.code} (−{applied?.percent}%)</dt><dd className="tabular-nums">−{formatCLP(discount)}</dd></div>}
           <div className="flex justify-between"><dt>Envío</dt><dd className="tabular-nums">{shipping === 0 ? "Gratis" : formatCLP(shipping)}</dd></div>
           <div className="mt-3 flex justify-between text-2xl"><dt>Total</dt><dd className="tabular-nums">{formatCLP(total)}</dd></div>
         </dl>

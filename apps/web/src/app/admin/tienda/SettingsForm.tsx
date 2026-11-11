@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition, type ReactNode } from "react";
 import { saveStore } from "@/lib/admin/actions";
 import type { AdminStore, StoreSettings } from "@/lib/admin/types";
@@ -35,7 +36,6 @@ export function SettingsForm({ store }: { store: AdminStore }) {
         settings: {
           tagline: s.tagline ?? "",
           email: s.email ?? "",
-          discountCode: s.discountCode ?? "",
           shippingRM: s.shippingRM ?? 0,
           shippingRegions: s.shippingRegions ?? 0,
           freeShippingFrom: s.freeShippingFrom ?? 0,
@@ -58,7 +58,7 @@ export function SettingsForm({ store }: { store: AdminStore }) {
         <Field label="Envío a regiones ($)"><input className={input} inputMode="numeric" value={s.shippingRegions ?? 0} onChange={(e) => set({ shippingRegions: num(e.target.value) })} /></Field>
         <Field label="Envío gratis desde ($)" hint="0 para no ofrecer envío gratis."><input className={input} inputMode="numeric" value={s.freeShippingFrom ?? 0} onChange={(e) => set({ freeShippingFrom: num(e.target.value) })} /></Field>
         <Field label="Cuotas sin interés"><input className={input} inputMode="numeric" value={s.installments ?? 1} onChange={(e) => set({ installments: num(e.target.value) })} /></Field>
-        <Field label="Código de descuento (10% en la primera compra)"><input className={input + " uppercase"} value={s.discountCode ?? ""} onChange={(e) => set({ discountCode: e.target.value.toUpperCase() })} maxLength={30} /></Field>
+        <p className="text-sm text-zinc-500 md:col-span-2">Los códigos de descuento ahora se manejan en <Link href="/admin/descuentos" className="underline">Descuentos</Link>.</p>
 
         <h2 className="mt-2 text-lg font-semibold md:col-span-2">Próximo lanzamiento</h2>
         <p className="-mt-2 text-sm text-zinc-500 md:col-span-2">Muestra una cuenta regresiva en la portada del diseño Vitrina. Déjalo vacío para ocultarla.</p>

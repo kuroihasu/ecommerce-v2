@@ -27,14 +27,15 @@ export function AnnouncementRotator({ items, className = "" }: { items: string[]
 }
 
 // Suscripción con descuento de bienvenida (en la preview no envía nada).
-export function Newsletter({ className = "", inputClass = "", buttonClass = "", label = "Suscribirme" }: {
+export function Newsletter({ className = "", inputClass = "", buttonClass = "", label = "Suscribirme", thanks = "Listo. Ya estás suscrito." }: {
   className?: string;
+  thanks?: string;
   inputClass?: string;
   buttonClass?: string;
   label?: string;
 }) {
   const [sent, setSent] = useState(false);
-  if (sent) return <p className={`text-xl ${className}`}>Listo. Revisa tu correo: ahí va tu código de 10%.</p>;
+  if (sent) return <p className={`text-xl ${className}`}>{thanks}</p>;
   return (
     <form
       className={`flex flex-col gap-3 sm:flex-row ${className}`}

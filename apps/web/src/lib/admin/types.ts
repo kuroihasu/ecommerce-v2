@@ -50,6 +50,8 @@ export type StoreSettings = {
   installments?: number;
   nextDrop?: { name: string; date: string } | null;
   hiddenSections?: string[];
+  texts?: { announce?: string[]; newsletterTitle?: string; newsletterThanks?: string };
+  discountPercent?: number;
   facebook?: string;
   tracking?: { metaPixelId?: string; ga4Id?: string; googleAdsId?: string; tiktokPixelId?: string };
 };
@@ -81,3 +83,17 @@ export type Insights = {
   instagram: { username: string; followers: number | null; posts: SocialPost[] } | null;
   ads: { account: string | null; currency: string; campaigns: Campaign[] } | null;
 };
+
+// Códigos de descuento (ver apps/api/src/discounts). maxUses null = ilimitado.
+export type AdminDiscount = {
+  id: string;
+  code: string;
+  percent: number;
+  maxUses: number | null;
+  usedCount: number;
+  active: boolean;
+  expiresAt: string | null;
+  createdAt: string;
+  featured: boolean;
+};
+export type DiscountPayload = Pick<AdminDiscount, "code" | "percent" | "maxUses" | "active" | "expiresAt">;

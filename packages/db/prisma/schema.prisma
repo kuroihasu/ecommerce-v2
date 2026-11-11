@@ -28,13 +28,35 @@ model Store {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  members      StoreMember[]
-  categories   Category[]
-  products     Product[]
-  customers    Customer[]
-  carts        Cart[]
-  orders       Order[]
-  integrations Integration[]
+  members       StoreMember[]
+  categories    Category[]
+  products      Product[]
+  customers     Customer[]
+  carts         Cart[]
+  orders        Order[]
+  integrations  Integration[]
+  discountCodes DiscountCode[]
+}
+
+// ─── Códigos de descuento ───────────────────────────────────────────
+
+// Código que el cliente escribe en el carrito. `maxUses` vacío = usos ilimitados.
+// `usedCount` lo suma el checkout al confirmar un pago (ver DiscountsService.redeem).
+model DiscountCode {
+  id        String    @id @default(cuid())
+  storeId   String
+  code      String
+  percent   Int
+  maxUses   Int?
+  usedCount Int       @default(0)
+  active    Boolean   @default(true)
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@unique([storeId, code])
 }
 
 // ─── Cuentas externas (Meta, Google) ────────────────────────────────

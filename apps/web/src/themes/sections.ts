@@ -8,5 +8,5 @@ export const sectionVisible = (store: { hiddenSections?: string[] }) => (id: str
 // Partes del marco (arriba y abajo de todas las páginas), comunes a los cuatro diseños.
 export const layoutSections: SectionDef[] = [
   { id: "announce", label: "Barra de avisos", hint: "La franja de arriba con envío gratis, cuotas y código de descuento." },
-  { id: "newsletter", label: "Suscripción al correo", hint: "El formulario del pie de página que ofrece 10% de descuento." },
+  { id: "newsletter", label: "Suscripción al correo", hint: "El formulario del pie de página que ofrece el descuento de bienvenida." },
 ];

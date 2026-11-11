@@ -63,7 +63,7 @@ export async function Home() {
           </div>
           <div className="flex flex-col gap-3">
             <Countdown date={drop.date} className="text-5xl font-black [font-stretch:62%] md:min-w-[460px] md:text-6xl" cellClass="bg-ink text-bg" />
-            <Newsletter inputClass="bg-bg text-ink" buttonClass="bg-ink text-bg font-semibold uppercase" label="Avísame" />
+            <Newsletter thanks="Listo. Te avisamos antes del lanzamiento." inputClass="bg-bg text-ink" buttonClass="bg-ink text-bg font-semibold uppercase" label="Avísame" />
           </div>
         </section>
         )}

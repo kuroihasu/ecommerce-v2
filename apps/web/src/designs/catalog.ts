@@ -3,6 +3,8 @@
 // Los datos reales salen de la API (lib/catalog.ts); esta muestra es el respaldo
 // cuando la API no responde, por ejemplo en desarrollo sin base de datos.
 
+import type { StoreTexts } from "@/themes/texts";
+
 export type Badge = "nuevo" | "preventa" | "ultimas";
 export type Line = "mujer" | "hombre" | "unisex";
 export type CategorySlug = string;
@@ -39,7 +41,10 @@ const store = {
   instagram: "@norte.cl",
   tiktok: "@norte.cl",
   whatsapp: "+56 9 1234 5678",
+  // Código destacado (Descuentos): lo anuncian la barra de avisos y la suscripción.
   discountCode: "NORTECLUB",
+  discountPercent: 10,
+  discountExpiresAt: null as string | null,
   shippingRM: 3500,
   shippingRegions: 5990,
   freeShippingFrom: 60000,
@@ -51,6 +56,8 @@ const store = {
   tracking: {} as Tracking,
   // Secciones ocultas desde el panel (Avanzado). Ver src/themes/sections.ts.
   hiddenSections: [] as string[],
+  // Textos propios de la barra de avisos y la suscripción. Ver src/themes/texts.ts.
+  texts: {} as StoreTexts,
 };
 
 export type Tracking = { metaPixelId?: string; ga4Id?: string; googleAdsId?: string; tiktokPixelId?: string };

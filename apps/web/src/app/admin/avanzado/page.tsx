@@ -4,6 +4,8 @@ import { getThemeDef, themes } from "@/themes/registry";
 import { layoutSections } from "@/themes/sections";
 import { AdminShell } from "../AdminShell";
 import { SectionsForm } from "./SectionsForm";
+import { TextsForm } from "./TextsForm";
+import { demoCatalog } from "@/designs/catalog";
 
 export default async function AdvancedPage() {
   const store = await adminApi<AdminStore>("");
@@ -17,6 +19,17 @@ export default async function AdvancedPage() {
         active={active}
         layout={layoutSections}
         designs={themes.map((t) => ({ id: t.id, name: t.name, sections: t.sections }))}
+      />
+      <TextsForm
+        initial={store.settings.texts ?? {}}
+        active={active}
+        designs={themes.map((t) => ({ id: t.id, name: t.name }))}
+        data={{
+          discountCode: store.settings.discountCode ?? "",
+          discountPercent: store.settings.discountPercent ?? 0,
+          freeShippingFrom: store.settings.freeShippingFrom ?? demoCatalog.store.freeShippingFrom,
+          installments: store.settings.installments ?? demoCatalog.store.installments,
+        }}
       />
     </AdminShell>
   );

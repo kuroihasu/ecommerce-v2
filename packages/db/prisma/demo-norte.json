@@ -9,6 +9,7 @@
       "tiktok": "@norte.cl",
       "whatsapp": "+56 9 1234 5678",
       "discountCode": "NORTECLUB",
+      "discountPercent": 10,
       "shippingRM": 3500,
       "shippingRegions": 5990,
       "freeShippingFrom": 60000,

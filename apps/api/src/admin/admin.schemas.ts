@@ -24,13 +24,11 @@ export const SettingsInput = z.object({
   instagram: text(60).optional(),
   tiktok: text(60).optional(),
   whatsapp: text(30).optional(),
-  discountCode: text(30).toUpperCase().optional(),
   shippingRM: money.optional(),
   shippingRegions: money.optional(),
   freeShippingFrom: money.optional(),
   installments: z.number().int().min(1).max(48).optional(),
   nextDrop: z.object({ name: text(80).min(1), date: z.iso.datetime({ offset: true }) }).nullable().optional(),
-  // Ids de secciones ocultas (ver apps/web/src/themes/sections.ts).
   facebook: text(100).optional(),
   // Píxeles de publicidad. Cada id se valida con su formato para que la tienda nunca
   // inyecte algo que no sea un id en el <script> del píxel.
@@ -42,7 +40,17 @@ export const SettingsInput = z.object({
       tiktokPixelId: z.union([z.string().trim().toUpperCase().regex(/^[A-Z0-9]{10,30}$/, 'El ID del píxel de TikTok son letras y números'), z.literal('')]).optional(),
     })
     .optional(),
+  // Ids de secciones ocultas (ver apps/web/src/themes/sections.ts).
   hiddenSections: z.array(z.string().regex(/^[a-z][a-z0-9-]{0,39}$/)).max(50).optional(),
+  // Textos propios de la barra de avisos y la suscripción (Avanzado). Vacío = el texto
+  // del diseño. Admiten {codigo}, {porcentaje}, {envio_gratis} y {cuotas}.
+  texts: z
+    .object({
+      announce: z.array(text(120).min(1)).max(5).optional(),
+      newsletterTitle: text(120).optional(),
+      newsletterThanks: text(160).optional(),
+    })
+    .optional(),
 });
 
 export const StoreInput = z.object({

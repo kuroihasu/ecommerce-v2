@@ -3,19 +3,21 @@ import { CartCount } from "@/designs/BuyBox";
 import { Newsletter } from "@/designs/extras";
 import { getCatalog } from "@/lib/catalog";
 import { sectionVisible } from "@/themes/sections";
+import { storeTexts } from "@/themes/texts";
 
 
 
 export async function Layout({ children }: { children: React.ReactNode }) {
   const { store } = await getCatalog();
   const show = sectionVisible(store);
+  const texts = storeTexts(store, "vitrina");
   return (
     <div className="flex min-h-screen flex-col bg-bg font-body text-ink">
-      {show("announce") && (
+      {show("announce") && texts.announce.length > 0 && (
         <div className="overflow-hidden bg-accent py-2 text-base font-semibold text-accent-ink">
           <div className="marquee flex w-max gap-12 whitespace-nowrap">
             {Array.from({ length: 8 }).map((_, i) => (
-              <span key={i}>Envíos a todo Chile · 10% OFF con el código {store.discountCode} · {store.installments} cuotas sin interés ·</span>
+              <span key={i}>{texts.announce.join(" · ")} ·</span>
             ))}
           </div>
         </div>
@@ -44,8 +46,8 @@ export async function Layout({ children }: { children: React.ReactNode }) {
         <div className="grid gap-10 px-4 py-16 text-lg sm:px-6 md:grid-cols-[2fr_1fr_1fr]">
           {show("newsletter") && (
             <div className="flex flex-col gap-5">
-              <p className="text-5xl font-black uppercase leading-[0.85] [font-stretch:62%]">Entra al club: 10% OFF</p>
-              <Newsletter inputClass="bg-bg text-ink" buttonClass="bg-accent text-accent-ink font-semibold" label="Quiero mi código" />
+              <p className="text-5xl font-black uppercase leading-[0.85] [font-stretch:62%]">{texts.newsletterTitle}</p>
+              <Newsletter thanks={texts.newsletterThanks} inputClass="bg-bg text-ink" buttonClass="bg-accent text-accent-ink font-semibold" label="Quiero mi código" />
             </div>
           )}
           <div className="flex flex-col gap-2">

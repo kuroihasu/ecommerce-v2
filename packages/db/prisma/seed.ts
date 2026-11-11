@@ -51,6 +51,16 @@ async function main() {
     create: { slug: "demo", name: demo.store.name, theme: THEME, settings: demo.store.settings as object },
   });
 
+  // El código destacado de la demo también existe como código real (10%, ilimitado).
+  const featured = (store.settings as { discountCode?: string } | null)?.discountCode;
+  if (featured) {
+    await prisma.discountCode.upsert({
+      where: { storeId_code: { storeId: store.id, code: featured } },
+      update: {},
+      create: { storeId: store.id, code: featured, percent: 10 },
+    });
+  }
+
   await prisma.product.updateMany({
     where: { storeId: store.id, slug: { in: LEGACY_SLUGS } },
     data: { status: "ARCHIVED" },

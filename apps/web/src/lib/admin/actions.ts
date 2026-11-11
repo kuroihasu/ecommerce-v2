@@ -7,7 +7,7 @@ import { STORE_SLUG } from "@/lib/catalog";
 import { PREVIEW_COOKIE } from "@/themes/resolve";
 import { adminApi, apiLogin, ApiError } from "./api";
 import { clearSession, setSession } from "./session";
-import type { ActionResult, AdminCategory, AdminProduct, AdminStore, IntegrationSlug, ProductPayload } from "./types";
+import type { ActionResult, AdminCategory, AdminDiscount, AdminProduct, AdminStore, DiscountPayload, IntegrationSlug, ProductPayload } from "./types";
 import { adminOrigin } from "./origin";
 
 // Acciones del panel. Cada una reenvía la sesión a la API, que valida permisos;
@@ -127,6 +127,50 @@ export async function disconnectIntegration(provider: string): Promise<ActionRes
   if (!isProvider(provider)) return { ok: false, error: "Proveedor desconocido" };
   try {
     await adminApi(`/integrations/${provider}`, { method: "DELETE" });
+    return { ok: true, data: undefined };
+  } catch (e) {
+    return fail(e);
+  }
+}
+
+// Códigos de descuento. El id llega del navegador: se codifica para la ruta.
+// Se refresca la tienda porque el código destacado aparece en la barra de avisos.
+export async function saveDiscount(id: string | null, payload: DiscountPayload): Promise<ActionResult<AdminDiscount>> {
+  try {
+    const data = id
+      ? await adminApi<AdminDiscount>(`/discounts/${encodeURIComponent(id)}`, { method: "PATCH", body: payload })
+      : await adminApi<AdminDiscount>("/discounts", { method: "POST", body: payload });
+    updateTag("store");
+    return { ok: true, data };
+  } catch (e) {
+    return fail(e);
+  }
+}
+
+export async function setDiscountActive(id: string, active: boolean): Promise<ActionResult<AdminDiscount>> {
+  try {
+    const data = await adminApi<AdminDiscount>(`/discounts/${encodeURIComponent(id)}`, { method: "PATCH", body: { active } });
+    updateTag("store");
+    return { ok: true, data };
+  } catch (e) {
+    return fail(e);
+  }
+}
+
+export async function deleteDiscount(id: string): Promise<ActionResult> {
+  try {
+    await adminApi(`/discounts/${encodeURIComponent(id)}`, { method: "DELETE" });
+    updateTag("store");
+    return { ok: true, data: undefined };
+  } catch (e) {
+    return fail(e);
+  }
+}
+
+export async function featureDiscount(id: string): Promise<ActionResult> {
+  try {
+    await adminApi(`/discounts/${encodeURIComponent(id)}/feature`, { method: "POST" });
+    updateTag("store");
     return { ok: true, data: undefined };
   } catch (e) {
     return fail(e);
