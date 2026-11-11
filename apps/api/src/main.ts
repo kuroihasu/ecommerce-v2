@@ -3,7 +3,8 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // rawBody: el webhook de WhatsApp verifica la firma de Meta sobre el cuerpo tal como llegó.
+  const app = await NestFactory.create(AppModule, { rawBody: true });
   // WEB_ORIGIN acepta varias URLs separadas por coma (producción, previews, local).
   const origins = (process.env.WEB_ORIGIN ?? 'http://localhost:3000').split(',').map((o) => o.trim());
   app.enableCors({ origin: origins });

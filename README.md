@@ -38,6 +38,7 @@ hoy y para la plataforma de varias tiendas mañana.
 - `Integration`: cuentas de Meta y Google Ads conectadas (token cifrado).
 - `Subscriber`: correos para novedades (ruleta de regalos o pie de página), uno por tienda.
 - `StockMovement`: historial de cada cambio de stock (cuánto, por qué y cuánto quedó).
+- `WhatsappAssistant`, `WaConversation`, `WaMessage`: asistente de WhatsApp (credenciales cifradas), conversaciones y mensajes.
 - `LedgerEntry`: ingresos y gastos anotados a mano en Contabilidad (total con IVA y el IVA que incluye).
 
 Los montos son enteros en la moneda de la tienda (CLP no usa decimales).
@@ -121,7 +122,9 @@ Secciones del panel:
   el sorteo. El servidor sortea y firma el resultado, los códigos no salen en la API
   pública, un premio con el código pausado, vencido o agotado no sale, y un correo participa
   una sola vez. La misma página lista los suscriptores y los descarga en CSV.
-- **Chat de WhatsApp**: botón de chat en la tienda que responde solo las preguntas frecuentes
+- **Asistente de WhatsApp**: un asistente con IA (Claude) que atiende el WhatsApp de la tienda.
+  Ver [Asistente de WhatsApp](#asistente-de-whatsapp).
+- **Chat de la tienda**: botón de chat en la tienda que responde solo las preguntas frecuentes
   (el dueño escribe preguntas y respuestas, con datos que se completan solos como el costo de
   envío). El cliente toca una pregunta o la escribe y el chat busca la más parecida; si no hay
   respuesta, o la pregunta lo pide, ofrece "Hablar con una persona", que abre el WhatsApp del
@@ -214,6 +217,54 @@ conectas un dominio propio (p. ej. `https://mitienda.cl`), agrégalo ahí o el c
 En un preview de Vercel con protección, Webpay vuelve por POST desde otro sitio y Vercel
 puede pedir login antes de mostrar el pedido. En producción (sin protección) no pasa.
 
+### Asistente de WhatsApp
+
+En **Panel → Asistente de WhatsApp** la tienda conecta su número de WhatsApp Business (Cloud API de
+Meta) a un asistente con Claude. El asistente:
+
+- responde dudas con los datos de envío y pago de la tienda, las preguntas frecuentes de «Chat de la
+  tienda» y las indicaciones que escriba el dueño (horario, cambios, tono);
+- busca productos con su precio, tallas y colores con stock, y manda el enlace (`buscar_productos`);
+- muestra el estado de un pedido solo si el cliente da el número **y** el correo de la compra
+  (`estado_pedido`). Si no cuadran responde lo mismo exista o no el pedido, y 5 intentos fallidos en
+  una hora bloquean la consulta en esa conversación;
+- pasa la conversación a una persona (`derivar_a_persona`) cuando el cliente lo pide, hay un reclamo,
+  un cambio o devolución, o no sabe la respuesta. Desde ahí calla hasta que el equipo la devuelva.
+
+No toma pedidos ni cobra por chat: manda a la tienda online. Las herramientas son de solo lectura.
+
+Pestañas: **Conversaciones** (todas las conversaciones, las que necesitan persona primero; el equipo
+responde desde ahí dentro de las 24 horas que permite WhatsApp, y al hacerlo el asistente se pausa en
+esa conversación), **Probar** (chatear con el asistente como si fueras cliente, sin WhatsApp, con el
+catálogo y los pedidos reales) y **Configurar**.
+
+Para conectarlo:
+
+1. API key de Claude (platform.claude.com → API keys). Se cobra por uso a la cuenta de quien la crea.
+   También sirve `ANTHROPIC_API_KEY` en la API para todas las tiendas. Modelo a elegir: Claude Opus 5.5
+   (por defecto), Sonnet 5.5 o Haiku 5.5 (el más económico).
+2. En developers.facebook.com, una app de tipo *Empresa* con el producto *WhatsApp*; el número de la
+   tienda agregado ahí (no puede seguir en la app de WhatsApp del teléfono) y su *Identificador del
+   número de teléfono*; un token permanente de un usuario del sistema con
+   `whatsapp_business_messaging` y `whatsapp_business_management`; y la *Clave secreta de la app*.
+3. En la app de Meta → WhatsApp → Configuración → Webhook: la URL `https://<api>/whatsapp/<tienda>/webhook`
+   y el token de verificación que muestra el panel; suscribirse al campo `messages`.
+
+Empieza en **modo prueba**: solo responde a los números que pongas (el tuyo); los demás mensajes se
+guardan pero no se responden. Cuando funcione, cambia a «A todos los clientes».
+
+Seguridad y costos: tokens, clave secreta y API key van cifrados (`INTEGRATIONS_KEY` o `AUTH_SECRET`)
+y guardarlos pide el código de 2FA (solo dueño y administradores). Cada aviso de Meta se verifica con
+la firma `X-Hub-Signature-256` sobre el cuerpo crudo; sin la clave secreta no se procesa nada. Un
+mensaje repetido por Meta no se responde dos veces (el id del mensaje es único). Cada cliente tiene un
+tope de 30 respuestas por hora; al pasarlo, la conversación pasa al equipo. Al asistente se le mandan
+los últimos 20 mensajes, con esfuerzo bajo y caché del texto de instrucciones. Si la IA falla, el
+cliente recibe un aviso y la conversación queda para el equipo. Los audios y fotos no se procesan: el
+asistente pide escribir.
+
+Para probar sin red, `WHATSAPP_API_URL` y `ANTHROPIC_BASE_URL` en la API apuntan a simuladores
+(`WHATSAPP_API_URL` se ignora en producción).
+
 ### Verificación en dos pasos
 
 En **Panel → Seguridad** cada persona puede activar la verificación en dos pasos: escanea un
@@ -288,6 +339,13 @@ borra las variables y cambia la contraseña con `admin:create`.
 | PATCH | `/admin/stores/:store/orders/:id` | Cambiar estado: pagado, anulado, despachado, entregado |
 | GET | `/admin/stores/:store/payments` | Configuración de pagos (sin secretos) |
 | PUT | `/admin/stores/:store/payments/webpay\|mercadopago\|transfer` | Guardar un medio de pago |
+| GET | `/whatsapp/:store/webhook` | Verificación del webhook de WhatsApp (Meta) |
+| POST | `/whatsapp/:store/webhook` | Mensajes de WhatsApp (firmados por Meta); responde el asistente |
+| GET, PUT | `/admin/stores/:store/whatsapp` | Configuración del asistente (PUT pide 2FA) |
+| GET | `/admin/stores/:store/whatsapp/conversations` | Conversaciones de WhatsApp |
+| GET, PATCH | `/admin/stores/:store/whatsapp/conversations/:id` | Mensajes; pasar al asistente, a una persona o cerrar |
+| POST | `/admin/stores/:store/whatsapp/conversations/:id/reply` | Responder como la tienda |
+| GET, POST, DELETE | `/admin/stores/:store/whatsapp/test` | Probar el asistente desde el panel |
 
 Las rutas `/admin` piden `Authorization: Bearer <token>` y ser miembro de la tienda.
 

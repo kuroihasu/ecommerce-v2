@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { adminApi } from "@/lib/admin/api";
 import type { AdminStore } from "@/lib/admin/types";
 import { demoCatalog } from "@/designs/catalog";
@@ -10,9 +11,10 @@ export default async function ChatPage() {
   const s = { ...demoCatalog.store, ...store.settings, name: store.name } as typeof demoCatalog.store;
   return (
     <AdminShell current="/admin/chat">
-      <h1 className="mb-1 text-2xl font-semibold">Chat de WhatsApp</h1>
+      <h1 className="mb-1 text-2xl font-semibold">Chat de la tienda</h1>
       <p className="mb-6 text-zinc-600">
         Un botón de chat en la tienda que responde solo las preguntas frecuentes. Si el cliente necesita algo más, lo pasa a tu WhatsApp con su pregunta ya escrita.
+        Estas mismas preguntas y respuestas las usa el <Link href="/admin/whatsapp" className="underline">Asistente de WhatsApp</Link> para atender por WhatsApp.
       </p>
       <ChatForm
         initial={store.settings.chat ?? defaultChat(store.settings.whatsapp ?? "")}
