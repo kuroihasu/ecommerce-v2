@@ -40,6 +40,8 @@ model Store {
   stockMoves    StockMovement[]
   ledger        LedgerEntry[]
   gateways      PaymentGateway[]
+  billing       BillingConfig?
+  dtes          Dte[]
 }
 
 // ─── Códigos de descuento ───────────────────────────────────────────
@@ -361,6 +363,7 @@ model Order {
   items     OrderItem[]
   payments  Payment[]
   shipments Shipment[]
+  dte       Dte?
 
   @@unique([storeId, number])
   @@index([storeId, status])
@@ -539,4 +542,65 @@ model LedgerEntry {
   store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
   @@index([storeId, date])
+}
+
+// ─── Boletas electrónicas (SII) ─────────────────────────────────────
+
+// Emisión de boletas con un proveedor autorizado (por ahora OpenFactura de Haulmer):
+// el proveedor guarda el certificado digital y los folios (CAF) de la empresa y firma y
+// envía cada boleta al SII. Aquí se guarda solo la API key (cifrada) y los datos del
+// emisor que van impresos. `live` = emite de verdad; si no, usa el ambiente de prueba del
+// proveedor (CAF simulado, no llega al SII). `exempt` = la tienda vende productos exentos
+// de IVA (boleta exenta, tipo 41).
+model BillingConfig {
+  storeId   String   @id
+  provider  String   @default("openfactura")
+  enabled   Boolean  @default(false)
+  live      Boolean  @default(false)
+  exempt    Boolean  @default(false)
+  // { rut, name, activity, address, comuna, branchCode }
+  issuer    Json     @default("{}")
+  apiKeyEnc String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+}
+
+enum DteStatus {
+  ISSUING // enviándose al proveedor
+  ISSUED // el proveedor la recibió y asignó folio
+  FAILED // el proveedor la rechazó o no respondió: se puede reintentar
+}
+
+// Una boleta por pedido (orderId único). Montos con IVA; `netAmount` + `taxAmount` =
+// `total` (en una exenta, `exemptAmount` = `total`). El PDF no se guarda: se pide al
+// proveedor con `token` cuando alguien lo descarga.
+model Dte {
+  id           String    @id @default(cuid())
+  storeId      String
+  orderId      String?   @unique
+  // 39 boleta electrónica, 41 boleta exenta electrónica.
+  type         Int
+  folio        Int?
+  status       DteStatus @default(ISSUING)
+  // Emitida en el ambiente de prueba del proveedor (no vale ante el SII).
+  test         Boolean   @default(false)
+  provider     String
+  token        String?
+  total        Int
+  netAmount    Int       @default(0)
+  taxAmount    Int       @default(0)
+  exemptAmount Int       @default(0)
+  receiverRut  String
+  issueDate    DateTime? @db.Date
+  error        String?
+  attempts     Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  store Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  order Order? @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([storeId, createdAt])
 }

@@ -7,14 +7,16 @@ const TZ = "America/Santiago";
 const day = (iso: string) => new Intl.DateTimeFormat("en-CA", { timeZone: TZ }).format(new Date(iso));
 const when = (iso: string) => new Intl.DateTimeFormat("es-CL", { timeZone: TZ, day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
 const STATUS: Record<string, string> = { PAID: "Pagado", FULFILLED: "Despachado", DELIVERED: "Entregado" };
+// Boleta electrónica de la venta (39 boleta, 41 exenta). Las de prueba no valen ante el SII.
+const docName = (o: SaleLine) => (!o.receipt ? "Sin boleta" : `${o.receipt.type === 41 ? "Boleta exenta" : "Boleta"}${o.receipt.test ? " (prueba)" : ""}`);
 
 // Libro de ventas de la tienda online y descarga del resumen del período.
 export function SalesBook({ sales, period, summary: s, entries }: { sales: SaleLine[]; period: { from: string; to: string }; summary: AccountingSummary; entries: LedgerEntry[] }) {
   const suffix = `${period.from}-a-${period.to}`;
   const exportSales = () =>
     downloadCsv(`ventas-online-${suffix}.csv`, [
-      ["fecha", "pedido", "cliente", "estado", "unidades", "productos", "envio", "descuento", "neto", "iva", "total"],
-      ...sales.map((o) => [day(o.date), o.number, o.email, STATUS[o.status] ?? o.status, o.units, o.products, o.shipping, o.discount, o.total - o.tax, o.tax, o.total]),
+      ["fecha", "pedido", "cliente", "estado", "documento", "folio", "unidades", "productos", "envio", "descuento", "neto", "iva", "total"],
+      ...sales.map((o) => [day(o.date), o.number, o.email, STATUS[o.status] ?? o.status, docName(o), o.receipt?.folio ?? "", o.units, o.products, o.shipping, o.discount, o.total - o.tax, o.tax, o.total]),
     ]);
   const exportSummary = () =>
     downloadCsv(`resumen-${suffix}.csv`, [
@@ -40,7 +42,7 @@ export function SalesBook({ sales, period, summary: s, entries }: { sales: SaleL
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold">Ventas de la tienda online</h2>
-          <p className="text-sm text-zinc-500">Pedidos pagados, despachados o entregados. Se suman solos, no hay que anotarlos.</p>
+          <p className="text-sm text-zinc-500">Pedidos pagados, despachados o entregados, con su boleta electrónica. Se suman solos, no hay que anotarlos.</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <button type="button" onClick={exportSummary} className="h-10 rounded-lg border border-zinc-300 px-4 text-sm hover:bg-zinc-50">Descargar resumen</button>
@@ -58,6 +60,7 @@ export function SalesBook({ sales, period, summary: s, entries }: { sales: SaleL
                 <th className="py-2 pr-3 font-medium">Fecha</th>
                 <th className="py-2 pr-3 font-medium">Cliente</th>
                 <th className="py-2 pr-3 font-medium">Estado</th>
+                <th className="py-2 pr-3 font-medium">Boleta</th>
                 <th className="py-2 pr-3 text-right font-medium">IVA</th>
                 <th className="py-2 text-right font-medium">Total</th>
               </tr>
@@ -69,6 +72,7 @@ export function SalesBook({ sales, period, summary: s, entries }: { sales: SaleL
                   <td className="whitespace-nowrap py-2.5 pr-3 text-zinc-600">{when(o.date)}</td>
                   <td className="py-2.5 pr-3">{o.email}</td>
                   <td className="py-2.5 pr-3">{STATUS[o.status] ?? o.status}</td>
+                  <td className="py-2.5 pr-3 text-zinc-600">{o.receipt ? `${o.receipt.folio ? `N° ${o.receipt.folio}` : "Emitida"}${o.receipt.test ? " (prueba)" : ""}` : "—"}</td>
                   <td className="py-2.5 pr-3 text-right tabular-nums text-zinc-600">{clp(o.tax)}</td>
                   <td className="py-2.5 text-right font-medium tabular-nums">{clp(o.total)}</td>
                 </tr>

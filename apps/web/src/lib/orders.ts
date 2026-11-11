@@ -42,6 +42,8 @@ export type PublicOrder = {
   payment: { method: Method; status: "PENDING" | "AUTHORIZED" | "FAILED" | "REFUNDED"; pending: boolean } | null;
   transfer: TransferDetails | null;
   methods: Methods | null;
+  // Boleta electrónica emitida (39 boleta, 41 exenta). El PDF está en /pedido/<id>/boleta.
+  receipt: { type: number; folio: number | null; test: boolean } | null;
 };
 
 const DOWN = "No pudimos conectar con la tienda. Intenta de nuevo en un rato.";

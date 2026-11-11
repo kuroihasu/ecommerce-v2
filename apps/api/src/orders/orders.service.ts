@@ -1,10 +1,11 @@
-import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException, Optional } from '@nestjs/common';
 import { Prisma, type PaymentProvider } from '@tienda/db';
 import { PrismaService } from '../prisma/prisma.service.js';
 import type { StoreAccess } from '../auth/store-access.guard.js';
 import { decrypt, encrypt, orderKey, verifyOrderKey } from '../integrations/crypto.js';
 import { WEBPAY_TEST, webpay, webpayApproved, type WebpayCommit, type WebpayCreds } from './gateways/webpay.js';
 import { mercadopago, type MpPayment } from './gateways/mercadopago.js';
+import { BillingService } from '../billing/billing.service.js';
 import type { CheckoutInput, Method } from './orders.schemas.js';
 import type { z } from 'zod';
 import type { MercadoPagoConfig, OrderPatch, TransferConfig, WebpayConfig } from './orders.schemas.js';
@@ -71,7 +72,10 @@ export function allowedOrigins(env: NodeJS.ProcessEnv = process.env): string[] |
 
 @Injectable()
 export class OrdersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Optional() private readonly billing?: BillingService,
+  ) {}
 
   private get db() {
     return this.prisma.client;
@@ -292,7 +296,16 @@ export class OrdersService {
   // `test`: el pago se hizo en el ambiente de prueba de la pasarela (tarjetas de prueba,
   // no se movió dinero). Se marca igual, para poder probar la tienda, pero el pedido queda
   // con un aviso bien visible para no despacharlo por error.
+  //
+  // Después de confirmar, se emite la boleta electrónica (si están activadas). Va fuera de
+  // la transacción: si el proveedor de boletas falla, el pago igual queda confirmado.
   async markPaid(orderId: string, paymentId: string, raw: Prisma.InputJsonObject, test = false) {
+    const marked = await this.confirmPaid(orderId, paymentId, raw, test);
+    if (marked) await this.billing?.afterPaid(orderId, test);
+    return marked;
+  }
+
+  private confirmPaid(orderId: string, paymentId: string, raw: Prisma.InputJsonObject, test: boolean) {
     return this.db.$transaction(async (tx) => {
       const payment = await tx.payment.findUniqueOrThrow({ where: { id: paymentId }, select: { status: true, orderId: true } });
       if (payment.orderId !== orderId) throw new BadRequestException('Pago de otro pedido');
@@ -432,6 +445,7 @@ export class OrdersService {
     const items = await this.db.orderItem.findMany({ where: { orderId }, select: { variantId: true, name: true, unitPrice: true, quantity: true } });
     const gw = await this.gateways(order.store.id);
     const last = order.payments[0];
+    const dte = await this.db.dte.findUnique({ where: { orderId }, select: { status: true, type: true, folio: true, test: true } });
     const a = order.shippingAddress as { name?: string; comuna?: string; region?: string; street?: string; number?: string; apartment?: string | null };
     return {
       id: order.id,
@@ -450,6 +464,8 @@ export class OrdersService {
       // Datos para transferir mientras el pedido espera el depósito.
       transfer: order.status === 'PENDING' && last?.provider === 'TRANSFER' ? this.transfer(gw.get('TRANSFER')) : null,
       methods: order.status === 'PENDING' ? this.available(gw) : null,
+      // Boleta electrónica emitida (el PDF se descarga de /orders/:id/receipt).
+      receipt: dte?.status === 'ISSUED' ? { type: dte.type, folio: dte.folio, test: dte.test } : null,
     };
   }
 
@@ -470,6 +486,7 @@ export class OrdersService {
         items: { select: { name: true, sku: true, unitPrice: true, quantity: true } },
         payments: { orderBy: { createdAt: 'desc' }, select: { provider: true, status: true, amount: true, raw: true, createdAt: true } },
         shipments: { orderBy: { createdAt: 'desc' }, select: { carrier: true, trackingNumber: true, status: true } },
+        dte: { select: { id: true, type: true, folio: true, status: true, test: true, error: true } },
       },
     });
     return orders.map((o) => ({ ...o, payments: o.payments.map((p) => ({ ...p, method: METHOD[p.provider] })) }));

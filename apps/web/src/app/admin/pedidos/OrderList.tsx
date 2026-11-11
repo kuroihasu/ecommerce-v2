@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { updateOrder } from "@/lib/admin/actions";
+import { issueReceipt, updateOrder } from "@/lib/admin/actions";
 import type { AdminOrder, OrderStatus } from "@/lib/admin/types";
 import { useTwoFactor } from "../StepUp";
 
@@ -46,6 +46,15 @@ function Detail({ o, onChange }: { o: AdminOrder; onChange: (o: AdminOrder) => v
       else setMsg(r.error);
     });
   };
+  const issue = () =>
+    start(async () => {
+      setMsg(null);
+      const r = await issueReceipt(o.id);
+      if (!r.ok) return setMsg(r.error);
+      onChange({ ...o, dte: { id: r.data.id, type: r.data.type, folio: r.data.folio, status: r.data.status, test: r.data.test, error: r.data.error } });
+      if (r.data.status === "FAILED") setMsg(`La boleta no se emitió: ${r.data.error}`);
+    });
+  const sold = ["PAID", "FULFILLED", "DELIVERED"].includes(o.status);
   const raw = pay?.raw as { authorizationCode?: string; card?: string; installments?: number; mpId?: string; manual?: boolean } | null;
 
   return (
@@ -80,6 +89,24 @@ function Detail({ o, onChange }: { o: AdminOrder; onChange: (o: AdminOrder) => v
           </p>
         )}
       </div>
+      {sold && (
+        <p className="flex flex-wrap items-center gap-2 md:col-span-2">
+          <span className="font-semibold">Boleta:</span>
+          {o.dte?.status === "ISSUED" ? (
+            <>
+              <span>{o.dte.type === 41 ? "Boleta exenta" : "Boleta electrónica"}{o.dte.folio ? ` N° ${o.dte.folio}` : ""}{o.dte.test ? " (prueba, no válida ante el SII)" : ""}</span>
+              <a href={`/admin/boletas/${o.dte.id}/pdf`} target="_blank" rel="noopener" className="underline">Ver PDF</a>
+            </>
+          ) : o.dte?.status === "ISSUING" ? (
+            <span>emitiéndose…</span>
+          ) : (
+            <>
+              <span className={o.dte ? "text-red-800" : "text-zinc-600"}>{o.dte ? `no se emitió${o.dte.error ? ` (${o.dte.error})` : ""}` : "sin boleta"}</span>
+              <button disabled={pending} onClick={issue} className="h-8 rounded-lg border border-zinc-300 bg-white px-3 disabled:opacity-60">{o.dte ? "Reintentar" : "Emitir boleta"}</button>
+            </>
+          )}
+        </p>
+      )}
       {o.notes && <p className="whitespace-pre-line rounded-lg bg-white p-3 ring-1 ring-zinc-200 md:col-span-2">{o.notes}</p>}
       <div className="flex flex-wrap items-end gap-2 md:col-span-2">
         {o.status === "PENDING" && (
