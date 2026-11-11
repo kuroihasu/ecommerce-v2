@@ -4,6 +4,7 @@ import { useState, useTransition, type ReactNode } from "react";
 import { saveGateway } from "@/lib/admin/actions";
 import type { GatewayConfig } from "@/lib/admin/types";
 import { ConfigDialog } from "../ConfigDialog";
+import { useTwoFactor } from "../StepUp";
 
 const input = "h-10 w-full rounded-lg border border-zinc-300 bg-white px-3 text-[15px] font-normal";
 type Provider = keyof GatewayConfig;
@@ -58,6 +59,7 @@ export function PaymentsForm({ initial }: { initial: GatewayConfig }) {
   });
   const [msg, setMsg] = useState<Record<Provider, Msg>>({ webpay: null, mercadopago: null, transfer: null });
   const [pending, start] = useTransition();
+  const withTwoFactor = useTwoFactor();
 
   const body = (p: Provider, enabled: boolean) =>
     p === "webpay" ? { enabled, ...wp } : p === "mercadopago" ? { enabled, accessToken: mpToken } : { enabled, ...tr };
@@ -65,14 +67,14 @@ export function PaymentsForm({ initial }: { initial: GatewayConfig }) {
   const toggle = (p: Provider, on: boolean) =>
     startRow(async () => {
       setRowMsg(null);
-      const r = await saveGateway(p, body(p, on));
+      const r = await withTwoFactor(() => saveGateway(p, body(p, on)));
       if (r.ok) setCfg(r.data);
       else setRowMsg({ ok: false, text: `${r.error}${on ? " Toca «Configurar» para completarlo." : ""}` });
     });
 
   const save = (p: Provider) =>
     start(async () => {
-      const r = await saveGateway(p, body(p, cfg[p].enabled));
+      const r = await withTwoFactor(() => saveGateway(p, body(p, cfg[p].enabled)));
       if (r.ok) {
         setCfg(r.data);
         setWp((w) => ({ ...w, apiKey: "" }));

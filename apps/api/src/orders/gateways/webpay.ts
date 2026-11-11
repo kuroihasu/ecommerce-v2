@@ -29,8 +29,9 @@ export type WebpayCommit = {
   transaction_date?: string;
 };
 
-// WEBPAY_BASE_URL permite apuntar a un servidor simulado en pruebas.
-const base = (live: boolean) => process.env.WEBPAY_BASE_URL || (live ? BASE.live : BASE.test);
+// WEBPAY_BASE_URL permite apuntar a un servidor simulado en pruebas; en producción se
+// ignora, para que nadie pueda hacer pasar un pago falso cambiando una variable.
+const base = (live: boolean) => (process.env.VERCEL_ENV !== 'production' && process.env.WEBPAY_BASE_URL) || (live ? BASE.live : BASE.test);
 
 async function call<T>(c: WebpayCreds, method: 'POST' | 'PUT' | 'GET', path: string, body?: unknown): Promise<T> {
   let res: Response;

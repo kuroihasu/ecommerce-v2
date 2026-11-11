@@ -3,6 +3,7 @@ import { Public } from '@nestjs/authentication';
 import { z } from 'zod';
 import { CurrentStore, StoreAccessGuard, type StoreAccess } from '../auth/store-access.guard.js';
 import { RateLimitGuard } from '../auth/rate-limit.js';
+import { RequireTwoFactor } from '../auth/step-up.js';
 import { DiscountsService } from './discounts.service.js';
 import { CheckInput, DiscountInput, DiscountPatch } from './discounts.schemas.js';
 
@@ -16,12 +17,18 @@ export class AdminDiscountsController {
     return this.discounts.list(store);
   }
 
+  // Crear o cambiar un código de descuento pide el código de 2FA (pausarlo no).
   @Post()
+  @RequireTwoFactor()
   create(@CurrentStore() store: StoreAccess, @Body({ schema: DiscountInput }) body: DiscountInput) {
     return this.discounts.create(store, body);
   }
 
   @Patch(':id')
+  @RequireTwoFactor((req) => {
+    const b = (req.body ?? {}) as Record<string, unknown>;
+    return !(Object.keys(b).length === 1 && b.active === false);
+  })
   update(@CurrentStore() store: StoreAccess, @Param('id') id: string, @Body({ schema: DiscountPatch }) body: DiscountPatch) {
     return this.discounts.update(store, id, body);
   }

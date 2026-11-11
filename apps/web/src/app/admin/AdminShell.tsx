@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { logout } from "@/lib/admin/actions";
+import { StepUpProvider } from "./StepUp";
 
 const links = [
   { href: "/admin/pedidos", label: "Pedidos" },
@@ -16,6 +17,7 @@ const links = [
   { href: "/admin/redes", label: "Redes y publicidad" },
   { href: "/admin/publicaciones", label: "Publicaciones y anuncios" },
   { href: "/admin/avanzado", label: "Avanzado" },
+  { href: "/admin/seguridad", label: "Seguridad" },
 ];
 
 // Marco de las páginas del panel: menú lateral y contenido.
@@ -42,7 +44,9 @@ export function AdminShell({ current, children }: { current: string; children: R
           </form>
         </div>
       </aside>
-      <main className="min-w-0 flex-1">{children}</main>
+      <main className="min-w-0 flex-1">
+        <StepUpProvider>{children}</StepUpProvider>
+      </main>
     </div>
   );
 }

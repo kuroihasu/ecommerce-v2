@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { getOrder } from "@/lib/orders";
 import { OrderView } from "@/designs/OrderView";
+import { ORDER_KEY_COOKIE } from "@/lib/order-key";
 
 export const metadata: Metadata = { title: "Tu pedido", robots: { index: false } };
 
 export default async function OrderPage({ params, searchParams }: PageProps<"/pedido/[id]">) {
-  const [{ id }, sp] = await Promise.all([params, searchParams]);
-  const key = typeof sp.k === "string" ? sp.k : "";
+  const [{ id }, sp, jar] = await Promise.all([params, searchParams, cookies()]);
+  // La llave llega en una cookie (src/proxy.ts la saca de la URL); ?k= queda de respaldo.
+  const key = jar.get(ORDER_KEY_COOKIE)?.value ?? (typeof sp.k === "string" ? sp.k : "");
   const order = key ? await getOrder(id, key) : null;
   return (
     <div className="mx-auto max-w-[900px] px-4 pb-24 sm:px-6">

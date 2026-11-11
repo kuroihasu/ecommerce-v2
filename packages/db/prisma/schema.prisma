@@ -109,7 +109,44 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  memberships StoreMember[]
+  memberships   StoreMember[]
+  totp          UserTotp?
+  recoveryCodes UserRecoveryCode[]
+  mfaFailures   MfaFailure[]
+}
+
+// Verificación en dos pasos del panel (TOTP, apps como Google Authenticator). El
+// secreto va cifrado; lo maneja MfaService de @nestjs/authentication.
+model UserTotp {
+  userId        String   @id
+  secret        String
+  confirmed     Boolean  @default(false)
+  pendingSecret String?
+  lastUsedStep  Int?
+  updatedAt     DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Códigos de respaldo (se guarda solo su hash; cada uno sirve una vez).
+model UserRecoveryCode {
+  userId String
+  hash   String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, hash])
+}
+
+// Códigos equivocados recientes, para bloquear a quien prueba al azar.
+model MfaFailure {
+  id     String   @id @default(cuid())
+  userId String
+  at     DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, at])
 }
 
 enum StoreRole {

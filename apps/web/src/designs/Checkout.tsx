@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState, useSyncExternalStore, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { checkDiscount } from "@/lib/discounts";
 import { startCheckout, type Method, type Methods, type Redirect } from "@/lib/orders";
 import { formatCLP } from "./catalog";
@@ -33,7 +32,6 @@ export function goToGateway(r: Exclude<Redirect, null>, form: HTMLFormElement | 
 export function Checkout({ methods, initialCode, initialRegion }: { methods: Methods; initialCode: string; initialRegion: "rm" | "regiones" }) {
   const cart = useCart("tienda");
   const { store } = useCatalogData();
-  const router = useRouter();
   const [d, setD] = useState<Data>(() => {
     if (typeof window === "undefined") return EMPTY;
     try {
@@ -106,7 +104,9 @@ export function Checkout({ methods, initialCode, initialRegion }: { methods: Met
       if (!r.ok) return setError(r.error);
       setLeaving(true);
       if (r.redirect) goToGateway(r.redirect, gateway.current);
-      else router.push(`/pedido/${encodeURIComponent(r.orderId)}?k=${encodeURIComponent(r.key)}`);
+      // Navegación completa a propósito: así el servidor guarda la llave en una cookie y la saca de la URL.
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+      else window.location.assign(`/pedido/${encodeURIComponent(r.orderId)}?k=${encodeURIComponent(r.key)}`);
     });
   };
 

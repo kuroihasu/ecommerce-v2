@@ -1,11 +1,11 @@
 // Descarga de CSV desde el panel. Usa punto y coma porque Excel en español lo abre
 // directo en columnas, y BOM para que respete las tildes.
-// Comillas cuando hace falta, y un apóstrofo delante de =, +, - o @ en textos para que
+// Comillas cuando hace falta, y un apóstrofo delante de =, +, -, @, tab o retorno en textos para que
 // Excel no lo tome como fórmula (los números van tal cual).
 const cell = (raw: string | number | null | undefined) => {
   if (raw === null || raw === undefined) return "";
   if (typeof raw === "number") return String(raw);
-  const v = /^[=+\-@]/.test(raw) ? `'${raw}` : raw;
+  const v = /^[=+\-@\t\r]/.test(raw) ? `'${raw}` : raw;
   return /[",\n;]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
 };
 

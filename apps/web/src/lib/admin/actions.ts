@@ -5,16 +5,16 @@ import { redirect } from "next/navigation";
 import { updateTag } from "next/cache";
 import { STORE_SLUG } from "@/lib/catalog";
 import { PREVIEW_COOKIE } from "@/themes/resolve";
-import { adminApi, apiLogin, ApiError } from "./api";
-import { clearSession, setSession } from "./session";
-import type { ActionResult, AdminCategory, AdminDiscount, AdminOrder, AdminProduct, AdminStore, DiscountPayload, EntryPayload, GatewayConfig, IntegrationSlug, LedgerEntry, ProductPayload, StockAdjust, StockMovement } from "./types";
+import { adminApi, apiLogin, ApiError, authApi, authApiRaw } from "./api";
+import { clearSession, setGrant, setSession } from "./session";
+import type { ActionResult, StepUp, AdminCategory, AdminDiscount, AdminOrder, AdminProduct, AdminStore, DiscountPayload, EntryPayload, GatewayConfig, IntegrationSlug, LedgerEntry, ProductPayload, StockAdjust, StockMovement } from "./types";
 import { adminOrigin } from "./origin";
 
 // Acciones del panel. Cada una reenvía la sesión a la API, que valida permisos;
 // después de escribir se refresca la tienda (updateTag) para que el cambio se vea al tiro.
 
-const fail = (e: unknown): { ok: false; error: string } => {
-  if (e instanceof ApiError) return { ok: false, error: e.message };
+const fail = (e: unknown): { ok: false; error: string; stepUp?: StepUp } => {
+  if (e instanceof ApiError) return { ok: false, error: e.message, ...(e.stepUp ? { stepUp: e.stepUp } : {}) };
   throw e; // redirect() y errores inesperados siguen su curso
 };
 
@@ -28,17 +28,21 @@ export const slugify = async (s: string) =>
     .slice(0, 120);
 
 // Devuelve el correo junto al error para que el formulario no lo borre al reintentar.
-export async function login(_: unknown, form: FormData): Promise<{ error?: string; email?: string }> {
+export async function login(_: unknown, form: FormData): Promise<{ error?: string; email?: string; needsCode?: boolean }> {
   const email = String(form.get("email") ?? "").trim();
   const password = String(form.get("password") ?? "");
+  // Segundo paso: 6 números de la app, o un código de respaldo (tiene letras o guion).
+  const raw = String(form.get("code") ?? "").replace(/\s/g, "");
+  const second = raw ? (/^\d{6}$/.test(raw) ? { code: raw } : { recoveryCode: raw }) : undefined;
   if (!email || !password) return { error: "Escribe tu correo y contraseña.", email };
   try {
-    const res = await apiLogin(email, password);
+    const res = await apiLogin(email, password, second);
     if (!res.stores.some((s) => s.slug === STORE_SLUG)) return { error: "Tu cuenta no tiene acceso a esta tienda.", email };
     await setSession(res.accessToken, res.expiresIn);
   } catch (e) {
     if (!(e instanceof ApiError)) return { error: "No pudimos conectar con el servidor. Intenta de nuevo.", email };
-    if (e.status === 429) return { error: "Demasiados intentos. Espera un minuto y vuelve a probar.", email };
+    if (e.mfaRequired) return { error: second ? e.message : undefined, email, needsCode: true };
+    if (e.status === 429) return { error: e.message || "Demasiados intentos. Espera un minuto y vuelve a probar.", email };
     return { error: e.status === 401 ? "Correo o contraseña incorrectos." : e.message, email };
   }
   redirect("/admin/productos");
@@ -111,14 +115,15 @@ export async function createCategory(_: unknown, form: FormData): Promise<{ erro
 // termina la conexión.
 const isProvider = (p: string): p is IntegrationSlug => p === "meta" || p === "google";
 
-export async function connectIntegration(provider: string): Promise<{ error: string }> {
+export async function connectIntegration(provider: string): Promise<{ error: string; stepUp?: StepUp }> {
   if (!isProvider(provider)) return { error: "Proveedor desconocido" };
   let url: string;
   try {
     const redirectUri = `${await adminOrigin()}/admin/redes/conectar/${provider}`;
     ({ url } = await adminApi<{ url: string }>(`/integrations/${provider}/start`, { method: "POST", body: { redirectUri } }));
   } catch (e) {
-    return { error: fail(e).error };
+    const f = fail(e);
+    return { error: f.error, stepUp: f.stepUp };
   }
   redirect(url);
 }
@@ -234,6 +239,61 @@ export async function updateOrder(id: string, patch: { status?: string; carrier?
     // El stock cambia al marcar un pago: la tienda se refresca.
     if (patch.status === "PAID") updateTag("store");
     return { ok: true, data: order };
+  } catch (e) {
+    return fail(e);
+  }
+}
+
+// ─── Verificación en dos pasos (Panel > Seguridad) ───────────────────
+
+export type TwoFactorStatus = { enabled: boolean; recoveryCodesLeft: number };
+
+export async function startTwoFactor(): Promise<ActionResult<{ secret: string; qr: string }>> {
+  try {
+    const { secret, uri } = await authApi<{ secret: string; uri: string }>("/2fa/setup", { method: "POST", body: {} });
+    const QR = (await import("qrcode")).default;
+    // El QR se arma aquí, en el servidor: el secreto no pasa por ningún servicio externo.
+    const svg = await QR.toString(uri, { type: "svg", margin: 1, errorCorrectionLevel: "M" });
+    const qr = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+    return { ok: true, data: { secret, qr } };
+  } catch (e) {
+    return fail(e);
+  }
+}
+
+export async function confirmTwoFactor(code: string): Promise<ActionResult<{ recoveryCodes: string[] }>> {
+  try {
+    return { ok: true, data: await authApi<{ recoveryCodes: string[] }>("/2fa/confirm", { method: "POST", body: { code: code.replace(/\s/g, "") } }) };
+  } catch (e) {
+    return fail(e);
+  }
+}
+
+export async function disableTwoFactor(code: string): Promise<ActionResult<TwoFactorStatus>> {
+  const c = code.replace(/\s/g, "");
+  try {
+    return { ok: true, data: await authApi<TwoFactorStatus>("/2fa/disable", { method: "POST", body: /^\d{6}$/.test(c) ? { code: c } : { recoveryCode: c } }) };
+  } catch (e) {
+    return fail(e);
+  }
+}
+
+export async function newRecoveryCodes(code: string): Promise<ActionResult<{ recoveryCodes: string[] }>> {
+  try {
+    return { ok: true, data: await authApi<{ recoveryCodes: string[] }>("/2fa/recovery-codes", { method: "POST", body: { code: code.replace(/\s/g, "") } }) };
+  } catch (e) {
+    return fail(e);
+  }
+}
+
+// Confirmar un cambio crítico con el código de 2FA: la API lo valida y entrega un
+// permiso de 5 minutos, que queda en una cookie y viaja en las llamadas siguientes.
+export async function verifyStepUp(code: string): Promise<ActionResult> {
+  try {
+    const { res } = await authApiRaw<{ ok: true }>("/2fa/step-up", { method: "POST", body: {}, headers: { "x-2fa-code": code.replace(/\s/g, "") } });
+    const grant = res.headers.get("x-2fa-grant");
+    if (grant) await setGrant(grant);
+    return { ok: true, data: undefined };
   } catch (e) {
     return fail(e);
   }

@@ -169,7 +169,8 @@ Las versiones de las APIs se pueden cambiar con `META_GRAPH_VERSION` (por defect
 El cliente paga en `/checkout` (contacto, dirección, medio de pago y código de descuento) y
 vuelve a `/pedido/:id?k=…`, que muestra si quedó pagado, los datos para transferir o los
 botones para reintentar con otro medio. La clave `k` es una firma del pedido: sin ella la
-página no muestra nada.
+página no muestra nada. Apenas llega, `src/proxy.ts` la guarda en una cookie solo para esa
+página y la saca de la URL, para que no la lean los píxeles de publicidad.
 
 - **Precios y stock** los calcula la API desde la base, nunca desde el carrito. El envío usa
   los valores de Datos de la tienda (RM, regiones y envío gratis desde); el código de descuento
@@ -198,10 +199,43 @@ Para cobrar de verdad:
 3. **Transferencia**: banco, tipo y número de cuenta, titular y RUT.
 
 Para probar sin red, `WEBPAY_BASE_URL` y `MERCADOPAGO_API_URL` en la API apuntan las llamadas
-a otra dirección (por ejemplo, un simulador local).
+a otra dirección (por ejemplo, un simulador local). En producción (`VERCEL_ENV=production`)
+se ignoran.
+
+**Mientras una pasarela esté en modo de prueba**, cualquiera puede "pagar" con las tarjetas de
+prueba. Esos pedidos quedan pagados (para poder probar la tienda) pero con la nota
+«⚠ PAGO DE PRUEBA … No lo despaches». Cambia a «Cobrar de verdad» antes de abrir la tienda.
+
+**Dominio de la tienda**: en producción la API solo devuelve al comprador a las direcciones
+que están en `WEB_ORIGIN` (o en `CHECKOUT_ORIGINS`, si la defines), separadas por coma. Si
+conectas un dominio propio (p. ej. `https://mitienda.cl`), agrégalo ahí o el checkout dirá
+«Dirección de la tienda inválida».
 
 En un preview de Vercel con protección, Webpay vuelve por POST desde otro sitio y Vercel
 puede pedir login antes de mostrar el pedido. En producción (sin protección) no pasa.
+
+### Verificación en dos pasos
+
+En **Panel → Seguridad** cada persona puede activar la verificación en dos pasos: escanea un
+QR con Google Authenticator (o Microsoft Authenticator, 1Password) y desde ahí, al entrar, se
+pide el código de 6 números además de la contraseña. Al activarla se entregan 10 códigos de
+respaldo de un solo uso. Los secretos se guardan cifrados (`INTEGRATIONS_KEY` o `AUTH_SECRET`),
+cada código sirve una vez y 5 códigos malos bloquean la cuenta 15 minutos.
+
+**Cambios críticos** piden el código aunque ya hayas entrado: medios de pago y cuenta para
+transferencias, marcar un pedido pagado o anularlo, crear o activar códigos de descuento, y
+conectar o desconectar Meta/Google. Quien no tiene 2FA activado no puede hacer esos cambios
+hasta activarlo. Después de un código válido hay 5 minutos de gracia (un permiso firmado por la
+API, `x-2fa-grant`, que la web guarda en una cookie httpOnly). En la API se marca una ruta con
+`@RequireTwoFactor()` (ver `apps/api/src/auth/step-up.ts`).
+
+Si alguien pierde el teléfono y los códigos de respaldo, el dueño la apaga desde la terminal:
+
+```bash
+RESET_2FA=1 ADMIN_PASSWORD='nueva-clave-larga' pnpm --filter @tienda/api admin:create correo@tienda.cl
+```
+
+(`RESET_2FA` nunca va en las variables de Vercel: el build corre `admin:create` en cada deploy.)
 
 ### Probar el panel en un preview de Vercel
 

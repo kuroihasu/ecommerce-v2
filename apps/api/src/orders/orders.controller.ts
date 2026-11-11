@@ -3,6 +3,7 @@ import { Public } from '@nestjs/authentication';
 import { z } from 'zod';
 import { CurrentStore, StoreAccessGuard, type StoreAccess } from '../auth/store-access.guard.js';
 import { RateLimitGuard } from '../auth/rate-limit.js';
+import { RequireTwoFactor } from '../auth/step-up.js';
 import { OrdersService } from './orders.service.js';
 import {
   CheckoutInput,
@@ -84,7 +85,9 @@ export class AdminOrdersController {
     return this.orders.list(store, status);
   }
 
+  // Marcar pagado (libera el pedido sin pago en línea) o anular piden el código de 2FA.
   @Patch('orders/:id')
+  @RequireTwoFactor((req) => ['PAID', 'CANCELLED'].includes((req.body as { status?: string } | undefined)?.status ?? ''))
   update(@CurrentStore() store: StoreAccess, @Param('id') id: string, @Body({ schema: OrderPatch }) body: z.infer<typeof OrderPatch>) {
     return this.orders.update(store, id, body);
   }
@@ -94,17 +97,21 @@ export class AdminOrdersController {
     return this.orders.gatewayConfig(store);
   }
 
+  // Cambiar a dónde llega la plata pide el código de 2FA.
   @Put('payments/webpay')
+  @RequireTwoFactor()
   webpay(@CurrentStore() store: StoreAccess, @Body({ schema: WebpayConfig }) body: z.infer<typeof WebpayConfig>) {
     return this.orders.setWebpay(store, body);
   }
 
   @Put('payments/mercadopago')
+  @RequireTwoFactor()
   mercadopago(@CurrentStore() store: StoreAccess, @Body({ schema: MercadoPagoConfig }) body: z.infer<typeof MercadoPagoConfig>) {
     return this.orders.setMercadoPago(store, body);
   }
 
   @Put('payments/transfer')
+  @RequireTwoFactor()
   transfer(@CurrentStore() store: StoreAccess, @Body({ schema: TransferConfig }) body: z.infer<typeof TransferConfig>) {
     return this.orders.setTransfer(store, body);
   }

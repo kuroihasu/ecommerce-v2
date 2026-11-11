@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { connectIntegration, disconnectIntegration } from "@/lib/admin/actions";
 import type { IntegrationStatus } from "@/lib/admin/types";
+import { useTwoFactor } from "../StepUp";
 
 const about: Record<string, string> = {
   meta: "Publicaciones y seguidores de Instagram, y resultados de tus anuncios en Facebook e Instagram.",
@@ -16,13 +17,14 @@ export function Connections({ status, failing = [] }: { status: IntegrationStatu
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [, start] = useTransition();
+  const withTwoFactor = useTwoFactor();
 
   const connect = (p: string) => {
     setBusy(p);
     setError(null);
     start(async () => {
       // Si todo va bien, la acción redirige a Meta/Google y no vuelve aquí.
-      const res = await connectIntegration(p);
+      const res = await withTwoFactor(async () => ({ ok: false, ...(await connectIntegration(p)) }));
       if (res?.error) setError(res.error);
       setBusy(null);
     });
@@ -32,7 +34,7 @@ export function Connections({ status, failing = [] }: { status: IntegrationStatu
     if (!confirm(`¿Desconectar ${name}? Dejarás de ver sus datos en el panel. Tus anuncios y publicaciones no cambian.`)) return;
     setBusy(p);
     start(async () => {
-      const res = await disconnectIntegration(p);
+      const res = await withTwoFactor(() => disconnectIntegration(p));
       if (!res.ok) setError(res.error);
       setBusy(null);
       router.refresh();

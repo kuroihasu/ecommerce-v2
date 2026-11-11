@@ -8,9 +8,11 @@ import { BadGatewayException } from '@nestjs/common';
 //    nunca se cree lo que llega en la URL o en el aviso.
 // https://www.mercadopago.cl/developers/es/docs/checkout-pro
 
-const API = () => process.env.MERCADOPAGO_API_URL || 'https://api.mercadopago.com';
+// MERCADOPAGO_API_URL apunta a un servidor simulado en pruebas; en producción se ignora,
+// para que nadie pueda hacer pasar un pago falso cambiando una variable.
+const API = () => (process.env.VERCEL_ENV !== 'production' && process.env.MERCADOPAGO_API_URL) || 'https://api.mercadopago.com';
 
-export type MpPayment = { id: number; status: string; status_detail?: string; external_reference?: string; transaction_amount: number; currency_id?: string; payment_type_id?: string; installments?: number };
+export type MpPayment = { id: number; status: string; status_detail?: string; external_reference?: string; transaction_amount: number; currency_id?: string; live_mode?: boolean; payment_type_id?: string; installments?: number };
 
 async function call<T>(token: string, method: 'GET' | 'POST', path: string, body?: unknown, idempotencyKey?: string): Promise<T> {
   let res: Response;

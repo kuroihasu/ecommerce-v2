@@ -2,7 +2,7 @@ import { BadRequestException, ForbiddenException, NotFoundException } from '@nes
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import type { PrismaService } from '../prisma/prisma.service.js';
 import type { StoreAccess } from '../auth/store-access.guard.js';
-import { OrdersService, computeTotals, safeOrigin } from './orders.service.js';
+import { OrdersService, allowedOrigins, computeTotals, safeOrigin } from './orders.service.js';
 import { CheckoutInput, MercadoPagoConfig, WebpayConfig } from './orders.schemas.js';
 import { orderKey, verifyOrderKey } from '../integrations/crypto.js';
 
@@ -37,6 +37,15 @@ describe('safeOrigin y llave del pedido', () => {
     expect(safeOrigin('https://norte.cl/carrito')).toBe('https://norte.cl');
     expect(safeOrigin('http://localhost:3000')).toBe('http://localhost:3000');
     expect(() => safeOrigin('http://evil.com')).toThrow(BadRequestException);
+  });
+  it('en producción solo vuelve a las direcciones de la tienda', () => {
+    const allowed = allowedOrigins({ VERCEL_ENV: 'production', WEB_ORIGIN: 'https://norte.cl, https://www.norte.cl/' });
+    expect(allowed).toEqual(['https://norte.cl', 'https://www.norte.cl']);
+    expect(safeOrigin('https://www.norte.cl/checkout', allowed)).toBe('https://www.norte.cl');
+    expect(() => safeOrigin('https://norte-falso.cl', allowed)).toThrow(BadRequestException);
+    // Previews y local: sin lista.
+    expect(allowedOrigins({ VERCEL_ENV: 'preview', WEB_ORIGIN: 'https://norte.cl' })).toBeNull();
+    expect(allowedOrigins({ WEB_ORIGIN: 'https://norte.cl' })).toBeNull();
   });
   it('la llave abre solo su pedido', () => {
     const k = orderKey('pedido1');
@@ -153,7 +162,8 @@ describe('OrdersService', () => {
     await service.webpayReturn('norte', { order: 'o1', token_ws: 'tok' });
     expect(fetch.mock.calls[0][1].method).toBe('PUT');
     expect(fetch.mock.calls[0][1].headers['Tbk-Api-Key-Id']).toBe('597055555532');
-    expect(markPaid).toHaveBeenCalledWith('o1', 'p1', expect.objectContaining({ authorizationCode: '1213' }));
+    // Comercio de prueba: se marca como pago de prueba.
+    expect(markPaid).toHaveBeenCalledWith('o1', 'p1', expect.objectContaining({ authorizationCode: '1213' }), true);
   });
 
   it('Mercado Pago: un pago de otro pedido no se usa', async () => {
@@ -180,7 +190,7 @@ describe('OrdersService', () => {
 
   it('confirmar dos veces el mismo pago no descuenta stock de nuevo', async () => {
     const tx = {
-      payment: { findUniqueOrThrow: vi.fn().mockResolvedValue({ status: 'AUTHORIZED', orderId: 'o1' }), update: vi.fn() },
+      payment: { findUniqueOrThrow: vi.fn().mockResolvedValue({ status: 'AUTHORIZED', orderId: 'o1' }), updateMany: vi.fn().mockResolvedValue({ count: 0 }) },
       order: { updateMany: vi.fn() },
       $executeRaw: vi.fn(),
     };
@@ -188,6 +198,21 @@ describe('OrdersService', () => {
     await expect(service.markPaid('o1', 'p1', {})).resolves.toBe(false);
     expect(tx.order.updateMany).not.toHaveBeenCalled();
     expect(tx.$executeRaw).not.toHaveBeenCalled();
+  });
+
+  it('un pago de prueba deja el pedido pagado pero con aviso de no despachar', async () => {
+    const tx = {
+      payment: { findUniqueOrThrow: vi.fn().mockResolvedValue({ status: 'PENDING', orderId: 'o1' }), updateMany: vi.fn().mockResolvedValue({ count: 1 }) },
+      order: {
+        updateMany: vi.fn().mockResolvedValue({ count: 1 }),
+        findUniqueOrThrow: vi.fn().mockResolvedValue({ id: 'o1', storeId: 's1', number: 1001, notes: null, discountCode: null, items: [] }),
+        update: vi.fn(),
+      },
+    };
+    const { service } = fakeDb({ $transaction: (fn: (t: typeof tx) => unknown) => fn(tx) });
+    await expect(service.markPaid('o1', 'p1', { a: 1 }, true)).resolves.toBe(true);
+    expect(tx.payment.updateMany).toHaveBeenCalledWith(expect.objectContaining({ data: { status: 'AUTHORIZED', raw: { a: 1, test: true } } }));
+    expect(tx.order.update.mock.calls[0][0].data.notes).toContain('PAGO DE PRUEBA');
   });
 
   it('activar transferencia pide los datos de la cuenta', async () => {

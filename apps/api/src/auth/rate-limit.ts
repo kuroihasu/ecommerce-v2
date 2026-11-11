@@ -27,3 +27,30 @@ export abstract class RateLimitGuard implements CanActivate {
     return true;
   }
 }
+
+// Intentos fallidos por clave (p. ej. por correo), para frenar a quien prueba
+// contraseñas de una cuenta desde muchas IP. También vive en memoria.
+export class FailureCounter {
+  private readonly fails = new Map<string, { count: number; resetAt: number }>();
+
+  constructor(
+    private readonly limit: number,
+    private readonly windowMs: number,
+  ) {}
+
+  blocked(key: string, now = Date.now()) {
+    const e = this.fails.get(key);
+    return Boolean(e && e.resetAt > now && e.count >= this.limit);
+  }
+
+  fail(key: string, now = Date.now()) {
+    if (this.fails.size > 10_000) for (const [k, v] of this.fails) if (v.resetAt <= now) this.fails.delete(k);
+    const e = this.fails.get(key);
+    if (!e || e.resetAt <= now) this.fails.set(key, { count: 1, resetAt: now + this.windowMs });
+    else e.count++;
+  }
+
+  reset(key: string) {
+    this.fails.delete(key);
+  }
+}

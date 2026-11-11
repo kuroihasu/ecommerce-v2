@@ -30,6 +30,12 @@ async function main() {
       update: { role: 'OWNER' },
       create: { storeId: store.id, userId: user.id, role: 'OWNER' },
     });
+    // Perdiste el teléfono y los códigos de respaldo: RESET_2FA=1 apaga la verificación en
+    // dos pasos de esta cuenta (no lo dejes puesto en Vercel: se aplicaría en cada deploy).
+    if (process.env.RESET_2FA === '1') {
+      await prisma.$transaction([prisma.userTotp.deleteMany({ where: { userId: user.id } }), prisma.userRecoveryCode.deleteMany({ where: { userId: user.id } })]);
+      console.log('Verificación en dos pasos desactivada para esta cuenta.');
+    }
     console.log(`Listo: ${user.email} es dueño de "${store.name}".`);
   } finally {
     await prisma.$disconnect();

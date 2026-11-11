@@ -41,11 +41,32 @@ export function computeTotals(
 
 // La tienda manda su propia dirección para volver después de pagar. Solo https (o la
 // máquina local en desarrollo).
-export function safeOrigin(origin: string) {
+//
+// En producción, además, tiene que ser una de las direcciones de la tienda (WEB_ORIGIN):
+// así nadie puede crear un cobro real de la tienda que, después de pagar, devuelva al
+// comprador a un sitio falso. En previews y en local se acepta cualquiera.
+export function safeOrigin(origin: string, allowed: string[] | null = allowedOrigins()) {
   const u = new URL(origin);
   const local = u.protocol === 'http:' && ['localhost', '127.0.0.1'].includes(u.hostname);
   if (u.protocol !== 'https:' && !local) throw new BadRequestException('Dirección de la tienda inválida');
+  if (allowed && !allowed.includes(u.origin)) throw new BadRequestException('Dirección de la tienda inválida');
   return u.origin;
+}
+
+export function allowedOrigins(env: NodeJS.ProcessEnv = process.env): string[] | null {
+  if (env.VERCEL_ENV !== 'production') return null;
+  const list = (env.CHECKOUT_ORIGINS || env.WEB_ORIGIN || '')
+    .split(',')
+    .map((o) => o.trim())
+    .filter(Boolean)
+    .flatMap((o) => {
+      try {
+        return [new URL(o).origin];
+      } catch {
+        return [];
+      }
+    });
+  return list.length ? list : null;
 }
 
 @Injectable()
@@ -267,15 +288,21 @@ export class OrdersService {
 
   // Pedido pagado: se marca una sola vez (aunque Webpay o Mercado Pago avisen dos
   // veces), se descuenta el stock y se registra el uso del código, todo junto.
-  async markPaid(orderId: string, paymentId: string, raw: Prisma.InputJsonValue) {
+  //
+  // `test`: el pago se hizo en el ambiente de prueba de la pasarela (tarjetas de prueba,
+  // no se movió dinero). Se marca igual, para poder probar la tienda, pero el pedido queda
+  // con un aviso bien visible para no despacharlo por error.
+  async markPaid(orderId: string, paymentId: string, raw: Prisma.InputJsonObject, test = false) {
     return this.db.$transaction(async (tx) => {
       const payment = await tx.payment.findUniqueOrThrow({ where: { id: paymentId }, select: { status: true, orderId: true } });
       if (payment.orderId !== orderId) throw new BadRequestException('Pago de otro pedido');
-      if (payment.status === 'AUTHORIZED') return false;
-      await tx.payment.update({ where: { id: paymentId }, data: { status: 'AUTHORIZED', raw } });
+      // Condicional: si dos avisos llegan a la vez, solo uno lo marca.
+      const claimed = await tx.payment.updateMany({ where: { id: paymentId, status: { not: 'AUTHORIZED' } }, data: { status: 'AUTHORIZED', raw: test ? { ...raw, test: true } : raw } });
+      if (!claimed.count) return false;
       const changed = await tx.order.updateMany({ where: { id: orderId, status: { in: ['PENDING', 'CANCELLED'] } }, data: { status: 'PAID' } });
       const order = await tx.order.findUniqueOrThrow({ where: { id: orderId }, include: { items: true } });
       const issues: string[] = [];
+      if (test) issues.push('PAGO DE PRUEBA: se pagó en el ambiente de prueba de la pasarela y NO se cobró dinero real. No lo despaches.');
       if (!changed.count) {
         issues.push('Llegó un segundo pago aprobado para este pedido. Revisa si corresponde devolverlo.');
       } else {
@@ -361,7 +388,7 @@ export class OrdersService {
         date: r.transaction_date ?? null,
       };
       const matches = r.buy_order === order.id && r.session_id === payment.id && r.amount === payment.amount;
-      if (webpayApproved(r) && matches) await this.markPaid(order.id, payment.id, raw);
+      if (webpayApproved(r) && matches) await this.markPaid(order.id, payment.id, raw, !creds.live);
       else await this.markFailed(payment.id, { ...raw, mismatch: !matches });
       return result;
     }
@@ -377,7 +404,8 @@ export class OrdersService {
     const order = await this.orderInStore(slug, orderId);
     const result = { orderId: order.id, key: orderKey(order.id) };
     if (!mpPaymentId) return result;
-    const token = this.mpToken((await this.gateways(order.store.id)).get('MERCADOPAGO'));
+    const gw = (await this.gateways(order.store.id)).get('MERCADOPAGO');
+    const token = this.mpToken(gw);
     if (!token) return result;
     const mp: MpPayment = await mercadopago.payment(token, mpPaymentId);
     if (mp.external_reference !== order.id) return result;
@@ -386,7 +414,7 @@ export class OrdersService {
     const payment = already ?? ours.find((p) => p.status === 'PENDING');
     if (!payment) return result;
     const raw = { mpId: String(mp.id), status: mp.status, detail: mp.status_detail ?? null, type: mp.payment_type_id ?? null, installments: mp.installments ?? 0 };
-    if (mp.status === 'approved' && mp.transaction_amount === payment.amount && (mp.currency_id ?? 'CLP') === 'CLP') await this.markPaid(order.id, payment.id, raw);
+    if (mp.status === 'approved' && mp.transaction_amount === payment.amount && (mp.currency_id ?? 'CLP') === 'CLP') await this.markPaid(order.id, payment.id, raw, this.mpTest(gw) || mp.live_mode === false);
     else if (['rejected', 'cancelled', 'refunded', 'charged_back'].includes(mp.status)) await this.markFailed(payment.id, raw);
     else await this.db.payment.update({ where: { id: payment.id }, data: { raw } });
     return result;
