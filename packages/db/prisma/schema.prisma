@@ -40,6 +40,8 @@ model Store {
   stockMoves    StockMovement[]
   ledger        LedgerEntry[]
   gateways      PaymentGateway[]
+  whatsapp      WhatsappAssistant?
+  waChats       WaConversation[]
 }
 
 // ─── Códigos de descuento ───────────────────────────────────────────
@@ -539,4 +541,82 @@ model LedgerEntry {
   store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
   @@index([storeId, date])
+}
+
+// ─── Asistente de WhatsApp (IA) ─────────────────────────────────────
+
+// Asistente con IA que atiende el WhatsApp de la tienda (WhatsApp Business Cloud API de
+// Meta). Los tokens y la API key van cifrados (AES-256-GCM, ver
+// apps/api/src/integrations/crypto.ts). `live` = responde a cualquier cliente; si no,
+// solo a los números de `testNumbers` (modo prueba). `verifyToken` lo pega el dueño en
+// Meta al registrar el webhook; no es secreto de pago, pero es aleatorio por tienda.
+model WhatsappAssistant {
+  id             String   @id @default(cuid())
+  storeId        String   @unique
+  enabled        Boolean  @default(false)
+  live           Boolean  @default(false)
+  testNumbers    String[] @default([])
+  phoneNumberId  String   @default("")
+  displayPhone   String   @default("")
+  verifyToken    String
+  accessTokenEnc String?
+  appSecretEnc   String?
+  aiKeyEnc       String?
+  model          String   @default("claude-opus-5-5")
+  // Lo que el dueño quiere que el asistente sepa o haga (horario, cambios, tono...).
+  instructions   String   @default("")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+}
+
+enum WaChatStatus {
+  BOT // responde el asistente
+  HUMAN // pidió una persona o el equipo tomó la conversación: el asistente calla
+  CLOSED
+}
+
+// Una conversación por número de cliente. `lastInboundAt` marca la ventana de 24 horas
+// de Meta: fuera de ella solo se puede escribir con plantillas aprobadas.
+model WaConversation {
+  id            String       @id @default(cuid())
+  storeId       String
+  waId          String
+  name          String?
+  status        WaChatStatus @default(BOT)
+  handoffReason String?
+  unread        Int          @default(0)
+  lastMessageAt DateTime     @default(now())
+  lastInboundAt DateTime?
+  createdAt     DateTime     @default(now())
+
+  store    Store       @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  messages WaMessage[]
+
+  @@unique([storeId, waId])
+  @@index([storeId, lastMessageAt])
+}
+
+enum WaAuthor {
+  CUSTOMER
+  BOT
+  STAFF
+}
+
+// Mensajes de la conversación. `waMessageId` (el id de Meta) es único: si Meta reenvía
+// el mismo aviso, el mensaje no se procesa ni se responde dos veces.
+model WaMessage {
+  id             String   @id @default(cuid())
+  conversationId String
+  author         WaAuthor
+  text           String
+  waMessageId    String?  @unique
+  // Prueba desde el panel: no viene ni va a WhatsApp.
+  simulated      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  conversation WaConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
 }

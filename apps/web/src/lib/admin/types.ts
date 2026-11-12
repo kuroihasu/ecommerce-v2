@@ -188,3 +188,35 @@ export type AdminOrder = {
   payments: { method: "webpay" | "mercadopago" | "transfer"; status: "PENDING" | "AUTHORIZED" | "FAILED" | "REFUNDED"; amount: number; raw: Record<string, unknown> | null; createdAt: string }[];
   shipments: { carrier: string; trackingNumber: string | null; status: string }[];
 };
+
+// Asistente de WhatsApp con IA (ver apps/api/src/whatsapp).
+export type WhatsappConfig = {
+  enabled: boolean;
+  live: boolean;
+  testNumbers: string[];
+  phoneNumberId: string;
+  displayPhone: string;
+  verifyToken: string;
+  webhookPath: string;
+  hasAccessToken: boolean;
+  hasAppSecret: boolean;
+  hasAiKey: boolean;
+  aiKeyFromEnv: boolean;
+  model: string;
+  instructions: string;
+};
+export type WaStatus = "BOT" | "HUMAN" | "CLOSED";
+export type WaAuthor = "CUSTOMER" | "BOT" | "STAFF";
+export type WaMessage = { id: string; author: WaAuthor; text: string; createdAt: string };
+export type WaConversation = {
+  id: string;
+  waId: string;
+  name: string | null;
+  status: WaStatus;
+  handoffReason: string | null;
+  unread: number;
+  lastMessageAt: string;
+  last: { text: string; author: WaAuthor } | null;
+};
+export type WaThread = WaConversation & { canReply: boolean; messages: WaMessage[] };
+export type WaTestChat = { messages: WaMessage[]; handoff: string | null };
